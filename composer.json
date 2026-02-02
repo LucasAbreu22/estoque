@@ -1,0 +1,24 @@
+{
+  "name": "lucas/estoque",
+  "description": "Estoque Almox",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Lucas Abreu",
+      "email": "lucassantosabreu@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Source\\": "source/"
+    },
+    "files": [
+      "source/Config.php"
+    ]
+  },
+  "require": {
+    "coffeecode/router": "2.0.*",
+    "league/plates": "v3.5.*"
+  }
+}
