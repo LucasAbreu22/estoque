@@ -195,8 +195,8 @@
             <td>${material.localizacao}</td>
             <td><span class="badge ${statusClss}">${material.status}</span></td>
             <td class="actions">
-                <button class="btn-entry" onclick="abrirMovimentacao('ENTRADA', this)">Entrada</button>
-                <button class="btn-alert" onclick="abrirMovimentacao('SAIDA', this)">Saída</button>
+                <button class="btn-entry" onclick="abrirMovimentacao('ENTRADA', this)">Entrada 🡇</button>
+                <button class="btn-alert" onclick="abrirMovimentacao('SAIDA', this)">Saída 🡅</button>
                 <button class="btn-edit" onclick="editarMaterial(this)">Editar</button>
                 <button class="btn-exit" onclick="excluirMaterial(this)">Excluir</button>
             </td>

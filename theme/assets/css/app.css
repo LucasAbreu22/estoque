@@ -63,7 +63,7 @@ header {
 }
 
 main {
-  padding: 24px;
+  padding: 16px;
   max-width: 1500px;
   margin: auto;
 }
@@ -71,7 +71,7 @@ main {
 .top-actions {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .btn-add {
