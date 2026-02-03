@@ -52,7 +52,19 @@
 <div class="modal" id="modalMov">
     <div class="modal-content">
         <h2 id="tituloMov"></h2>
-        <label>Ponto</label>
+        <br>
+        <div id="movProd">
+            <div id="codArea">
+                <label>Código</label>
+                <input type="text" id="movCodigo" disabled>
+            </div>
+            <div>
+                <label>Descriço</label>
+                <input type="text" id="movDescricao" disabled>
+            </div>
+
+        </div>
+        <label>Ponto responsável</label>
         <input type="number" id="pontoResponsavel">
         <!-- <label>Nome</label>
         <input type="text" id="nomeResponsavel"> -->
@@ -154,7 +166,7 @@
             dataType: "json",
             success: function(response) {
 
-                if (response.hasOwnProperty("message") && response.message.indexOf("<br>[ERRO]") === 0) {
+                if (response.hasOwnProperty("message") && response.message.indexOf("[ERRO]") === 0) {
                     alert(response.message);
 
                 } else {
@@ -186,7 +198,7 @@
 
             tr.innerHTML = `
             <td class="codigo">${material.codigo}</td>
-            <td class="left">${material.descricao}</td>
+            <td class="left descricao">${material.descricao}</td>
             <td class="left">${material.categoria}</td>
             <td class="saldo">${material.quantidade}</td>
             <td class="left">${material.unidade_base}</td>
@@ -237,6 +249,8 @@
         tipoMov = tipo;
         linhaSelecionada = btn.closest('tr');
         document.getElementById('tituloMov').innerText = tipo === 'ENTRADA' ? 'Entrada de Material' : 'Saída de Material';
+        document.getElementById('movCodigo').value = linhaSelecionada.querySelector('.codigo').innerText;
+        document.getElementById('movDescricao').value = linhaSelecionada.querySelector('.descricao').innerText;
         document.getElementById('quantidadeMov').value = '';
         document.getElementById('modalMov').classList.add('active');
     }
@@ -275,7 +289,7 @@
             dataType: "json",
             success: function(response) {
 
-                if (response.hasOwnProperty("message") && response.message.indexOf("<br>[ERRO]") === 0) {
+                if (response.hasOwnProperty("message") && response.message.indexOf("[ERRO]") === 0) {
                     alert(response.message);
 
                 } else {
@@ -310,6 +324,8 @@
         const fator = document.getElementById('fator').value;
         const minimo = document.getElementById('minimo').value;
         const localizacao = document.getElementById('localizacao').value;
+
+        let materialReg = {}
 
         if (codigo === "" || codigo === undefined) {
             alert("Campo de código vazio!");
@@ -369,8 +385,9 @@
 
         if (linhaSelecionada !== null) {
 
+
             const codigoLinhaSelec = linhaSelecionada.querySelector('.codigo').innerText;
-            const materialReg = materiais.find((material) => material.codigo === codigoLinhaSelec);
+            materialReg = materiais.find((material) => material.codigo === codigoLinhaSelec);
 
             material.id_material = materialReg.id_material;
         }
@@ -382,7 +399,7 @@
             dataType: "json",
             success: function(response) {
 
-                if (response.hasOwnProperty("message") && response.message.indexOf("<br>[ERRO]") === 0) {
+                if (response.hasOwnProperty("message") && response.message.indexOf("[ERRO]") === 0) {
                     alert(response.message);
 
                 } else {
@@ -393,6 +410,7 @@
                         materiais.pop()
 
                     } else {
+
                         const idx = materiais.findIndex((material) => material.id_material === materialReg.id_material);
 
                         materiais[idx] = material;

@@ -299,8 +299,22 @@ table .left {
   }
 }
 
+.disabled,
 .disabled-button {
   background-color: #c5c5c5 !important;
   color: #fff !important;
+}
+
+.disabled-button {
   cursor: not-allowed !important;
+}
+
+#movProd {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#codArea {
+  width: 30%;
 }
