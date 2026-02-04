@@ -128,7 +128,7 @@
 
         <label>Unidade de Compra</label>
         <select id="unCompra">
-            <option value="1">Resma</option>
+            <option>Resma</option>
             <option>Caixa</option>
             <option>Rolo</option>
         </select>
@@ -259,13 +259,16 @@
     function abrirMovimentacao(tipo, btn) {
         tipoMov = tipo;
         linhaSelecionada = btn.closest('tr');
+
         document.getElementById('tituloMov').innerText = tipo === 'ENTRADA' ? 'Entrada de Material' : 'Saída de Material';
+
         document.getElementById('movCodigo').value = linhaSelecionada.querySelector('.codigo').innerText;
         document.getElementById('movDescricao').value = linhaSelecionada.querySelector('.descricao').innerText;
         document.getElementById('movSaldo').value = linhaSelecionada.querySelector('.saldo').innerText;
-        document.getElementById('quantidadeMov').value = '';
+
         document.getElementById('areaSolicitante').style.display = tipo === 'ENTRADA' ? "none" : 'initial';
         document.getElementById('areaSigma').style.display = tipo === 'ENTRADA' ? "initial" : "none";
+
         document.getElementById('modalMov').classList.add('active');
     }
 
