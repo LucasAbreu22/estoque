@@ -9,6 +9,7 @@ use Source\DAO\MovimentacaoEstoqueDAO;
 class MovimentacaoEstoque
 {
     private  ?INT $id_movimentacao;
+    private  ?INT $codigo_sigma;
     private  ?Material $material;
     private  ?Usuario $usuario;
     private  STRING $tipo;
@@ -17,12 +18,13 @@ class MovimentacaoEstoque
     private  ?INT $fator_conversao_aplicado;
     private  INT $quantidade_convertida;
     private  STRING $data_movimentacao;
-    private  STRING $pontoSolicitante;
-    private  STRING $nomeSolicitante;
+    private  ?STRING $pontoSolicitante;
+    private  ?STRING $nomeSolicitante;
 
 
     function __construct(
         ?INT $id_movimentacao = null,
+        ?INT $codigo_sigma = null,
         ?Material $material = null,
         ?Usuario $usuario = null,
         STRING $tipo = "",
@@ -31,11 +33,12 @@ class MovimentacaoEstoque
         ?INT $fator_conversao_aplicado = 0,
         INT $quantidade_convertida = 0,
         STRING $data_movimentacao = "",
-        STRING $pontoSolicitante = "",
-        STRING $nomeSolicitante = ""
+        ?STRING $pontoSolicitante = null,
+        ?STRING $nomeSolicitante = null
     ) {
 
         $this->setIdMovimentacao($id_movimentacao);
+        $this->setCodigoSigma($id_movimentacao);
         $this->setMaterial($material);
         $this->setUsuario($usuario);
         $this->setTipo($tipo);
@@ -62,6 +65,24 @@ class MovimentacaoEstoque
     public function setIdMovimentacao(?INT $id_movimentacao): self
     {
         $this->id_movimentacao = $id_movimentacao;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of codigo_sigma
+     */
+    public function getCodigoSigma(): ?INT
+    {
+        return $this->codigo_sigma;
+    }
+
+    /**
+     * Set the value of codigo_sigma
+     */
+    public function setCodigoSigma(?INT $codigo_sigma): self
+    {
+        $this->codigo_sigma = $codigo_sigma;
 
         return $this;
     }
@@ -213,7 +234,7 @@ class MovimentacaoEstoque
     /**
      * Get the value of pontoSolicitante
      */
-    public function getPontoSolicitante(): STRING
+    public function getPontoSolicitante(): ?STRING
     {
         return $this->pontoSolicitante;
     }
@@ -221,7 +242,7 @@ class MovimentacaoEstoque
     /**
      * Set the value of pontoSolicitante
      */
-    public function setPontoSolicitante(STRING $pontoSolicitante): self
+    public function setPontoSolicitante(?STRING $pontoSolicitante): self
     {
         $this->pontoSolicitante = $pontoSolicitante;
 
@@ -231,7 +252,7 @@ class MovimentacaoEstoque
     /**
      * Get the value of nomeSolicitante
      */
-    public function getNomeSolicitante(): STRING
+    public function getNomeSolicitante(): ?STRING
     {
         return $this->nomeSolicitante;
     }
@@ -239,7 +260,7 @@ class MovimentacaoEstoque
     /**
      * Set the value of nomeSolicitante
      */
-    public function setNomeSolicitante(STRING $nomeSolicitante): self
+    public function setNomeSolicitante(?STRING $nomeSolicitante): self
     {
         $this->nomeSolicitante = $nomeSolicitante;
 
@@ -277,11 +298,9 @@ class MovimentacaoEstoque
         if (empty($this->getQuantidade()) || $this->getQuantidade() < 1) throw new Exception("[ERRO][Movimentacao 04] Informação QUANTIDADE de vazia!", 1);
 
         if (empty($this->getUnidadeUtilizada())) throw new Exception("[ERRO][Movimentacao 05] Informação UNIDADE de vazia!", 1);
-        if (empty($this->getPontoSolicitante())) throw new Exception("[ERRO][Movimentacao 06] Informação PONTO DO SOLICITANTE de vazia!", 1);
-        if (empty($this->getNomeSolicitante())) throw new Exception("[ERRO][Movimentacao 07] Informação NOME DO SOLICITANTE de vazia!", 1);
 
-        if ($this->getTipo() === "SAIDA" && $this->getMaterial()->getQuantidade() === 0) throw new Exception("[ERRO][Movimentacao 08] Material sem estoque!", 1);
-        if ($this->getTipo() === "SAIDA" && $this->getQuantidade() > $this->getMaterial()->getQuantidade()) throw new Exception("[ERRO][Movimentacao 09] Quantidade maior que há no estoque!", 1);
+        if ($this->getTipo() === "SAIDA" && $this->getMaterial()->getQuantidade() === 0) throw new Exception("[ERRO][Movimentacao 06] Material sem estoque!", 1);
+        if ($this->getTipo() === "SAIDA" && $this->getQuantidade() > $this->getMaterial()->getQuantidade()) throw new Exception("[ERRO][Movimentacao 07] Quantidade maior que há no estoque!", 1);
 
         $material = $this->getMaterial();
 

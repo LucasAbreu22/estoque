@@ -33,6 +33,23 @@ INSERT INTO `categorias` (`id_categoria`, `nome`, `visibilidade`) VALUES
 	(2, 'Insumos', 1),
 	(3, 'Acabamento', 1);
 
+-- Copiando estrutura para tabela almox.logs_sistema
+CREATE TABLE IF NOT EXISTS `logs_sistema` (
+  `id_log` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
+  `tabela_afetada` varchar(100) NOT NULL,
+  `id_registro` int(11) NOT NULL,
+  `evento` enum('INSERT','UPDATE','DELETE','ENTRADA','SAIDA') NOT NULL,
+  `valor_antigo` text DEFAULT NULL,
+  `valor_novo` text DEFAULT NULL,
+  `data_evento` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_log`),
+  KEY `fk_log_usuario` (`id_usuario`),
+  CONSTRAINT `fk_log_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Copiando dados para a tabela almox.logs_sistema: ~0 rows (aproximadamente)
+
 -- Copiando estrutura para tabela almox.materiais
 CREATE TABLE IF NOT EXISTS `materiais` (
   `id_material` int(11) NOT NULL AUTO_INCREMENT,
@@ -53,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `materiais` (
   UNIQUE KEY `codigo` (`codigo`),
   KEY `fk_material_categoria` (`id_categoria`),
   CONSTRAINT `fk_material_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Copiando dados para a tabela almox.materiais: ~86 rows (aproximadamente)
 INSERT INTO `materiais` (`id_material`, `codigo`, `descricao`, `quantidade`, `unidade_base`, `unidade_compra`, `fator_conversao`, `quantidade_minima`, `custo_unitario`, `localizacao`, `id_categoria`, `data_criacao`, `data_edicao`, `visibilidade`) VALUES
@@ -73,15 +90,15 @@ INSERT INTO `materiais` (`id_material`, `codigo`, `descricao`, `quantidade`, `un
 	(14, 'INS-004', 'Tinta Amarela', 3, 'Unidade', 'Caixa', 12, 5, 130.00, 'B1', 2, '2026-01-27 15:39:10', NULL, 1),
 	(15, 'INS-005', 'Verniz UV', 0, 'Unidade', 'Caixa', 6, 2, 200.00, 'B2', 2, '2026-01-27 15:39:10', NULL, 1),
 	(16, 'INS-006', 'Cola Branca', 10, 'Unidade', 'Caixa', 24, 6, 8.50, 'B2', 2, '2026-01-27 15:39:10', NULL, 1),
-	(17, 'INS-007', 'Cola Spray', 1, 'Unidade', 'Caixa', 12, 4, 35.00, 'B3', 2, '2026-01-27 15:39:10', NULL, 1),
+	(17, 'INS-007', 'Cola Spray', 0, 'Unidade', 'Caixa', 12, 4, 35.00, 'B3', 2, '2026-01-27 15:39:10', '2026-02-02 15:24:49', 1),
 	(18, 'INS-008', 'Toner Preto', 0, 'Unidade', 'Caixa', 1, 2, 450.00, 'B3', 2, '2026-01-27 15:39:10', NULL, 1),
 	(19, 'INS-009', 'Toner Colorido', 1, 'Unidade', 'Caixa', 1, 2, 480.00, 'B3', 2, '2026-01-27 15:39:10', NULL, 1),
-	(20, 'INS-010', 'Álcool Isopropílico', 0, 'Unidade', 'Caixa', 12, 3, NULL, 'B4', 2, '2026-01-27 15:39:10', '2026-01-30 17:19:29', 1),
-	(21, 'ACB-001', 'Espiral Plástico', 300, 'Unidade', 'Caixa', 100, 200, 0.25, 'C1', 3, '2026-01-27 15:39:10', NULL, 1),
+	(20, 'INS-010', 'Álcool Isopropílico', 0, 'Unidade', 'Caixa', 12, 3, NULL, 'B4', 2, '2026-01-27 15:39:10', '2026-02-03 16:40:11', 1),
+	(21, 'ACB-001', 'Espiral Plástico', 0, 'Unidade', 'Caixa', 100, 200, 0.25, 'C1', 3, '2026-01-27 15:39:10', '2026-02-02 15:25:33', 1),
 	(22, 'ACB-002', 'Espiral Metálico', 0, 'Unidade', 'Caixa', 100, 200, 0.40, 'C1', 3, '2026-01-27 15:39:10', NULL, 1),
 	(23, 'ACB-003', 'Wire-O Preto', 120, 'Unidade', 'Caixa', 100, 100, 0.55, 'C2', 3, '2026-01-27 15:39:10', NULL, 1),
-	(24, 'ACB-004', 'Capa Transparente A4', 80, 'Unidade', 'Caixa', 100, 100, 0.60, 'C2', 3, '2026-01-27 15:39:10', NULL, 1),
-	(25, 'ACB-005', 'Capa Preta A4', 40, 'Unidade', 'Caixa', 100, 100, 0.70, 'C2', 3, '2026-01-27 15:39:10', NULL, 1),
+	(24, 'ACB-004', 'Capa Transparente A4', 0, 'Unidade', 'Caixa', 100, 100, 0.60, 'C2', 3, '2026-01-27 15:39:10', '2026-02-02 15:19:54', 1),
+	(25, 'ACB-005', 'Capa Preta A4', 0, 'Unidade', 'Caixa', 100, 100, NULL, 'C2', 3, '2026-01-27 15:39:10', '2026-02-03 16:11:39', 1),
 	(26, 'ACB-006', 'Laminação Fosca', 0, 'Metro', 'Rolo', 50, 10, 4.50, 'C3', 3, '2026-01-27 15:39:10', NULL, 1),
 	(27, 'ACB-007', 'Laminação Brilho', 15, 'Metro', 'Rolo', 50, 10, 4.20, 'C3', 3, '2026-01-27 15:39:10', NULL, 1),
 	(28, 'ACB-008', 'Hot Stamping Dourado', 5, 'Metro', 'Rolo', 30, 5, 12.00, 'C4', 3, '2026-01-27 15:39:10', NULL, 1),
@@ -98,7 +115,7 @@ INSERT INTO `materiais` (`id_material`, `codigo`, `descricao`, `quantidade`, `un
 	(39, 'INS-014', 'Máscara Descartável', 200, 'Unidade', 'Caixa', 100, 50, 0.50, 'B6', 2, '2026-01-27 15:39:10', NULL, 1),
 	(40, 'INS-015', 'Estopa Industrial', 5, 'Unidade', 'Caixa', 10, 3, 15.00, 'B7', 2, '2026-01-27 15:39:10', NULL, 1),
 	(41, 'ACB-011', 'Grampo Industrial', 1000, 'Unidade', 'Caixa', 1000, 500, 0.02, 'C6', 3, '2026-01-27 15:39:10', NULL, 1),
-	(42, 'ACB-012', 'Cantoneira Plástica', 0, 'Unidade', 'Caixa', 100, 50, 0.30, 'C6', 3, '2026-01-27 15:39:10', NULL, 1),
+	(42, 'ACB-012', 'Cantoneira Plástica', 60, 'Unidade', 'Caixa', 100, 50, 0.30, 'C6', 3, '2026-01-27 15:39:10', '2026-02-02 16:22:39', 1),
 	(43, 'ACB-013', 'Etiqueta Adesiva', 2000, 'Unidade', 'Caixa', 1000, 1000, 0.01, 'C7', 3, '2026-01-27 15:39:10', NULL, 1),
 	(44, 'ACB-014', 'Fita Dupla Face', 10, 'Metro', 'Rolo', 50, 10, 3.50, 'C7', 3, '2026-01-27 15:39:10', NULL, 1),
 	(45, 'ACB-015', 'Fita Crepe', 8, 'Metro', 'Rolo', 50, 10, 2.80, 'C7', 3, '2026-01-27 15:39:10', NULL, 1),
@@ -143,6 +160,62 @@ INSERT INTO `materiais` (`id_material`, `codigo`, `descricao`, `quantidade`, `un
 	(84, 'PAP-121', 'Papel Couchê Texturizado', 70, 'Folha', 'Caixa', 100, 50, 1.10, 'C7', 1, '2026-01-27 15:40:39', NULL, 1),
 	(85, 'PAP-122', 'Papel Offset Texturizado', 95, 'Folha', 'Caixa', 100, 60, 0.88, 'C7', 1, '2026-01-27 15:40:39', NULL, 1),
 	(86, 'test', 'Teste', 0, 'Unidade', 'Resma', 1, 1, NULL, '1', 3, '2026-01-29 17:41:14', NULL, 1);
+
+-- Copiando estrutura para tabela almox.movimentacoes_estoque
+CREATE TABLE IF NOT EXISTS `movimentacoes_estoque` (
+  `id_movimentacao` int(11) NOT NULL AUTO_INCREMENT,
+  `id_material` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `tipo` enum('ENTRADA','SAIDA') NOT NULL,
+  `quantidade` int(11) NOT NULL,
+  `unidade_utilizada` enum('BASE','COMPRA') NOT NULL,
+  `fator_conversao_aplicado` int(11) DEFAULT NULL,
+  `quantidade_convertida` int(11) NOT NULL,
+  `ponto_solicitante` varchar(10) DEFAULT NULL,
+  `nome_solicitante` varchar(164) DEFAULT NULL,
+  `data_movimentacao` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_movimentacao`),
+  KEY `fk_mov_material` (`id_material`),
+  KEY `fk_mov_usuario` (`id_usuario`),
+  CONSTRAINT `fk_mov_material` FOREIGN KEY (`id_material`) REFERENCES `materiais` (`id_material`),
+  CONSTRAINT `fk_mov_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Copiando dados para a tabela almox.movimentacoes_estoque: ~15 rows (aproximadamente)
+INSERT INTO `movimentacoes_estoque` (`id_movimentacao`, `id_material`, `id_usuario`, `tipo`, `quantidade`, `unidade_utilizada`, `fator_conversao_aplicado`, `quantidade_convertida`, `ponto_solicitante`, `nome_solicitante`, `data_movimentacao`) VALUES
+	(1, 20, 1, 'ENTRADA', 1, 'BASE', NULL, 0, '666', 'Teste', '2026-02-02 14:21:33'),
+	(2, 20, 1, 'SAIDA', 6, 'BASE', NULL, 0, '666', 'Teste', '2026-02-02 14:24:54'),
+	(10, 20, 1, 'ENTRADA', 5, 'BASE', NULL, 0, '666', 'Teste', '2026-02-02 14:53:54'),
+	(11, 20, 1, 'SAIDA', 100, 'BASE', NULL, 0, '666', 'Teste', '2026-02-02 14:54:20'),
+	(12, 20, 1, 'ENTRADA', 5, 'BASE', NULL, 0, '546', 'Teste', '2026-02-02 15:00:48'),
+	(13, 20, 1, 'ENTRADA', 5, 'BASE', NULL, 0, '2146', 'Teste', '2026-02-02 15:01:53'),
+	(14, 20, 1, 'SAIDA', 15, 'BASE', NULL, 0, '246', 'Teste', '2026-02-02 15:02:18'),
+	(15, 25, 1, 'ENTRADA', 40, 'BASE', NULL, 0, '4654', 'Teste', '2026-02-02 15:19:27'),
+	(16, 24, 1, 'SAIDA', 80, 'BASE', NULL, 0, '546', 'Teste', '2026-02-02 15:19:54'),
+	(17, 25, 1, 'SAIDA', 80, 'BASE', NULL, 0, '456', 'Teste', '2026-02-02 15:24:07'),
+	(18, 17, 1, 'SAIDA', 1, 'BASE', NULL, 0, '5456', 'Teste', '2026-02-02 15:24:49'),
+	(19, 21, 1, 'SAIDA', 200, 'BASE', NULL, 0, '46', 'Teste', '2026-02-02 15:25:18'),
+	(20, 21, 1, 'SAIDA', 100, 'BASE', NULL, 0, '465', 'Teste', '2026-02-02 15:25:33'),
+	(21, 42, 1, 'ENTRADA', 60, 'BASE', NULL, 0, '123', 'Teste', '2026-02-02 16:22:39'),
+	(22, 17, 1, 'ENTRADA', 120, 'BASE', NULL, 0, '45646', 'Teste', '2026-02-02 17:39:10'),
+	(23, 25, 1, 'ENTRADA', 120, 'BASE', NULL, 0, '546', 'Teste', '2026-02-02 17:40:14');
+
+-- Copiando estrutura para tabela almox.usuarios
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `id_usuario` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `ponto` varchar(50) NOT NULL,
+  `senha` varchar(255) DEFAULT NULL,
+  `data_edicao` datetime DEFAULT NULL,
+  `data_criacao` datetime NOT NULL,
+  `visibilidade` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`id_usuario`),
+  UNIQUE KEY `ponto` (`ponto`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Copiando dados para a tabela almox.usuarios: ~1 rows (aproximadamente)
+INSERT INTO `usuarios` (`id_usuario`, `nome`, `ponto`, `senha`, `data_edicao`, `data_criacao`, `visibilidade`) VALUES
+	(1, 'Lucas Abreu', '921456', NULL, '2025-02-02 00:00:00', '2026-02-02 12:38:59', 1);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

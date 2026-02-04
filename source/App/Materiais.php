@@ -59,6 +59,8 @@ class Materiais
                 "data" => ["qtdMateriais" => $material->contarMateriais()]
             ];
 
+            if (empty($param["id_material"])) $callback["data"]["newId"] = $material->getIdMaterial();
+
             echo json_encode($callback);
         } catch (\Throwable $th) {
             echo json_encode(["code" => 501, "message" => $th->getMessage()]);

@@ -48,7 +48,7 @@ class MaterialDAO
             ma.id_categoria = ca.id_categoria
             WHERE ma.visibilidade = 1
             ORDER BY ma.descricao ASC
-            LIMIT 13 OFFSET ?";
+            LIMIT 12 OFFSET ?";
 
             $stmt = $this->connect->prepare($sql);
 
@@ -152,7 +152,10 @@ class MaterialDAO
 
             $stmt->execute();
 
-            return "Dados criados com sucesso!";
+            return [
+                "message" => "Dados criados com sucesso!",
+                "newId" => $this->connect->lastInsertId()
+            ];
         } catch (PDOException $e) {
             $msg = "[ERRO][Material DAO 03] ";
             $msg .= str_contains($e->getMessage(), "Duplicate entry") ? "Código de material já existente!" : $e->getMessage();

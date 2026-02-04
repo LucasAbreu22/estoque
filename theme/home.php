@@ -62,16 +62,23 @@
                 <label>Descriço</label>
                 <input type="text" id="movDescricao" disabled>
             </div>
-
         </div>
+
+        <div id="areaSigma">
+            <label>Código do sigma</label>
+            <input type="number" id="codigoSigma">
+        </div>
+
         <label>Ponto responsável</label>
         <input type="number" id="pontoResponsavel">
-        <!-- <label>Nome</label>
-        <input type="text" id="nomeResponsavel"> -->
-        <label>Ponto solicitante</label>
-        <input type="number" id="pontoSolicitante">
-        <label>Nome solicitante</label>
-        <input type="text" id="nomeSolicitante">
+
+        <div id="areaSolicitante">
+            <label>Ponto solicitante</label>
+            <input type="number" id="pontoSolicitante">
+            <label>Nome solicitante</label>
+            <input type="text" id="nomeSolicitante">
+        </div>
+
         <label>Quantidade</label>
         <input type="number" id="quantidadeMov">
         <!--<label>Unidade para movimentação</label>
@@ -148,7 +155,7 @@
     let linhaSelecionada = null;
     let tipoMov = null;
     let offset = 0
-    const lines = 13;
+    const lines = 12;
 
     mostrarLoading()
     getMateriais();
@@ -166,14 +173,14 @@
             dataType: "json",
             success: function(response) {
 
-                if (response.hasOwnProperty("message") && response.message.indexOf("[ERRO]") === 0) {
-                    alert(response.message);
-
-                } else {
+                if (response.code == 200) {
                     materiais = response.data.materiais;
                     qtdMateriais = response.data.qtdMateriais;
                     atualizarMaterialList();
+                } else {
+                    alert(response.message);
                 }
+
                 ocultarLoading();
             }
         });
@@ -252,6 +259,8 @@
         document.getElementById('movCodigo').value = linhaSelecionada.querySelector('.codigo').innerText;
         document.getElementById('movDescricao').value = linhaSelecionada.querySelector('.descricao').innerText;
         document.getElementById('quantidadeMov').value = '';
+        document.getElementById('areaSolicitante').style.display = tipo === 'ENTRADA' ? "none" : 'initial';
+        document.getElementById('areaSigma').style.display = tipo === 'ENTRADA' ? "initial" : "none";
         document.getElementById('modalMov').classList.add('active');
     }
 
@@ -289,12 +298,7 @@
             dataType: "json",
             success: function(response) {
 
-                if (response.hasOwnProperty("message") && response.message.indexOf("[ERRO]") === 0) {
-                    alert(response.message);
-
-                } else {
-
-                }
+                alert(response.message);
 
             }
         });
@@ -399,12 +403,12 @@
             dataType: "json",
             success: function(response) {
 
-                if (response.hasOwnProperty("message") && response.message.indexOf("[ERRO]") === 0) {
-                    alert(response.message);
+                alert(response.message);
 
-                } else {
+                if (response.code == 200) {
 
                     if (material.id_material === null) {
+                        material.id_material = response.data.newId;
                         qtdMateriais = response.data.qtdMateriais;
                         materiais.unshift(material)
                         materiais.pop()
@@ -426,28 +430,13 @@
 
     function criarMovimentacao() {
         const pontoResponsavel = document.getElementById('pontoResponsavel').value;
-        // const nomeResponsavel = document.getElementById('nomeResponsavel').value;
-        const pontoSolicitante = document.getElementById('pontoSolicitante').value;
-        const nomeSolicitante = document.getElementById('nomeSolicitante').value;
         let quantidade = document.getElementById('quantidadeMov').value;
+        let codigoSigma = null;
+        let pontoSolicitante = null;
+        let nomeSolicitante = null;
 
         if (pontoResponsavel === "" || pontoResponsavel === undefined) {
             alert("Campo de ponto vazio!");
-            return;
-        }
-
-        /*   if (nomeResponsavel === "" || nomeResponsavel === undefined) {
-              alert("Campo de nome vazio!");
-              return;
-          } */
-
-        if (pontoSolicitante === "" || pontoSolicitante === undefined) {
-            alert("Campo de ponto do solicitante vazio!");
-            return;
-        }
-
-        if (nomeSolicitante === "" || nomeSolicitante === undefined) {
-            alert("Campo de nome do solicitante vazio!");
             return;
         }
 
@@ -461,10 +450,36 @@
             return;
         }
 
+        if (tipoMov == "SAIDA") {
+
+            pontoSolicitante = document.getElementById('pontoSolicitante').value;
+            nomeSolicitante = document.getElementById('nomeSolicitante').value;
+
+            if (pontoSolicitante === "" || pontoSolicitante === undefined) {
+                alert("Campo de ponto do solicitante vazio!");
+                return;
+            }
+
+            if (nomeSolicitante === "" || nomeSolicitante === undefined) {
+                alert("Campo de nome do solicitante vazio!");
+                return;
+            }
+
+        } else {
+            codigoSigma = document.getElementById('codigoSigma').value;
+
+            if (codigoSigma === "" || codigoSigma === undefined) {
+                alert("Campo de código de sigma vazio!");
+                return;
+            }
+        }
+
+
         const codigoLinhaSelec = linhaSelecionada.querySelector('.codigo').innerText;
         const materialReg = materiais.find((material) => material.codigo === codigoLinhaSelec);
 
         const movimentacao = {
+            "codigoSigma": codigoSigma,
             "pontoResponsavel": pontoResponsavel,
             "pontoSolicitante": pontoSolicitante,
             "nomeSolicitante": nomeSolicitante,
@@ -535,7 +550,6 @@
             document.getElementById('localizacao').value = "";
         } else {
             document.getElementById('pontoResponsavel').value = "";
-            // document.getElementById('nomeResponsavel').value = "";
             document.getElementById('pontoSolicitante').value = "";
             document.getElementById('nomeSolicitante').value = "";
             document.getElementById('quantidadeMov').value = "";

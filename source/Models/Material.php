@@ -360,8 +360,13 @@ class Material
             "id_categoria" => $this->getCategoria()->getIdCategoria()
         ];
 
-        if (is_null($this->getIdMaterial()))  return $materialDAO->criarMaterial($material);
-        else  return $materialDAO->editarMaterial($material);
+        if (is_null($this->getIdMaterial())) {
+            $callback = $materialDAO->criarMaterial($material);
+
+            $this->setIdMaterial($callback["newId"]);
+
+            return $callback["message"];
+        } else  return $materialDAO->editarMaterial($material);
     }
 
     public function excluirMaterial(): string
