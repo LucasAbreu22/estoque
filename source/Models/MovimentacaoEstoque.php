@@ -313,6 +313,7 @@ class MovimentacaoEstoque
         $movimentacao = [
             "id_material" => $material->getIdMaterial(),
             "id_usuario" => $this->getUsuario()->getIdUsuario(),
+            "codigoSigma" => $this->getCodigoSigma(),
             "tipo" => $this->getTipo(),
             "quantidade" => $this->getQuantidade(),
             "quantidade_convertida" => $this->getQuantidadeConvertida(),

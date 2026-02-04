@@ -100,6 +100,7 @@ class Materiais
             $material->getMaterialById();
 
             $movimentacao = new MovimentacaoEstoque();
+            $movimentacao->setCodigoSigma(empty($param["codigoSigma"]) ? null : $param["codigoSigma"]);
             $movimentacao->setMaterial($material);
             $movimentacao->setUsuario($usuario);
             $movimentacao->setTipo($param["tipo"]);

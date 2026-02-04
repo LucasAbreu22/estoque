@@ -62,6 +62,10 @@
                 <label>Descriço</label>
                 <input type="text" id="movDescricao" disabled>
             </div>
+            <div id="saldoArea">
+                <label>Saldo</label>
+                <input type="text" id="movSaldo" disabled>
+            </div>
         </div>
 
         <div id="areaSigma">
@@ -258,6 +262,7 @@
         document.getElementById('tituloMov').innerText = tipo === 'ENTRADA' ? 'Entrada de Material' : 'Saída de Material';
         document.getElementById('movCodigo').value = linhaSelecionada.querySelector('.codigo').innerText;
         document.getElementById('movDescricao').value = linhaSelecionada.querySelector('.descricao').innerText;
+        document.getElementById('movSaldo').value = linhaSelecionada.querySelector('.saldo').innerText;
         document.getElementById('quantidadeMov').value = '';
         document.getElementById('areaSolicitante').style.display = tipo === 'ENTRADA' ? "none" : 'initial';
         document.getElementById('areaSigma').style.display = tipo === 'ENTRADA' ? "initial" : "none";
@@ -549,6 +554,7 @@
             document.getElementById('minimo').value = "";
             document.getElementById('localizacao').value = "";
         } else {
+            document.getElementById('codigoSigma').value = "";
             document.getElementById('pontoResponsavel').value = "";
             document.getElementById('pontoSolicitante').value = "";
             document.getElementById('nomeSolicitante').value = "";

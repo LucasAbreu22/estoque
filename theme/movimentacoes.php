@@ -6,6 +6,7 @@
             <tr>
                 <th>ID</th>
                 <th>Código</th>
+                <th>Cod. Sigma</th>
                 <th>Material</th>
                 <th>QTD.</th>
                 <th>Data</th>
@@ -76,9 +77,12 @@
         movimentacoes.forEach(movimentacao => {
             const tr = document.createElement('tr');
 
+            const codigo_sigma = movimentacao.codigo_sigma === null ? "" : movimentacao.codigo_sigma;
+
             tr.innerHTML = `
             <td>${movimentacao.id_movimentacao}</td>
             <td>${movimentacao.codigo}</td>
+            <td>${codigo_sigma}</td>
             <td class="left">${movimentacao.descricao}</td>
             <td>${movimentacao.quantidade}</td>
             <td>${movimentacao.data_movimentacao}</td>

@@ -31,7 +31,7 @@ class MovimentacaoEstoqueDAO
     {
         try {
             $sql = "SELECT 
-            me.id_movimentacao, me.tipo, me.quantidade, me.ponto_solicitante, 
+            me.id_movimentacao, me.codigo_sigma, me.tipo, me.quantidade, me.ponto_solicitante, 
             me.nome_solicitante, me.data_movimentacao,
             us.ponto, us.nome,
             ma.codigo, ma.descricao
@@ -40,6 +40,7 @@ class MovimentacaoEstoqueDAO
             ON me.id_usuario = us.id_usuario 
             INNER JOIN materiais ma 
             ON me.id_material = ma.id_material
+            ORDER BY me.id_movimentacao DESC
             LIMIT 13 OFFSET ?";
 
             $stmt = $this->connect->prepare($sql);
@@ -76,8 +77,8 @@ class MovimentacaoEstoqueDAO
     public function criarMovimentacao(array $movimentacao)
     {
         try {
-            $sql = "INSERT INTO movimentacoes_estoque(id_material, id_usuario, tipo, quantidade, unidade_utilizada, fator_conversao_aplicado, quantidade_convertida, ponto_solicitante, nome_solicitante)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO movimentacoes_estoque(id_material, id_usuario, tipo, quantidade, unidade_utilizada, fator_conversao_aplicado, quantidade_convertida, ponto_solicitante, nome_solicitante, codigo_sigma)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $this->connect->prepare($sql);
 
@@ -90,6 +91,7 @@ class MovimentacaoEstoqueDAO
             $stmt->bindValue(7, $movimentacao["quantidade_convertida"], PDO::PARAM_STR); // CALCULADO
             $stmt->bindValue(8, $movimentacao["ponto_solicitante"], PDO::PARAM_STR); // Formulário
             $stmt->bindValue(9, $movimentacao["nome_solicitante"], PDO::PARAM_STR); // Formulário
+            $stmt->bindValue(10, $movimentacao["codigoSigma"], PDO::PARAM_STR); // Formulário
 
 
             /* $stmt->debugDumpParams(); */

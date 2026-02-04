@@ -313,8 +313,13 @@ table .left {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  gap: 3px;
 }
 
 #codArea {
   width: 30%;
+}
+
+#saldoArea {
+  width: 20%;
 }
