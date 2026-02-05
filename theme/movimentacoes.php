@@ -1,6 +1,12 @@
 <?php $this->layout("_theme", ["title" => $title]); ?>
 
 <main>
+    <div>
+        <label>Périodo:</label>
+        <input type="date" id="dateInicial">
+        <span>a</span>
+        <input type="date" id="dateFinal">
+    </div>
     <table>
         <thead>
             <tr>
@@ -37,13 +43,28 @@
 
     });
 
+    document.getElementById("dateInicial").addEventListener("change", function() {
+        getMovimentacao();
+
+    });
+    document.getElementById("dateFinal").addEventListener("change", function() {
+        getMovimentacao();
+
+    });
+
     let movimentacoes = [];
     let qtdMovimentacoes = 0;
     let paginaAtual = 0;
     let offset = 0
     const lines = 13;
 
+
     function getMovimentacao(increment = 0) {
+        let dataInicial = document.getElementById("dateInicial").value;
+        let dataFinal = document.getElementById("dateFinal").value;
+
+        if (dataInicial !== "") dataInicial += " 23:59:59";
+        if (dataFinal !== "") dataFinal += " 23:59:59";
 
         offset += increment;
 
@@ -51,7 +72,9 @@
             type: "POST",
             url: "<?= url("/movimentacoes/") ?>",
             data: {
-                offset: offset
+                offset: offset,
+                dataInicial: dataInicial,
+                dataFinal: dataFinal
             },
             dataType: "json",
             success: function(response) {

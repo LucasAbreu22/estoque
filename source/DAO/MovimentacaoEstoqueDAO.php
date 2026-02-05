@@ -27,7 +27,7 @@ class MovimentacaoEstoqueDAO
         return $this->connect->commit();
     }
 
-    public function getMovimentacoes(int $offset = 0)
+    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "")
     {
         try {
             $sql = "SELECT 
@@ -40,12 +40,30 @@ class MovimentacaoEstoqueDAO
             ON me.id_usuario = us.id_usuario 
             INNER JOIN materiais ma 
             ON me.id_material = ma.id_material
-            ORDER BY me.id_movimentacao DESC
-            LIMIT 13 OFFSET ?";
+            WHERE 1=1";
+
+            if (!empty($dataInicial)) {
+                $sql .= " AND me.data_movimentacao >= :dataInicial";
+            }
+            if (!empty($dataFinal)) {
+
+                $sql .= " AND me.data_movimentacao <= :dataFinal";
+            }
+
+            $sql .= " ORDER BY me.id_movimentacao DESC
+            LIMIT 13 OFFSET :offset";
 
             $stmt = $this->connect->prepare($sql);
 
-            $stmt->bindValue(1, $offset, PDO::PARAM_INT);
+            if (!empty($dataInicial)) {
+                $stmt->bindValue(":dataInicial", $dataInicial, PDO::PARAM_STR);
+            }
+            if (!empty($dataFinal)) {
+
+                $stmt->bindValue(":dataFinal", $dataFinal, PDO::PARAM_STR);
+            }
+
+            $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
 
             // $stmt->debugDumpParams();
 
@@ -56,14 +74,33 @@ class MovimentacaoEstoqueDAO
         }
     }
 
-    public function contarMovimentacoes()
+    public function contarMovimentacoes(string $dataInicial = "", string $dataFinal = "")
     {
         try {
             $sql = "SELECT 
             count(*) AS qtdMovimentacoes
-            FROM movimentacoes_estoque";
+            FROM movimentacoes_estoque
+            WHERE 1=1";
+
+            if (!empty($dataInicial)) {
+                $sql .= " AND data_movimentacao >= :dataInicial ";
+            }
+
+            if (!empty($dataFinal)) {
+
+                $sql .= " AND data_movimentacao <= :dataFinal";
+            }
 
             $stmt = $this->connect->prepare($sql);
+
+            if (!empty($dataInicial)) {
+
+                $stmt->bindValue(":dataInicial", $dataInicial, PDO::PARAM_STR);
+            }
+            if (!empty($dataFinal)) {
+
+                $stmt->bindValue(":dataFinal", $dataFinal, PDO::PARAM_STR);
+            }
 
             // $stmt->debugDumpParams();
 

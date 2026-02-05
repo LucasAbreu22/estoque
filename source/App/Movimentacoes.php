@@ -11,14 +11,16 @@ class Movimentacoes
     {
         try {
             $offset = (int)$param["offset"];
+            $dataInicial = $param["dataInicial"];
+            $dataFinal = $param["dataFinal"];
 
             $movimentacao = new MovimentacaoEstoque();
 
             $callback = [
                 "code" => 200,
                 "data" => [
-                    "movimentacoes" => $movimentacao->getMovimentacoes($offset),
-                    "qtdMovimentacoes" => $movimentacao->contarMovimentacoes()
+                    "movimentacoes" => $movimentacao->getMovimentacoes($offset, $dataInicial, $dataFinal),
+                    "qtdMovimentacoes" => $movimentacao->contarMovimentacoes($dataInicial, $dataFinal)
                 ]
             ];
 

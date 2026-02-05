@@ -254,6 +254,11 @@ input[type="text"] {
   margin: 6px 0 12px;
 }
 
+input[type="date"] {
+  padding: 8px;
+  margin: 6px 0 12px;
+}
+
 .modal-content input[type="text"] {
   width: 100%;
   padding: 8px;
