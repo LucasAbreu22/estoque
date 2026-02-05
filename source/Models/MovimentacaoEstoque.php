@@ -28,7 +28,7 @@ class MovimentacaoEstoque
         ?Material $material = null,
         ?Usuario $usuario = null,
         STRING $tipo = "",
-        INT $quantidade = 0,
+        INT $quantidade = 1,
         STRING $unidade_utilizada = "BASE",
         ?INT $fator_conversao_aplicado = 0,
         INT $quantidade_convertida = 0,
@@ -154,6 +154,8 @@ class MovimentacaoEstoque
      */
     public function setQuantidade(INT $quantidade): self
     {
+        if ($quantidade < 1) throw new Exception("[ERRO][Movimentação 08] Quantidade inferior a 1!", 1);
+
         $this->quantidade = $quantidade;
 
         return $this;

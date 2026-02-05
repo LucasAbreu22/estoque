@@ -227,7 +227,7 @@ table .left {
 
 .modal-content {
   background: #fff;
-  width: 510px;
+  width: 650px;
   max-height: 890px;
   padding: 20px;
   border-radius: 8px;
@@ -366,13 +366,13 @@ input[type="text"] {
 
 #areaCarrinho {
   height: 170px;
-  overflow-y: auto;
+  overflow-y: scroll;
   border-bottom: 1px solid #d4d4d4;
 }
 
 #areaAlmox {
   height: 220px;
-  overflow-y: auto;
+  overflow-y: scroll;
   border-bottom: 1px solid #d4d4d4;
 }
 

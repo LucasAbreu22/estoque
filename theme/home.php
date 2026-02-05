@@ -734,6 +734,18 @@
             return false;
         }
 
+        let erroQTD = false;
+
+        carrinhoList.forEach(element => {
+            if (element.quantidadeMov < 1 || element.quantidadeMov === "") {
+                alert(`O material "${element.descricao}" não pode movimentar uma quantidade zerada!`)
+                erroQTD = true
+                return false;
+            }
+        });
+
+        if (erroQTD) return false;
+
         $.ajax({
             type: "POST",
             url: "<?= url("/criarMovimentacao") ?>",
@@ -784,7 +796,6 @@
             document.getElementById('minimo').value = "";
             document.getElementById('localizacao').value = "";
         } else {
-
 
             let fechar = true;
 
