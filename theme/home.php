@@ -694,6 +694,7 @@
     }
 
     function criarMovimentacao() {
+
         const pontoResponsavel = document.getElementById('pontoResponsavel').value.trim();
 
         let codigoSigma = document.getElementById('codigoSigma').value;
@@ -755,15 +756,18 @@
                         let line = materiais.find((item) => item.id_material === material.id_material);
 
                         line.quantidade = parseFloat(line.quantidade)
-                        material.quantidade = parseFloat(material.quantidade)
 
-                        line.quantidade = tipoMov === 'ENTRADA' ? line.quantidade + material.quantidade : line.quantidade - material.quantidade;
+                        material.quantidadeMov = parseFloat(material.quantidadeMov)
+
+                        line.quantidade = tipoMov === 'ENTRADA' ? line.quantidade + material.quantidadeMov : line.quantidade - material.quantidadeMov;
 
                         if (line.quantidade < 0) line.quantidade = 0;
 
                     });
 
+                    tipoMov = "SAIR";
                     atualizarMaterialList();
+
                     fecharModal('modalMov');
                 }
 
@@ -780,6 +784,8 @@
             document.getElementById('minimo').value = "";
             document.getElementById('localizacao').value = "";
         } else {
+
+
             let fechar = true;
 
             const codigoSigma = document.getElementById('codigoSigma');
@@ -788,11 +794,13 @@
             const nomeSolicitante = document.getElementById('nomeSolicitante');
             const buscarMaterialModal = document.getElementById("buscarMaterialModal");
 
+            if (tipoMov != "SAIR") {
 
-            if (codigoSigma.value !== "" || pontoResponsavel.value !== "" || pontoSolicitante.value !== "" ||
-                nomeSolicitante.value !== "" || carrinhoList.length > 0) fechar = confirm("As informações da movimentações serão perdidas! \nDesja continuar?")
+                if (codigoSigma.value !== "" || pontoResponsavel.value !== "" || pontoSolicitante.value !== "" ||
+                    nomeSolicitante.value !== "" || carrinhoList.length > 0) fechar = confirm("As informações da movimentações serão perdidas! \nDesja continuar?")
 
-            if (!fechar) return false;
+                if (!fechar) return false;
+            }
 
             codigoSigma.value = "";
             pontoResponsavel.value = "";
