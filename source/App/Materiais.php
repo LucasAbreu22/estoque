@@ -15,13 +15,14 @@ class Materiais
     {
         try {
             $offset = (int)$param["offset"];
+            $search = $param["search"];
 
             $material = new Material();
             $callback = [
                 "code" => 200,
                 "data" => [
-                    "materiais" => $material->getMateriais($offset),
-                    "qtdMateriais" => $material->contarMateriais()
+                    "materiais" => $material->getMateriais($offset, $search),
+                    "qtdMateriais" => $material->contarMateriais($search)
                 ]
             ];
 

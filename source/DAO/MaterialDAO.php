@@ -27,40 +27,41 @@ class MaterialDAO
         return $this->connect->commit();
     }
 
-    public function getMateriais(int $offset = 0)
+    public function getMateriais(int $offset = 0, string $search = "")
     {
-        try {
-            $sql = "SELECT 
-            ma.id_material, ma.id_categoria, ma.codigo,
-            ma.descricao, ma.quantidade, ma.unidade_base, ma.unidade_compra,
-            ma.fator_conversao, ma.quantidade_minima, ma.custo_unitario,
-            CASE
-                WHEN ma.quantidade = 0 THEN 'Sem Estoque'
-                WHEN ma.quantidade < ma.quantidade_minima THEN 'Acabando'
-                ELSE 'Normal'
-            END AS status,
-            ma.localizacao, DATE_FORMAT(ma.data_criacao, '%d/%m/%Y %H:%i:%s') AS data_criacao, DATE_FORMAT(ma.data_edicao, '%d/%m/%Y %H:%i:%s') AS data_edicao,
-            ca.nome AS categoria
+        $sql = "
+            SELECT 
+                ma.id_material, ma.id_categoria, ma.codigo,
+                ma.descricao, ma.quantidade, ma.unidade_base, ma.unidade_compra,
+                ma.fator_conversao, ma.quantidade_minima, ma.custo_unitario,
+                CASE
+                    WHEN ma.quantidade = 0 THEN 'Sem Estoque'
+                    WHEN ma.quantidade < ma.quantidade_minima THEN 'Acabando'
+                    ELSE 'Normal'
+                END AS status,
+                ma.localizacao,
+                ca.nome AS categoria
             FROM materiais ma
-            INNER JOIN
-            categorias ca
-            ON
-            ma.id_categoria = ca.id_categoria
+            INNER JOIN categorias ca ON ma.id_categoria = ca.id_categoria
             WHERE ma.visibilidade = 1
-            ORDER BY ma.descricao ASC
-            LIMIT 12 OFFSET ?";
+        ";
 
-            $stmt = $this->connect->prepare($sql);
-
-            $stmt->bindValue(1, $offset, PDO::PARAM_INT);
-
-            // $stmt->debugDumpParams();
-
-            $stmt->execute();
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            throw new Exception("[ERRO][Material DAO 01]" . $e->getMessage());
+        if (!empty($search)) {
+            $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
         }
+
+        $sql .= " ORDER BY ma.descricao ASC LIMIT 12 OFFSET :offset";
+
+        $stmt = $this->connect->prepare($sql);
+
+        if (!empty($search)) {
+            $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        }
+
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getMaterialById(int $id_material)
@@ -86,24 +87,27 @@ class MaterialDAO
         }
     }
 
-    public function contarMateriais()
+    public function contarMateriais(string $search = "")
     {
         try {
             $sql = "SELECT 
-            count(*) AS qtdMateriais
-            FROM materiais ma
-            INNER JOIN
-            categorias ca
-            ON
-            ma.id_categoria = ca.id_categoria
-            WHERE ma.visibilidade";
+                count(*) AS qtdMateriais
+                FROM materiais ma
+                WHERE ma.visibilidade = 1
+            ";
+
+            if (!empty($search)) {
+                $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
+            }
 
             $stmt = $this->connect->prepare($sql);
 
-            // $stmt->debugDumpParams();
+            if (!empty($search)) {
+                $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+            }
 
             $stmt->execute();
-            return $stmt->fetch()->qtdMateriais;
+            return (int) $stmt->fetchColumn();;
         } catch (PDOException $e) {
             throw new Exception("[ERRO][Material DAO 02]" . $e->getMessage());
         }

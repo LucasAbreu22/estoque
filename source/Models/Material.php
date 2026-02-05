@@ -321,17 +321,17 @@ class Material
         return $this;
     }
 
-    public function getMateriais(int $offset = 0)
+    public function getMateriais(int $offset = 0, string $search = "")
     {
 
         $materialDAO = new MaterialDAO();
-        return $materialDAO->getMateriais($offset);
+        return $materialDAO->getMateriais($offset, $search);
     }
 
-    public function contarMateriais()
+    public function contarMateriais(string $search = "")
     {
         $materialDAO = new MaterialDAO();
-        return $materialDAO->contarMateriais();
+        return $materialDAO->contarMateriais($search);
     }
 
     public function salvarMaterial(): string
