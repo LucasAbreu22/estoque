@@ -97,21 +97,27 @@ class Materiais
             $usuario->setPonto($param["pontoResponsavel"]);
             $usuario->getUsuarioByPonto();
 
-            $material = new Material($param["id_material"]);
-            $material->getMaterialById();
+            $materiais = $param["materiais"];
 
-            $movimentacao = new MovimentacaoEstoque();
-            $movimentacao->setCodigoSigma(empty($param["codigoSigma"]) ? null : $param["codigoSigma"]);
-            $movimentacao->setMaterial($material);
-            $movimentacao->setUsuario($usuario);
-            $movimentacao->setTipo($param["tipo"]);
-            $movimentacao->setQuantidade($param["quantidade"]);
-            $movimentacao->setPontoSolicitante($param["pontoSolicitante"]);
-            $movimentacao->setNomeSolicitante($param["nomeSolicitante"]);
+            foreach ($materiais as $material) {
+                $materialObj = new Material($material["id_material"]);
+                $materialObj->getMaterialById();
+
+                $movimentacao = new MovimentacaoEstoque();
+                $movimentacao->setCodigoSigma(empty($param["codigoSigma"]) ? null : $param["codigoSigma"]);
+                $movimentacao->setMaterial($materialObj);
+                $movimentacao->setUsuario($usuario);
+                $movimentacao->setTipo($param["tipo"]);
+                $movimentacao->setQuantidade($material["quantidadeMov"]);
+                $movimentacao->setPontoSolicitante($param["pontoSolicitante"]);
+                $movimentacao->setNomeSolicitante($param["nomeSolicitante"]);
+
+                $msg = $movimentacao->criarMovimentacao();
+            }
 
             $callback = [
                 "code" => 200,
-                "message" => $movimentacao->criarMovimentacao(),
+                "message" => $msg,
             ];
 
             echo json_encode($callback);

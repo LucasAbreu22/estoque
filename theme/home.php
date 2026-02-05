@@ -694,69 +694,56 @@
     }
 
     function criarMovimentacao() {
-        const pontoResponsavel = document.getElementById('pontoResponsavel').value;
-        let quantidade = document.getElementById('quantidadeMov').value;
-        let codigoSigma = null;
-        let pontoSolicitante = null;
-        let nomeSolicitante = null;
+        const pontoResponsavel = document.getElementById('pontoResponsavel').value.trim();
 
-        if (pontoResponsavel === "" || pontoResponsavel === undefined) {
-            alert("Campo de ponto vazio!");
-            return;
+        let codigoSigma = document.getElementById('codigoSigma').value;
+
+        let pontoSolicitante = document.getElementById('pontoSolicitante').value;
+        let nomeSolicitante = document.getElementById('nomeSolicitante').value.trim();
+
+        if (pontoResponsavel === "") {
+            alert("Campo de Ponto do Responsável está vazio!");
+            return false;
         }
 
-        if (quantidade === "" || quantidade === undefined) {
-            alert("Campo de quantidade vazio!");
-            return;
-        }
+        if (tipoMov === "ENTRADA") {
+            pontoSolicitante = "";
+            nomeSolicitante = "";
 
-        if (quantidade === "0") {
-            alert("Campo de quantidade com valor inválido!");
-            return;
-        }
-
-        if (tipoMov == "SAIDA") {
-
-            pontoSolicitante = document.getElementById('pontoSolicitante').value;
-            nomeSolicitante = document.getElementById('nomeSolicitante').value;
-
-            if (pontoSolicitante === "" || pontoSolicitante === undefined) {
-                alert("Campo de ponto do solicitante vazio!");
-                return;
+            if (codigoSigma === "") {
+                alert("Campo de Código do SiGMA está vazio!");
+                return false;
             }
-
-            if (nomeSolicitante === "" || nomeSolicitante === undefined) {
-                alert("Campo de nome do solicitante vazio!");
-                return;
-            }
-
         } else {
-            codigoSigma = document.getElementById('codigoSigma').value;
+            codigoSigma = "";
 
-            if (codigoSigma === "" || codigoSigma === undefined) {
-                alert("Campo de código de sigma vazio!");
-                return;
+            if (pontoSolicitante === "") {
+                alert("Campo de Ponto do Solicitante está vazio!");
+                return false;
+            }
+
+            if (nomeSolicitante === "") {
+                alert("Campo de Nome do Solicitante está vazio!");
+                return false;
             }
         }
 
-
-        const codigoLinhaSelec = linhaSelecionada.querySelector('.codigo').innerText;
-        const materialReg = materiais.find((material) => material.codigo === codigoLinhaSelec);
-
-        const movimentacao = {
-            "codigoSigma": codigoSigma,
-            "pontoResponsavel": pontoResponsavel,
-            "pontoSolicitante": pontoSolicitante,
-            "nomeSolicitante": nomeSolicitante,
-            "quantidade": quantidade,
-            "id_material": materialReg.id_material,
-            "tipo": tipoMov
-        };
+        if (carrinhoList.length < 1) {
+            alert("Não existe material para realizar movimentação!");
+            return false;
+        }
 
         $.ajax({
             type: "POST",
             url: "<?= url("/criarMovimentacao") ?>",
-            data: movimentacao,
+            data: {
+                materiais: carrinhoList,
+                tipo: tipoMov,
+                pontoResponsavel: pontoResponsavel,
+                codigoSigma: codigoSigma,
+                pontoSolicitante: pontoSolicitante,
+                nomeSolicitante: nomeSolicitante,
+            },
             dataType: "json",
             success: function(response) {
 
@@ -764,38 +751,19 @@
 
                 if (response.code == 200) {
 
-                    quantidade = parseFloat(quantidade);
+                    carrinhoList.forEach(material => {
+                        let line = materiais.find((item) => item.id_material === material.id_material);
 
-                    const saldoCell = linhaSelecionada.querySelector('.saldo');
+                        line.quantidade = parseFloat(line.quantidade)
+                        material.quantidade = parseFloat(material.quantidade)
 
-                    let saldo = parseFloat(saldoCell.innerText);
-                    saldo = tipoMov === 'ENTRADA' ? saldo + quantidade : saldo - quantidade;
+                        line.quantidade = tipoMov === 'ENTRADA' ? line.quantidade + material.quantidade : line.quantidade - material.quantidade;
 
-                    if (saldo < 0) saldo = 0;
+                        if (line.quantidade < 0) line.quantidade = 0;
 
-                    saldoCell.innerText = saldo;
+                    });
 
-                    const minimoCell = linhaSelecionada.querySelector('.minimo');
-                    const minimo = parseFloat(minimoCell.innerText);
-
-                    const classList = linhaSelecionada.querySelector('.badge').classList;
-                    const atualClass = classList[classList.length - 1]
-
-                    let classStatus = "ok"
-                    let txt = "Normal";
-
-                    if (saldo === 0) {
-                        classStatus = "out";
-                        txt = "Sem Estoque"
-                    } else if (saldo <= minimo) {
-                        classStatus = "low";
-                        txt = "Acabando"
-                    }
-
-                    linhaSelecionada.querySelector('.badge').classList.remove(atualClass);
-                    linhaSelecionada.querySelector('.badge').classList.add(classStatus);
-                    linhaSelecionada.querySelector('.badge').innerHTML = txt
-
+                    atualizarMaterialList();
                     fecharModal('modalMov');
                 }
 
@@ -814,15 +782,23 @@
         } else {
             let fechar = true;
 
-            if (carrinhoList.length > 0) fechar = confirm("As informações da movimentações serão perdidas! \nDesja continuar?")
+            const codigoSigma = document.getElementById('codigoSigma');
+            const pontoResponsavel = document.getElementById('pontoResponsavel');
+            const pontoSolicitante = document.getElementById('pontoSolicitante');
+            const nomeSolicitante = document.getElementById('nomeSolicitante');
+            const buscarMaterialModal = document.getElementById("buscarMaterialModal");
+
+
+            if (codigoSigma.value !== "" || pontoResponsavel.value !== "" || pontoSolicitante.value !== "" ||
+                nomeSolicitante.value !== "" || carrinhoList.length > 0) fechar = confirm("As informações da movimentações serão perdidas! \nDesja continuar?")
 
             if (!fechar) return false;
 
-            document.getElementById('codigoSigma').value = "";
-            document.getElementById('pontoResponsavel').value = "";
-            document.getElementById('pontoSolicitante').value = "";
-            document.getElementById('nomeSolicitante').value = "";
-            document.getElementById("buscarMaterialModal").value = "";
+            codigoSigma.value = "";
+            pontoResponsavel.value = "";
+            pontoSolicitante.value = "";
+            nomeSolicitante.value = "";
+            buscarMaterialModal.value = "";
 
             carrinhoList = [];
             atualizarCarrinhoList();
