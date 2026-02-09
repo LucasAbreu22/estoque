@@ -17,12 +17,16 @@ class Materiais
             $offset = (int)$param["offset"];
             $search = $param["search"];
 
+            $fltrStatusNormal = isset($param["fltrStatusNormal"]) ? filter_var($param["fltrStatusNormal"], FILTER_VALIDATE_BOOLEAN) : false;
+            $fltrStatusAcabando = isset($param["fltrStatusAcabando"]) ? filter_var($param["fltrStatusAcabando"], FILTER_VALIDATE_BOOLEAN) : false;
+            $fltrStatusSemEstoque = isset($param["fltrStatusSemEstoque"]) ? filter_var($param["fltrStatusSemEstoque"], FILTER_VALIDATE_BOOLEAN) : false;
+
             $material = new Material();
             $callback = [
                 "code" => 200,
                 "data" => [
-                    "materiais" => $material->getMateriais($offset, $search),
-                    "qtdMateriais" => $material->contarMateriais($search)
+                    "materiais" => $material->getMateriais($offset, $search, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque),
+                    "qtdMateriais" => $material->contarMateriais($search, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque)
                 ]
             ];
 

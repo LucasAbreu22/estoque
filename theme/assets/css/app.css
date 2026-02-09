@@ -75,8 +75,18 @@ h4 {
 .top-actions {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
   gap: 10px;
+}
+
+.top-actions input[type="checkbox"],
+.top-actions label {
+  cursor: pointer;
+}
+
+.top-actions input[type="text"] {
+  margin: 0 !important;
 }
 
 .btn-add {
@@ -400,4 +410,25 @@ table input[type="number"] {
   width: 60px;
   padding: 3px;
   margin: 0;
+}
+
+.fltrCheck {
+  margin: 0 5px;
+}
+
+#fltrCategoria {
+  cursor: pointer;
+  padding: 8px;
+}
+
+#fltrArea {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.fltrColumn {
+  display: flex;
+  flex-direction: column;
 }

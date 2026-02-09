@@ -2,7 +2,29 @@
 
 <main>
     <div class="top-actions">
-        <input type="text" id="buscarMaterial" placeholder="Digite o código ou descrição">
+        <div id="fltrArea">
+            <div class="fltrColumn">
+                <label> <b> Digite o código ou descrição:</b> </label>
+                <input type="text" id="buscarMaterial">
+            </div>
+
+            <div class="fltrColumn">
+                <label> <b> Categoria:</b> </label>
+                <select id="fltrCategoria">
+                    <?php foreach ($categorias as $categoria): ?>
+                        <option value="<?= $categoria->id_categoria ?>"><?= $categoria->nome ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="fltrColumn">
+                <span><b>Status:</b></span>
+                <div>
+                    <input type="checkbox" class="fltrCheck" id="fltrStatusNormal"><label for="fltrStatusNormal">Normal</label>
+                    <input type="checkbox" class="fltrCheck" id="fltrStatusAcabando"><label for="fltrStatusAcabando">Acabando</label>
+                    <input type="checkbox" class="fltrCheck" id="fltrStatusSemEstoque"><label for="fltrStatusSemEstoque">Sem Estoque</label>
+                </div>
+            </div>
+        </div>
 
         <div>
             <button class="btn-add btn-entry" onclick="abrirMovimentacao()">Novas movimentações</button>
@@ -26,22 +48,6 @@
             </tr>
         </thead>
         <tbody id="tabelaMateriais">
-            <tr>
-                <td>PAP-001</td>
-                <td>Papel Couchê 150g</td>
-                <td>Papéis</td>
-                <td class="saldo">2350</td>
-                <td>folha</td>
-                <td>resma</td>
-                <td>1000</td>
-                <td>Prateleira A1</td>
-                <td><span class="badge ok">Normal</span></td>
-                <td class="actions">
-                    <button class="btn-entry" onclick="abrirMovimentacao('ENTRADA', this)">Entrada</button>
-                    <button class="btn-exit" onclick="abrirMovimentacao('SAIDA', this)">Saída</button>
-                    <button class="btn-edit">Editar</button>
-                </td>
-            </tr>
         </tbody>
     </table>
     <div id="nav-table">
@@ -211,7 +217,7 @@
     getMateriais();
 
     document.getElementById("buscarMaterial").addEventListener("keyup", function() {
-        offset = 0
+        offset = 0;
         getMateriais();
     });
 
@@ -244,19 +250,31 @@
         });
     });
 
+    document.querySelectorAll('.fltrCheck').forEach(chcks => {
+        chcks.addEventListener('click', function(chck) {
+            offset = 0;
+            getMateriais();
+        });
+    });
+
     function getMateriais(increment = 0) {
 
         offset += increment;
 
         const search = document.getElementById("buscarMaterial").value.trim();
-
+        const fltrStatusNormal = document.getElementById("fltrStatusNormal").checked;
+        const fltrStatusAcabando = document.getElementById("fltrStatusAcabando").checked;
+        const fltrStatusSemEstoque = document.getElementById("fltrStatusSemEstoque").checked;
 
         $.ajax({
             type: "POST",
             url: "<?= url("/") ?>",
             data: {
                 offset: offset,
-                search: search
+                search: search,
+                fltrStatusNormal: fltrStatusNormal,
+                fltrStatusAcabando: fltrStatusAcabando,
+                fltrStatusSemEstoque: fltrStatusSemEstoque,
             },
             dataType: "json",
             success: function(response) {

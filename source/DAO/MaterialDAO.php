@@ -27,7 +27,7 @@ class MaterialDAO
         return $this->connect->commit();
     }
 
-    public function getMateriais(int $offset = 0, string $search = "")
+    public function getMateriais(int $offset = 0, string $search = "", bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
         $sql = "
             SELECT 
@@ -50,6 +50,26 @@ class MaterialDAO
             $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
         }
 
+        if ($fltrStatusNormal) {
+            $sql .= " AND ma.quantidade > ma.quantidade_minima";
+        }
+
+        if ($fltrStatusAcabando) {
+            $sql .= !$fltrStatusNormal ? " AND" : " OR";
+            $sql .= " (ma.quantidade > 0 AND ma.quantidade < ma.quantidade_minima)";
+        }
+
+        if ($fltrStatusSemEstoque) {
+
+            if ($fltrStatusNormal || $fltrStatusAcabando) {
+                $sql .= " OR ";
+            } else {
+                $sql .= " AND ";
+            }
+
+            $sql .= " ma.quantidade = 0";
+        }
+
         $sql .= " ORDER BY ma.descricao ASC LIMIT 12 OFFSET :offset";
 
         $stmt = $this->connect->prepare($sql);
@@ -59,6 +79,8 @@ class MaterialDAO
         }
 
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        // $stmt->debugDumpParams();
 
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -87,7 +109,7 @@ class MaterialDAO
         }
     }
 
-    public function contarMateriais(string $search = "")
+    public function contarMateriais(string $search = "", bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
         try {
             $sql = "SELECT 
@@ -98,6 +120,27 @@ class MaterialDAO
 
             if (!empty($search)) {
                 $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
+            }
+
+
+            if ($fltrStatusNormal) {
+                $sql .= " AND ma.quantidade > ma.quantidade_minima";
+            }
+
+            if ($fltrStatusAcabando) {
+                $sql .= !$fltrStatusNormal ? " AND" : " OR";
+                $sql .= " (ma.quantidade > 0 AND ma.quantidade < ma.quantidade_minima)";
+            }
+
+            if ($fltrStatusSemEstoque) {
+
+                if ($fltrStatusNormal || $fltrStatusAcabando) {
+                    $sql .= " OR ";
+                } else {
+                    $sql .= " AND ";
+                }
+
+                $sql .= " ma.quantidade = 0";
             }
 
             $stmt = $this->connect->prepare($sql);

@@ -321,17 +321,17 @@ class Material
         return $this;
     }
 
-    public function getMateriais(int $offset = 0, string $search = "")
+    public function getMateriais(int $offset = 0, string $search = "", bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
 
         $materialDAO = new MaterialDAO();
-        return $materialDAO->getMateriais($offset, $search);
+        return $materialDAO->getMateriais($offset, $search, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque);
     }
 
-    public function contarMateriais(string $search = "")
+    public function contarMateriais(string $search = "", bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
         $materialDAO = new MaterialDAO();
-        return $materialDAO->contarMateriais($search);
+        return $materialDAO->contarMateriais($search, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque);
     }
 
     public function salvarMaterial(): string
