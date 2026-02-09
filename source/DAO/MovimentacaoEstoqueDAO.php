@@ -27,7 +27,7 @@ class MovimentacaoEstoqueDAO
         return $this->connect->commit();
     }
 
-    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "")
+    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "")
     {
         try {
             $sql = "SELECT 
@@ -50,6 +50,18 @@ class MovimentacaoEstoqueDAO
                 $sql .= " AND me.data_movimentacao <= :dataFinal";
             }
 
+            if (!empty($buscarCodSig)) {
+                $sql .= " AND me.codigo_sigma LIKE :codigo_sigma";
+            }
+
+            if (!empty($buscarMaterial)) {
+                $sql .= " AND (ma.codigo LIKE :buscarMaterial OR ma.descricao LIKE :buscarMaterial)";
+            }
+
+            if (!empty($buscarPessoa)) {
+                $sql .= " AND (me.nome_solicitante LIKE :buscarPessoa OR me.ponto_solicitante LIKE :buscarPessoa OR us.ponto LIKE :buscarPessoa OR us.nome LIKE :buscarPessoa)";
+            }
+
             $sql .= " ORDER BY me.id_movimentacao DESC
             LIMIT 13 OFFSET :offset";
 
@@ -63,6 +75,18 @@ class MovimentacaoEstoqueDAO
                 $stmt->bindValue(":dataFinal", $dataFinal, PDO::PARAM_STR);
             }
 
+            if (!empty($buscarCodSig)) {
+                $stmt->bindValue(":codigo_sigma", "%$buscarCodSig%", PDO::PARAM_STR);;
+            }
+
+            if (!empty($buscarMaterial)) {
+                $stmt->bindValue(":buscarMaterial", "%$buscarMaterial%", PDO::PARAM_STR);;
+            }
+
+            if (!empty($buscarPessoa)) {
+                $stmt->bindValue(":buscarPessoa", "%$buscarPessoa%", PDO::PARAM_STR);;
+            }
+
             $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
 
             // $stmt->debugDumpParams();
@@ -74,12 +98,16 @@ class MovimentacaoEstoqueDAO
         }
     }
 
-    public function contarMovimentacoes(string $dataInicial = "", string $dataFinal = "")
+    public function contarMovimentacoes(string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "")
     {
         try {
             $sql = "SELECT 
             count(*) AS qtdMovimentacoes
-            FROM movimentacoes_estoque
+            FROM movimentacoes_estoque me
+            INNER JOIN usuarios us 
+            ON me.id_usuario = us.id_usuario 
+            INNER JOIN materiais ma 
+            ON me.id_material = ma.id_material
             WHERE 1=1";
 
             if (!empty($dataInicial)) {
@@ -89,6 +117,18 @@ class MovimentacaoEstoqueDAO
             if (!empty($dataFinal)) {
 
                 $sql .= " AND data_movimentacao <= :dataFinal";
+            }
+
+            if (!empty($buscarCodSig)) {
+                $sql .= " AND me.codigo_sigma LIKE :codigo_sigma";
+            }
+
+            if (!empty($buscarMaterial)) {
+                $sql .= " AND (ma.codigo LIKE :buscarMaterial OR ma.descricao LIKE :buscarMaterial)";
+            }
+
+            if (!empty($buscarPessoa)) {
+                $sql .= " AND (me.nome_solicitante LIKE :buscarPessoa OR me.ponto_solicitante LIKE :buscarPessoa OR us.ponto LIKE :buscarPessoa OR us.nome LIKE :buscarPessoa)";
             }
 
             $stmt = $this->connect->prepare($sql);
@@ -102,6 +142,17 @@ class MovimentacaoEstoqueDAO
                 $stmt->bindValue(":dataFinal", $dataFinal, PDO::PARAM_STR);
             }
 
+            if (!empty($buscarCodSig)) {
+                $stmt->bindValue(":codigo_sigma", "%$buscarCodSig%", PDO::PARAM_STR);;
+            }
+
+            if (!empty($buscarMaterial)) {
+                $stmt->bindValue(":buscarMaterial", "%$buscarMaterial%", PDO::PARAM_STR);;
+            }
+
+            if (!empty($buscarPessoa)) {
+                $stmt->bindValue(":buscarPessoa", "%$buscarPessoa%", PDO::PARAM_STR);;
+            }
             // $stmt->debugDumpParams();
 
             $stmt->execute();

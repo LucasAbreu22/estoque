@@ -269,11 +269,11 @@ class MovimentacaoEstoque
         return $this;
     }
 
-    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "")
+    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "")
     {
 
         $movimentacaoDAO = new MovimentacaoEstoqueDAO();
-        $movimentacoes = $movimentacaoDAO->getMovimentacoes($offset, $dataInicial, $dataFinal);
+        $movimentacoes = $movimentacaoDAO->getMovimentacoes($offset, $dataInicial, $dataFinal, $buscarCodSig, $buscarMaterial, $buscarPessoa);
 
         foreach ($movimentacoes as $movimentacao) {
             $date = new DateTime($movimentacao->data_movimentacao);
@@ -283,10 +283,10 @@ class MovimentacaoEstoque
         return $movimentacoes;
     }
 
-    public function contarMovimentacoes(string $dataInicial = "", string $dataFinal = "")
+    public function contarMovimentacoes(string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "")
     {
         $movimentacaoDAO = new MovimentacaoEstoqueDAO();
-        return $movimentacaoDAO->contarMovimentacoes($dataInicial, $dataFinal);
+        return $movimentacaoDAO->contarMovimentacoes($dataInicial, $dataFinal, $buscarCodSig, $buscarMaterial, $buscarPessoa);
     }
 
 

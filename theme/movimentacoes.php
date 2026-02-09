@@ -1,18 +1,39 @@
 <?php $this->layout("_theme", ["title" => $title]); ?>
 
 <main>
-    <div>
-        <label>Périodo:</label>
-        <input type="date" id="dateInicial">
-        <span>a</span>
-        <input type="date" id="dateFinal">
+
+    <div id="fltrArea">
+        <div>
+            <label for="dateInicial"> <b>Périodo:</b></label>
+            <div>
+                <input type="date" id="dateInicial">
+                <span>a</span>
+                <input type="date" id="dateFinal">
+            </div>
+        </div>
+
+        <div class="fltrColumn">
+            <label for="buscarCodSig"> <b> Digite o código do SIGMA:</b> </label>
+            <input type="number" id="buscarCodSig">
+        </div>
+
+        <div class="fltrColumn">
+            <label for="buscarMaterial"> <b> Digite o código ou descrição:</b> </label>
+            <input type="text" id="buscarMaterial">
+        </div>
+
+        <div class="fltrColumn">
+            <label for="buscarPessoa"> <b> Digite o ponto ou nome:</b> </label>
+            <input type="text" id="buscarPessoa">
+        </div>
     </div>
+
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Código</th>
                 <th>Cod. Sigma</th>
+                <th>Código Material</th>
                 <th>Material</th>
                 <th>QTD.</th>
                 <th>Data</th>
@@ -27,6 +48,7 @@
 
         </tbody>
     </table>
+
     <div id="nav-table">
         <button class="btn-nav" id="navVoltar" onclick="getMovimentacao(-lines)">
             < </button>
@@ -44,24 +66,44 @@
     });
 
     document.getElementById("dateInicial").addEventListener("change", function() {
+        offset = 0
         getMovimentacao();
 
     });
     document.getElementById("dateFinal").addEventListener("change", function() {
+        offset = 0
         getMovimentacao();
 
+    });
+
+    document.getElementById("buscarCodSig").addEventListener("keyup", function() {
+        offset = 0
+        getMovimentacao();
+    });
+
+    document.getElementById("buscarMaterial").addEventListener("keyup", function() {
+        offset = 0
+        getMovimentacao();
+    });
+
+    document.getElementById("buscarPessoa").addEventListener("keyup", function() {
+        offset = 0
+        getMovimentacao();
     });
 
     let movimentacoes = [];
     let qtdMovimentacoes = 0;
     let paginaAtual = 0;
-    let offset = 0
+    let offset = 0;
     const lines = 13;
 
 
     function getMovimentacao(increment = 0) {
         let dataInicial = document.getElementById("dateInicial").value;
         let dataFinal = document.getElementById("dateFinal").value;
+        const buscarCodSig = document.getElementById("buscarCodSig").value.trim();
+        const buscarMaterial = document.getElementById("buscarMaterial").value.trim();
+        const buscarPessoa = document.getElementById("buscarPessoa").value.trim();
 
         if (dataInicial !== "") dataInicial += " 23:59:59";
         if (dataFinal !== "") dataFinal += " 23:59:59";
@@ -74,7 +116,10 @@
             data: {
                 offset: offset,
                 dataInicial: dataInicial,
-                dataFinal: dataFinal
+                dataFinal: dataFinal,
+                buscarCodSig: buscarCodSig,
+                buscarMaterial: buscarMaterial,
+                buscarPessoa: buscarPessoa
             },
             dataType: "json",
             success: function(response) {
@@ -104,8 +149,8 @@
 
             tr.innerHTML = `
             <td>${movimentacao.id_movimentacao}</td>
-            <td>${movimentacao.codigo}</td>
             <td>${codigo_sigma}</td>
+            <td>${movimentacao.codigo}</td>
             <td class="left">${movimentacao.descricao}</td>
             <td>${movimentacao.quantidade}</td>
             <td>${movimentacao.data_movimentacao}</td>
