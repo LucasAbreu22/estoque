@@ -2,36 +2,38 @@
 
 <main>
 
-    <div id="fltrArea">
-        <div>
-            <label for="dateInicial"> <b>Périodo:</b></label>
+    <div class="top-actions">
+        <div id="fltrArea">
             <div>
-                <input type="date" id="dateInicial">
-                <span>a</span>
-                <input type="date" id="dateFinal">
+                <label for="dateInicial"> <b>Périodo:</b></label>
+                <div>
+                    <input type="date" id="dateInicial">
+                    <span>a</span>
+                    <input type="date" id="dateFinal">
+                </div>
             </div>
-        </div>
 
-        <div class="fltrColumn">
-            <label for="buscarCodSig"> <b> Digite o código do SIGMA:</b> </label>
-            <input type="number" id="buscarCodSig">
-        </div>
+            <div class="fltrColumn">
+                <label for="buscarCodSig"> <b> Digite o código do SIGMA:</b> </label>
+                <input type="number" id="buscarCodSig">
+            </div>
 
-        <div class="fltrColumn">
-            <label for="buscarMaterial"> <b> Digite o código ou descrição:</b> </label>
-            <input type="text" id="buscarMaterial">
-        </div>
+            <div class="fltrColumn">
+                <label for="buscarMaterial"> <b> Digite o código ou descrição:</b> </label>
+                <input type="text" id="buscarMaterial">
+            </div>
 
-        <div class="fltrColumn">
-            <label for="buscarPessoa"> <b> Digite o ponto ou nome:</b> </label>
-            <input type="text" id="buscarPessoa">
-        </div>
+            <div class="fltrColumn">
+                <label for="buscarPessoa"> <b> Digite o ponto ou nome:</b> </label>
+                <input type="text" id="buscarPessoa">
+            </div>
 
-        <div class="fltrColumn">
-            <span><b>Tipo moviemntação:</b></span>
-            <div>
-                <input type="checkbox" class="fltrCheck" id="fltrTipoMovEntrada"><label for="fltrTipoMovEntrada">Entrada</label>
-                <input type="checkbox" class="fltrCheck" id="fltrTipoMovSaida"><label for="fltrTipoMovSaida">Saída</label>
+            <div class="fltrColumn">
+                <span><b>Tipo moviemntação:</b></span>
+                <div>
+                    <input type="checkbox" class="fltrCheck" id="fltrTipoMovEntrada"><label for="fltrTipoMovEntrada">Entrada</label>
+                    <input type="checkbox" class="fltrCheck" id="fltrTipoMovSaida"><label for="fltrTipoMovSaida">Saída</label>
+                </div>
             </div>
         </div>
     </div>

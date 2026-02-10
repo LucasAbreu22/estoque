@@ -85,7 +85,9 @@ h4 {
   cursor: pointer;
 }
 
-.top-actions input[type="text"] {
+.top-actions input[type="text"],
+.top-actions input[type="date"],
+.top-actions input[type="number"] {
   margin: 0 !important;
 }
 
