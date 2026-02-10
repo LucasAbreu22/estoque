@@ -28,7 +28,8 @@
         </div>
 
         <div>
-            <button class="btn-add btn-entry" onclick="abrirMovimentacao()">Novas movimentações</button>
+            <button class="btn-add btn-entry" onclick="abrirMovimentacao('ENTRADA')">Novas Entrada</button>
+            <button class="btn-add btn-alert" onclick="abrirMovimentacao('SAIDA')">Novas Saída</button>
             <button class="btn-add" onclick="abrirModalMaterial()">+ Novo Material</button>
         </div>
     </div>
