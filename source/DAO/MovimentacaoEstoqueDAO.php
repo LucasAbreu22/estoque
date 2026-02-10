@@ -27,7 +27,7 @@ class MovimentacaoEstoqueDAO
         return $this->connect->commit();
     }
 
-    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "")
+    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
     {
         try {
             $sql = "SELECT 
@@ -60,6 +60,14 @@ class MovimentacaoEstoqueDAO
 
             if (!empty($buscarPessoa)) {
                 $sql .= " AND (me.nome_solicitante LIKE :buscarPessoa OR me.ponto_solicitante LIKE :buscarPessoa OR us.ponto LIKE :buscarPessoa OR us.nome LIKE :buscarPessoa)";
+            }
+
+            if ($fltrMovEntrada && $fltrMovSaida) {
+                $sql .= " AND (me.tipo = 'ENTRADA' OR me.tipo = 'SAIDA')";
+            } else {
+                if ($fltrMovEntrada) $sql .= " AND me.tipo = 'ENTRADA'";
+
+                else if ($fltrMovSaida) $sql .= " AND me.tipo = 'SAIDA'";
             }
 
             $sql .= " ORDER BY me.id_movimentacao DESC
@@ -98,7 +106,7 @@ class MovimentacaoEstoqueDAO
         }
     }
 
-    public function contarMovimentacoes(string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "")
+    public function contarMovimentacoes(string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
     {
         try {
             $sql = "SELECT 
@@ -129,6 +137,14 @@ class MovimentacaoEstoqueDAO
 
             if (!empty($buscarPessoa)) {
                 $sql .= " AND (me.nome_solicitante LIKE :buscarPessoa OR me.ponto_solicitante LIKE :buscarPessoa OR us.ponto LIKE :buscarPessoa OR us.nome LIKE :buscarPessoa)";
+            }
+
+            if ($fltrMovEntrada && $fltrMovSaida) {
+                $sql .= " AND (me.tipo = 'ENTRADA' OR me.tipo = 'SAIDA')";
+            } else {
+                if ($fltrMovEntrada) $sql .= " AND me.tipo = 'ENTRADA'";
+
+                else if ($fltrMovSaida) $sql .= " AND me.tipo = 'SAIDA'";
             }
 
             $stmt = $this->connect->prepare($sql);

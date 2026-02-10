@@ -26,6 +26,14 @@
             <label for="buscarPessoa"> <b> Digite o ponto ou nome:</b> </label>
             <input type="text" id="buscarPessoa">
         </div>
+
+        <div class="fltrColumn">
+            <span><b>Tipo moviemntação:</b></span>
+            <div>
+                <input type="checkbox" class="fltrCheck" id="fltrTipoMovEntrada"><label for="fltrTipoMovEntrada">Entrada</label>
+                <input type="checkbox" class="fltrCheck" id="fltrTipoMovSaida"><label for="fltrTipoMovSaida">Saída</label>
+            </div>
+        </div>
     </div>
 
     <table>
@@ -91,6 +99,13 @@
         getMovimentacao();
     });
 
+    document.querySelectorAll('.fltrCheck').forEach(chcks => {
+        chcks.addEventListener('click', function(chck) {
+            offset = 0;
+            getMovimentacao();
+        });
+    })
+
     let movimentacoes = [];
     let qtdMovimentacoes = 0;
     let paginaAtual = 0;
@@ -104,6 +119,8 @@
         const buscarCodSig = document.getElementById("buscarCodSig").value.trim();
         const buscarMaterial = document.getElementById("buscarMaterial").value.trim();
         const buscarPessoa = document.getElementById("buscarPessoa").value.trim();
+        const fltrMovEntrada = document.getElementById("fltrTipoMovEntrada").checked;
+        const fltrMovSaida = document.getElementById("fltrTipoMovSaida").checked;
 
         if (dataInicial !== "") dataInicial += " 23:59:59";
         if (dataFinal !== "") dataFinal += " 23:59:59";
@@ -119,7 +136,9 @@
                 dataFinal: dataFinal,
                 buscarCodSig: buscarCodSig,
                 buscarMaterial: buscarMaterial,
-                buscarPessoa: buscarPessoa
+                buscarPessoa: buscarPessoa,
+                fltrMovEntrada: fltrMovEntrada,
+                fltrMovSaida: fltrMovSaida
             },
             dataType: "json",
             success: function(response) {

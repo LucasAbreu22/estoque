@@ -16,14 +16,18 @@ class Movimentacoes
             $buscarCodSig = $param["buscarCodSig"];
             $buscarMaterial = $param["buscarMaterial"];
             $buscarPessoa = $param["buscarPessoa"];
+            $fltrMovEntrada =  isset($param["fltrMovEntrada"]) ? filter_var($param["fltrMovEntrada"], FILTER_VALIDATE_BOOLEAN) : false;;
+            $fltrMovSaida =  isset($param["fltrMovSaida"]) ? filter_var($param["fltrMovSaida"], FILTER_VALIDATE_BOOLEAN) : false;;
+
+
 
             $movimentacao = new MovimentacaoEstoque();
 
             $callback = [
                 "code" => 200,
                 "data" => [
-                    "movimentacoes" => $movimentacao->getMovimentacoes($offset, $dataInicial, $dataFinal, $buscarCodSig, $buscarMaterial, $buscarPessoa),
-                    "qtdMovimentacoes" => $movimentacao->contarMovimentacoes($dataInicial, $dataFinal, $buscarCodSig, $buscarMaterial, $buscarPessoa)
+                    "movimentacoes" => $movimentacao->getMovimentacoes($offset, $dataInicial, $dataFinal, $buscarCodSig, $buscarMaterial, $buscarPessoa, $fltrMovEntrada, $fltrMovSaida),
+                    "qtdMovimentacoes" => $movimentacao->contarMovimentacoes($dataInicial, $dataFinal, $buscarCodSig, $buscarMaterial, $buscarPessoa, $fltrMovEntrada, $fltrMovSaida)
                 ]
             ];
 
