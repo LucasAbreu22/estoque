@@ -27,7 +27,7 @@ class MaterialDAO
         return $this->connect->commit();
     }
 
-    public function getMateriais(int $offset = 0, string $search = "", bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
+    public function getMateriais(int $offset = 0, string $search = "", ?int $fltrCategoria = null, bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
         $sql = "
             SELECT 
@@ -48,6 +48,10 @@ class MaterialDAO
 
         if (!empty($search)) {
             $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
+        }
+
+        if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
+            $sql .= " AND ma.id_categoria = :fltrCategoria";
         }
 
         if ($fltrStatusNormal) {
@@ -76,6 +80,10 @@ class MaterialDAO
 
         if (!empty($search)) {
             $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        }
+
+        if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
+            $stmt->bindValue(':fltrCategoria', $fltrCategoria, PDO::PARAM_INT);
         }
 
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -109,7 +117,7 @@ class MaterialDAO
         }
     }
 
-    public function contarMateriais(string $search = "", bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
+    public function contarMateriais(string $search = "", ?int $fltrCategoria = null, bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
         try {
             $sql = "SELECT 
@@ -122,6 +130,9 @@ class MaterialDAO
                 $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
             }
 
+            if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
+                $sql .= " AND ma.id_categoria = :fltrCategoria";
+            }
 
             if ($fltrStatusNormal) {
                 $sql .= " AND ma.quantidade > ma.quantidade_minima";
@@ -147,6 +158,10 @@ class MaterialDAO
 
             if (!empty($search)) {
                 $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+            }
+
+            if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
+                $stmt->bindValue(':fltrCategoria', $fltrCategoria, PDO::PARAM_INT);
             }
 
             $stmt->execute();

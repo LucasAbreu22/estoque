@@ -16,6 +16,7 @@ class Materiais
         try {
             $offset = (int)$param["offset"];
             $search = $param["search"];
+            $fltrCategoria = isset($param["fltrCategoria"]) && is_numeric($param["fltrCategoria"]) ? (int) $param["fltrCategoria"] : null;
 
             $fltrStatusNormal = isset($param["fltrStatusNormal"]) ? filter_var($param["fltrStatusNormal"], FILTER_VALIDATE_BOOLEAN) : false;
             $fltrStatusAcabando = isset($param["fltrStatusAcabando"]) ? filter_var($param["fltrStatusAcabando"], FILTER_VALIDATE_BOOLEAN) : false;
@@ -25,8 +26,8 @@ class Materiais
             $callback = [
                 "code" => 200,
                 "data" => [
-                    "materiais" => $material->getMateriais($offset, $search, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque),
-                    "qtdMateriais" => $material->contarMateriais($search, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque)
+                    "materiais" => $material->getMateriais($offset, $search, $fltrCategoria, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque),
+                    "qtdMateriais" => $material->contarMateriais($search, $fltrCategoria, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque)
                 ]
             ];
 

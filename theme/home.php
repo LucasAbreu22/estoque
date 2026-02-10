@@ -11,6 +11,7 @@
             <div class="fltrColumn">
                 <label> <b> Categoria:</b> </label>
                 <select id="fltrCategoria">
+                    <option value="" selected>Selecione</option>
                     <?php foreach ($categorias as $categoria): ?>
                         <option value="<?= $categoria->id_categoria ?>"><?= $categoria->nome ?></option>
                     <?php endforeach; ?>
@@ -226,6 +227,11 @@
         getMateriaisModal();
     });
 
+    document.getElementById('fltrCategoria').addEventListener("change", function() {
+        offset = 0;
+        getMateriais();
+    });
+
     document.querySelectorAll('input[name="evento"]').forEach(radio => {
         radio.addEventListener('click', function() {
 
@@ -262,6 +268,7 @@
         offset += increment;
 
         const search = document.getElementById("buscarMaterial").value.trim();
+        const fltrCategoria = document.getElementById('fltrCategoria').selectedOptions[0].value;
         const fltrStatusNormal = document.getElementById("fltrStatusNormal").checked;
         const fltrStatusAcabando = document.getElementById("fltrStatusAcabando").checked;
         const fltrStatusSemEstoque = document.getElementById("fltrStatusSemEstoque").checked;
@@ -272,6 +279,7 @@
             data: {
                 offset: offset,
                 search: search,
+                fltrCategoria: fltrCategoria,
                 fltrStatusNormal: fltrStatusNormal,
                 fltrStatusAcabando: fltrStatusAcabando,
                 fltrStatusSemEstoque: fltrStatusSemEstoque,
