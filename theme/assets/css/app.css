@@ -176,6 +176,13 @@ table .left {
   text-align: left;
 }
 
+input[type="text"],
+input[type="number"] {
+  width: 250px;
+  padding: 8px;
+  margin: 6px 0 12px;
+}
+
 .badge {
   padding: 4px 8px;
   border-radius: 4px;
@@ -254,13 +261,6 @@ table .left {
 .modal-content input,
 .modal-content select {
   width: 100%;
-  padding: 8px;
-  margin: 6px 0 12px;
-}
-
-input[type="text"],
-input[type="number"] {
-  width: 250px;
   padding: 8px;
   margin: 6px 0 12px;
 }

@@ -1,7 +1,7 @@
 <?php
 
-define("URL_BASE", "http://localhost/estoque");
-// define("URL_BASE", "http://10.120.1.120/estoque");
+// define("URL_BASE", "http://localhost/estoque");
+define("URL_BASE", "http://10.120.1.120/estoque");
 
 define("SITE", "Estoque");
 
