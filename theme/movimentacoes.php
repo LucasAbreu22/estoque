@@ -2,69 +2,71 @@
 
 <main>
 
-    <div class="top-actions">
-        <div id="fltrArea">
-            <div>
-                <label for="dateInicial"> <b>Périodo:</b></label>
+    <div id="app">
+        <div class="top-actions">
+            <div id="fltrArea">
                 <div>
-                    <input type="date" id="dateInicial">
-                    <span>a</span>
-                    <input type="date" id="dateFinal">
+                    <label for="dateInicial"> <b>Périodo:</b></label>
+                    <div>
+                        <input type="date" id="dateInicial">
+                        <span>a</span>
+                        <input type="date" id="dateFinal">
+                    </div>
                 </div>
-            </div>
 
-            <div class="fltrColumn">
-                <label for="buscarCodSig"> <b> Digite o código do SIGMA:</b> </label>
-                <input type="number" id="buscarCodSig">
-            </div>
+                <div class="fltrColumn">
+                    <label for="buscarCodSig"> <b> Digite o código do SIGMA:</b> </label>
+                    <input type="number" id="buscarCodSig">
+                </div>
 
-            <div class="fltrColumn">
-                <label for="buscarMaterial"> <b> Digite o código ou descrição:</b> </label>
-                <input type="text" id="buscarMaterial">
-            </div>
+                <div class="fltrColumn">
+                    <label for="buscarMaterial"> <b> Digite o código ou descrição:</b> </label>
+                    <input type="text" id="buscarMaterial">
+                </div>
 
-            <div class="fltrColumn">
-                <label for="buscarPessoa"> <b> Digite o ponto ou nome:</b> </label>
-                <input type="text" id="buscarPessoa">
-            </div>
+                <div class="fltrColumn">
+                    <label for="buscarPessoa"> <b> Digite o ponto ou nome:</b> </label>
+                    <input type="text" id="buscarPessoa">
+                </div>
 
-            <div class="fltrColumn">
-                <span><b>Tipo moviemntação:</b></span>
-                <div>
-                    <input type="checkbox" class="fltrCheck" id="fltrTipoMovEntrada"><label for="fltrTipoMovEntrada">Entrada</label>
-                    <input type="checkbox" class="fltrCheck" id="fltrTipoMovSaida"><label for="fltrTipoMovSaida">Saída</label>
+                <div class="fltrColumn">
+                    <span><b>Tipo moviemntação:</b></span>
+                    <div>
+                        <input type="checkbox" class="fltrCheck" id="fltrTipoMovEntrada"><label for="fltrTipoMovEntrada">Entrada</label>
+                        <input type="checkbox" class="fltrCheck" id="fltrTipoMovSaida"><label for="fltrTipoMovSaida">Saída</label>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cod. Sigma</th>
-                <th>Código Material</th>
-                <th>Material</th>
-                <th>QTD.</th>
-                <th>Data</th>
-                <th>Tipo</th>
-                <th>Ponto Solicitante</th>
-                <th>Nome Solicitante</th>
-                <th>Ponto Resp.</th>
-                <th>Nome Resp.</th>
-            </tr>
-        </thead>
-        <tbody id="tabelaMovimentacoes">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cod. Sigma</th>
+                    <th>Código Material</th>
+                    <th>Material</th>
+                    <th>QTD.</th>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Ponto Solicitante</th>
+                    <th>Nome Solicitante</th>
+                    <th>Ponto Resp.</th>
+                    <th>Nome Resp.</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaMovimentacoes">
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-    <div id="nav-table">
-        <button class="btn-nav" id="navVoltar" onclick="getMovimentacao(-lines)">
-            < </button>
-                <span id="nav-index">1</span>
+        <div id="nav-table">
+            <button class="btn-nav" id="navVoltar" onclick="getMovimentacao(-lines)">
+                < </button>
+                    <span id="nav-index">1</span>
 
-                <button class="btn-nav" id="navAvancar" onclick="getMovimentacao(lines)"> > </button>
+                    <button class="btn-nav" id="navAvancar" onclick="getMovimentacao(lines)"> > </button>
+        </div>
     </div>
 </main>
 <?php $this->start("js"); ?>
@@ -74,6 +76,75 @@
         getMovimentacao();
 
     });
+
+    const {
+        createApp,
+        ref,
+        computed,
+        onMounted,
+        onBeforeUnmount,
+        watch,
+    } = Vue;
+
+    createApp({
+        setup() {
+            const movimentacoes = ref([]);
+            const qtdMovimentacoes = ref(0);
+            const offset = ref(0);
+
+            function getMovimentacao(increment = 0) {
+                let dataInicial = document.getElementById("dateInicial").value;
+                let dataFinal = document.getElementById("dateFinal").value;
+                const buscarCodSig = document.getElementById("buscarCodSig").value.trim();
+                const buscarMaterial = document.getElementById("buscarMaterial").value.trim();
+                const buscarPessoa = document.getElementById("buscarPessoa").value.trim();
+                const fltrMovEntrada = document.getElementById("fltrTipoMovEntrada").checked;
+                const fltrMovSaida = document.getElementById("fltrTipoMovSaida").checked;
+
+                if (dataInicial !== "") dataInicial += " 23:59:59";
+                if (dataFinal !== "") dataFinal += " 23:59:59";
+
+                offset.value += increment;
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?= url("/movimentacoes/") ?>",
+                    data: {
+                        offset: offset.value,
+                        dataInicial: dataInicial,
+                        dataFinal: dataFinal,
+                        buscarCodSig: buscarCodSig,
+                        buscarMaterial: buscarMaterial,
+                        buscarPessoa: buscarPessoa,
+                        fltrMovEntrada: fltrMovEntrada,
+                        fltrMovSaida: fltrMovSaida
+                    },
+                    dataType: "json",
+                    success: function(response) {
+
+                        if (response.hasOwnProperty("message") && response.message.indexOf("<br>[ERRO]") === 0) {
+                            alert(response.message);
+
+                        } else {
+                            movimentacoes.value = response.data.movimentacoes;
+                            qtdMovimentacoes.value = response.data.qtdMovimentacoes;
+                            atualizarMovimentacaoList();
+                        }
+                        ocultarLoading()
+                    }
+                });
+            }
+
+            onMounted(() => {
+                getMovimentacao();
+            });
+
+
+            return {
+
+            };
+        },
+    }).mount("#app");
 
     document.getElementById("dateInicial").addEventListener("change", function() {
         offset = 0

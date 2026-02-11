@@ -1,516 +1,808 @@
 <?php $this->layout("_theme", ["title" => $title]); ?>
 
 <main>
-    <div class="top-actions">
-        <div id="fltrArea">
-            <div class="fltrColumn">
-                <label> <b> Digite o código ou descrição:</b> </label>
-                <input type="text" id="buscarMaterial">
+    <div id="app">
+        <div class="top-actions">
+            <div id="fltrArea">
+                <div class="fltrColumn">
+                    <label> <b> Digite o código ou descrição:</b> </label>
+                    <input type="text" id="buscarMaterial">
+                </div>
+
+                <div class="fltrColumn">
+                    <label> <b> Categoria:</b> </label>
+                    <select id="fltrCategoria">
+                        <option value="" selected>Selecione</option>
+                        <?php foreach ($categorias as $categoria): ?>
+                            <option value="<?= $categoria->id_categoria ?>"><?= $categoria->nome ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="fltrColumn">
+                    <span><b>Status:</b></span>
+                    <div>
+                        <input type="checkbox" class="fltrCheck" id="fltrStatusNormal"><label for="fltrStatusNormal">Normal</label>
+                        <input type="checkbox" class="fltrCheck" id="fltrStatusAcabando"><label for="fltrStatusAcabando">Acabando</label>
+                        <input type="checkbox" class="fltrCheck" id="fltrStatusSemEstoque"><label for="fltrStatusSemEstoque">Sem Estoque</label>
+                    </div>
+                </div>
             </div>
 
-            <div class="fltrColumn">
-                <label> <b> Categoria:</b> </label>
-                <select id="fltrCategoria">
-                    <option value="" selected>Selecione</option>
-                    <?php foreach ($categorias as $categoria): ?>
-                        <option value="<?= $categoria->id_categoria ?>"><?= $categoria->nome ?></option>
-                    <?php endforeach; ?>
-                </select>
+            <div>
+                <button class="btn-add btn-entry" @click="abrirMovimentacao('ENTRADA')">Novas Entrada</button>
+                <button class="btn-add btn-alert" @click="abrirMovimentacao('SAIDA')">Novas Saída</button>
+                <button class="btn-add" @click="abrirModalMaterial()">+ Novo Material</button>
             </div>
-            <div class="fltrColumn">
-                <span><b>Status:</b></span>
-                <div>
-                    <input type="checkbox" class="fltrCheck" id="fltrStatusNormal"><label for="fltrStatusNormal">Normal</label>
-                    <input type="checkbox" class="fltrCheck" id="fltrStatusAcabando"><label for="fltrStatusAcabando">Acabando</label>
-                    <input type="checkbox" class="fltrCheck" id="fltrStatusSemEstoque"><label for="fltrStatusSemEstoque">Sem Estoque</label>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Saldo</th>
+                    <th>Un. Base</th>
+                    <th>Un. Compra</th>
+                    <th>Mínimo</th>
+                    <th>Localização</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaMateriais">
+
+                <tr v-for="(material, i) in materiais" :key="i">
+                    <td class="codigo">{{material.codigo}}</td>
+                    <td class="left descricao">{{material.descricao}}</td>
+                    <td class="left">{{material.categoria}}</td>
+                    <td class="saldo">{{material.quantidade}}</td>
+                    <td class="left">{{material.unidade_base}}</td>
+                    <td class="left">{{material.unidade_compra}}</td>
+                    <td class="minimo">{{material.quantidade_minima}}</td>
+                    <td>{{material.localizacao}}</td>
+                    <td><span class="badge {{statusClss}}">{{material.status}}</span></td>
+                    <td class="actions">
+                        <button class="btn-entry" @click="abrirMovimentacao('ENTRADA', material.id_material)">Entrada 🡇</button>
+                        <button class="btn-alert" @click="abrirMovimentacao('SAIDA', material.id_material)">Saída 🡅</button>
+                        <button class="btn-edit" onclick="editarMaterial(this)">Editar</button>
+                        <button class="btn-exit" onclick="excluirMaterial(this)">Excluir</button>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <div id="nav-table">
+            <button class="btn-nav disabled-button" id="navVoltar" @click="getMateriais(-lines)" disabled>
+                ◄ </button>
+            <span id="nav-index">1</span>
+
+            <button class="btn-nav disabled-button" id="navAvancar" @click="getMateriais(lines)" disabled> ► </button>
+        </div>
+
+        <!-- MODAL MOVIMENTAÇÃO -->
+        <div class="modal" id="modalMov">
+            <div class="modal-content">
+                <h2 id="tituloMov"></h2>
+                <br>
+
+                <span>Evento</span>
+                <div id="eventoArea">
+                    <div>
+                        <input type="radio" id="movEntrada" name="evento" value="ENTRADA">
+                        <label for="movEntrada">Entrada</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="movSaida" name="evento" value="SAIDA">
+                        <label for="movSaida">Saída</label>
+                    </div>
+                </div>
+                <br>
+
+                <div id="areaSigma">
+                    <label>Código do sigma</label>
+                    <input type="number" id="codigoSigma">
+                </div>
+
+                <label>Ponto responsável</label>
+                <input type="number" id="pontoResponsavel">
+
+                <div id="areaSolicitante">
+                    <div id="areaPontoSolicitante">
+                        <label>Ponto solicitante</label>
+                        <input type="number" id="pontoSolicitante">
+                    </div>
+                    <div id="areaNomeSolicitante">
+                        <label>Nome solicitante</label>
+                        <input type="text" id="nomeSolicitante">
+                    </div>
+                </div>
+
+                <h4>Materiais movimentação</h4>
+                <div id="areaCarrinho">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descrição</th>
+                                <th>QTD</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaCarrinho">
+                            <tr v-for="(material, i) in carrinhoList" :key="i">
+                                <td class="codigo">{{material.codigo}}</td>
+                                <td class="left descricao">{{material.descricao}}</td>
+                                <td><input type="number" @keyup="editQtdItem(this)" min="1" :value="material.quantidadeMov"></td>
+                                <td class="actions">
+                                    <button class="btn-exit" @click="removerItem(material.id_material)">▼</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>Materiais almox</h4>
+                <input type="text" id="buscarMaterialModal" placeholder="Digite o código ou descrição">
+                <div id="areaAlmox">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descrição</th>
+                                <th>Saldo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaMateriaisModal">
+                            <tr v-for="(material, i) in materiaisModal" :key="i">
+                                <td class="codigo">{{material.codigo}}</td>
+                                <td class="left descricao">{{material.descricao}}</td>
+                                <td>{{material.quantidade}}</td>
+                                <td class="actions">
+                                    <button :class="tipoMov === 'SAIDA' && material.quantidade == 0? 'disabled-button ': 'btn-entry '" @click="adicionarItem(material.id_material)">▲</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="nav-table">
+                    <button class="btn-nav disabled-button" id="navModalVoltar" @click="getMateriaisModal(-lines)" disabled>
+                        ◄ </button>
+                    <span id="navModal-index">1</span>
+
+                    <button class="btn-nav disabled-button" id="navModalAvancar" @click="getMateriaisModal(lines)" disabled> ► </button>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" @click="fecharModal('modalMov')">Cancelar</button>
+                    <button class="btn-confirm" @click="criarMovimentacao()">Confirmar</button>
                 </div>
             </div>
         </div>
 
-        <div>
-            <button class="btn-add btn-entry" onclick="abrirMovimentacao('ENTRADA')">Novas Entrada</button>
-            <button class="btn-add btn-alert" onclick="abrirMovimentacao('SAIDA')">Novas Saída</button>
-            <button class="btn-add" onclick="abrirModalMaterial()">+ Novo Material</button>
+
+        <!-- MODAL NOVO MATERIAL -->
+        <div class="modal" id="modalMaterial">
+            <div class="modal-content">
+                <h2 id="titleModalMaterial">Novo Material</h2>
+
+                <label>Código</label>
+                <input type="text" id="codigo">
+
+                <label>Descrição</label>
+                <input type="text" id="descricao">
+
+                <label>Categoria</label>
+                <select id="categoria">
+                    <?php foreach ($categorias as $categoria): ?>
+                        <option value="<?= $categoria->id_categoria ?>"><?= $categoria->nome ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label>Unidade Base</label>
+                <select id="unBase">
+                    <option>Unidade</option>
+                    <option>Folha</option>
+                    <option>Metro</option>
+                </select>
+
+                <label>Unidade de Compra</label>
+                <select id="unCompra">
+                    <option>Resma</option>
+                    <option>Caixa</option>
+                    <option>Rolo</option>
+                </select>
+
+                <label>Fator de Conversão</label>
+                <input type="number" id="fator">
+
+                <label>Quantidade Mínima</label>
+                <input type="number" id="minimo">
+
+                <label>Localização</label>
+                <input type="text" id="localizacao">
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="fecharModal('modalMaterial')">Cancelar</button>
+                    <button class="btn-confirm" onclick="salvarMaterial()">Salvar</button>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Descrição</th>
-                <th>Categoria</th>
-                <th>Saldo</th>
-                <th>Un. Base</th>
-                <th>Un. Compra</th>
-                <th>Mínimo</th>
-                <th>Localização</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody id="tabelaMateriais">
-        </tbody>
-    </table>
-    <div id="nav-table">
-        <button class="btn-nav disabled-button" id="navVoltar" onclick="getMateriais(-lines)" disabled>
-            ◄ </button>
-        <span id="nav-index">1</span>
-
-        <button class="btn-nav disabled-button" id="navAvancar" onclick="getMateriais(lines)" disabled> ► </button>
     </div>
 </main>
 
-<!-- MODAL MOVIMENTAÇÃO -->
-<div class="modal" id="modalMov">
-    <div class="modal-content">
-        <h2 id="tituloMov"></h2>
-        <br>
 
-        <span>Evento</span>
-        <div id="eventoArea">
-            <div>
-                <input type="radio" id="movEntrada" name="evento" value="ENTRADA">
-                <label for="movEntrada">Entrada</label>
-            </div>
-            <div>
-                <input type="radio" id="movSaida" name="evento" value="SAIDA">
-                <label for="movSaida">Saída</label>
-            </div>
-        </div>
-        <br>
-
-        <div id="areaSigma">
-            <label>Código do sigma</label>
-            <input type="number" id="codigoSigma">
-        </div>
-
-        <label>Ponto responsável</label>
-        <input type="number" id="pontoResponsavel">
-
-        <div id="areaSolicitante">
-            <div id="areaPontoSolicitante">
-                <label>Ponto solicitante</label>
-                <input type="number" id="pontoSolicitante">
-            </div>
-            <div id="areaNomeSolicitante">
-                <label>Nome solicitante</label>
-                <input type="text" id="nomeSolicitante">
-            </div>
-        </div>
-
-        <h4>Materiais movimentação</h4>
-        <div id="areaCarrinho">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Descrição</th>
-                        <th>QTD</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaCarrinho">
-
-                </tbody>
-            </table>
-        </div>
-
-        <h4>Materiais almox</h4>
-        <input type="text" id="buscarMaterialModal" placeholder="Digite o código ou descrição">
-        <div id="areaAlmox">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Descrição</th>
-                        <th>Saldo</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaMateriaisModal">
-
-                </tbody>
-            </table>
-        </div>
-        <div id="nav-table">
-            <button class="btn-nav disabled-button" id="navModalVoltar" onclick="getMateriaisModal(-lines)" disabled>
-                ◄ </button>
-            <span id="navModal-index">1</span>
-
-            <button class="btn-nav disabled-button" id="navModalAvancar" onclick="getMateriaisModal(lines)" disabled> ► </button>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="fecharModal('modalMov')">Cancelar</button>
-            <button class="btn-confirm" onclick="criarMovimentacao()">Confirmar</button>
-        </div>
-    </div>
-</div>
-
-
-<!-- MODAL NOVO MATERIAL -->
-<div class="modal" id="modalMaterial">
-    <div class="modal-content">
-        <h2 id="titleModalMaterial">Novo Material</h2>
-
-        <label>Código</label>
-        <input type="text" id="codigo">
-
-        <label>Descrição</label>
-        <input type="text" id="descricao">
-
-        <label>Categoria</label>
-        <select id="categoria">
-            <?php foreach ($categorias as $categoria): ?>
-                <option value="<?= $categoria->id_categoria ?>"><?= $categoria->nome ?></option>
-            <?php endforeach; ?>
-        </select>
-
-        <label>Unidade Base</label>
-        <select id="unBase">
-            <option>Unidade</option>
-            <option>Folha</option>
-            <option>Metro</option>
-        </select>
-
-        <label>Unidade de Compra</label>
-        <select id="unCompra">
-            <option>Resma</option>
-            <option>Caixa</option>
-            <option>Rolo</option>
-        </select>
-
-        <label>Fator de Conversão</label>
-        <input type="number" id="fator">
-
-        <label>Quantidade Mínima</label>
-        <input type="number" id="minimo">
-
-        <label>Localização</label>
-        <input type="text" id="localizacao">
-
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="fecharModal('modalMaterial')">Cancelar</button>
-            <button class="btn-confirm" onclick="salvarMaterial()">Salvar</button>
-        </div>
-    </div>
-</div>
-</body>
 
 
 <?php $this->start("js"); ?>
 <script>
-    let carrinhoList = [];
-    let materiais = [];
-    let qtdMateriais = 0;
-    let paginaAtual = 0;
-    let linhaSelecionada = null;
-    let offset = 0
+    const {
+        createApp,
+        ref,
+        computed,
+        onMounted,
+        onBeforeUnmount,
+        watch,
+    } = Vue;
+
+    createApp({
+        setup() {
+            const lines = 12;
+
+            const materiais = ref([]);
+            const paginaAtual = ref(0);
+            const qtdMateriais = ref(0);
+
+            const offset = ref(0);
+
+            const carrinhoList = ref([]);
+            const materiaisModal = ref([]);
+            const tipoMov = ref(null);
+            const offsetModal = ref(0);
+            const qtdMateriaisModal = ref(0);
+            const paginaAtualModal = ref(0);
+            const linhaSelecionadaModal = ref(null);
+
+            function getMateriais(increment = 0) {
+
+                offset.value += increment;
+
+                const search = document.getElementById("buscarMaterial").value.trim();
+                const fltrCategoria = document.getElementById('fltrCategoria').selectedOptions[0].value;
+                const fltrStatusNormal = document.getElementById("fltrStatusNormal").checked;
+                const fltrStatusAcabando = document.getElementById("fltrStatusAcabando").checked;
+                const fltrStatusSemEstoque = document.getElementById("fltrStatusSemEstoque").checked;
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?= url("/") ?>",
+                    data: {
+                        offset: offset.value,
+                        search: search,
+                        fltrCategoria: fltrCategoria,
+                        fltrStatusNormal: fltrStatusNormal,
+                        fltrStatusAcabando: fltrStatusAcabando,
+                        fltrStatusSemEstoque: fltrStatusSemEstoque,
+                    },
+                    dataType: "json",
+                    success: function(response) {
+
+                        if (response.code == 200) {
+                            materiais.value = response.data.materiais;
+                            qtdMateriais.value = response.data.qtdMateriais;
+
+                            const navIdx = document.getElementById("nav-index");
+
+                            const paginaFinal = Math.ceil(qtdMateriais.value <= lines ? 1 : qtdMateriais.value / lines);
+
+                            paginaAtual.value = (offset.value / lines) + 1;
+
+                            const navVoltar = document.getElementById("navVoltar");
+                            const navAvancar = document.getElementById("navAvancar");
+
+                            if (paginaAtual.value == 1) {
+                                navVoltar.disabled = true;
+                                navVoltar.classList.add("disabled-button");
+                            } else if (paginaAtual.value > 1) {
+                                navVoltar.disabled = false;
+                                navVoltar.classList.remove("disabled-button");
+                            }
+
+                            if (paginaAtual.value == paginaFinal) {
+                                navAvancar.disabled = true;
+                                navAvancar.classList.add("disabled-button");
+                            } else if (paginaAtual.value < paginaFinal && paginaAtual.value > 1 || paginaFinal > 1) {
+                                navAvancar.disabled = false;
+                                navAvancar.classList.remove("disabled-button");
+                            }
+
+                            navIdx.innerHTML = `${paginaAtual.value}/${paginaFinal} Páginas`;
+
+                        } else {
+                            alert(response.message);
+                        }
+
+                        ocultarLoading();
+                    }
+                });
+            }
+
+            function abrirMovimentacao(tipo = "ENTRADA", id_material = null) {
+
+                tipoMov.value = tipo;
+
+                if (tipoMov.value === 'ENTRADA') {
+                    document.getElementById('tituloMov').innerText = 'Entrada de Material';
+                    document.getElementById('areaSolicitante').style.display = "none";
+                    document.getElementById('areaSigma').style.display = "initial";
+
+                    document.getElementById("movEntrada").checked = true;
+                } else {
+                    document.getElementById('tituloMov').innerText = 'Saída de Material';
+                    document.getElementById('areaSolicitante').style.display = 'flex';
+                    document.getElementById('areaSigma').style.display = "none";
+
+                    document.getElementById("movSaida").checked = true;
+                }
+
+                if (id_material !== null && id_material > 0) {
+                    let material = materiais.value.find((material) => material.id_material == id_material);
+
+                    material.quantidadeMov = material.quantidade;
+
+                    if (material === undefined) {
+                        alert("[INICAR] Material não encontrado!");
+                        return false;
+                    }
+
+                    if (tipoMov.value === 'SAIDA' && material.quantidade == 0) {
+                        alert("Não é possivel dar saída para material sem estoque!");
+                        return false;
+                    }
+
+                    carrinhoList.value.push({
+                        ...material
+                    });
+                }
+
+                getMateriaisModal();
+
+                document.getElementById('modalMov').classList.add('active');
+            }
+
+            function getMateriaisModal(increment = 0) {
+
+                offsetModal.value += increment;
+
+                const search = document.getElementById("buscarMaterialModal").value.trim();
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?= url("/") ?>",
+                    data: {
+                        offset: offsetModal.value,
+                        search: search
+                    },
+                    dataType: "json",
+                    success: function(response) {
+
+                        if (response.code == 200) {
+                            materiaisModal.value = response.data.materiais;
+                            qtdMateriaisModal.value = response.data.qtdMateriais;
+
+                        } else {
+                            alert(response.message);
+                        }
+                    }
+                });
+            }
+
+            function adicionarItem(id_material) {
+
+                const material = materiaisModal.value.find((material) => material.id_material === id_material);
+
+                if (carrinhoList.value.findIndex((material) => material.id_material === id_material) >= 0) {
+                    alert("Material já incluído para movimentação!");
+                    return false;
+                }
+
+                if (tipoMov === 'SAIDA' && material.quantidade == 0) {
+                    alert("Não é possivel dar saída para material sem estoque!");
+                    return false;
+                }
+
+                material.quantidadeMov = material.quantidade;
+
+                carrinhoList.value.push({
+                    ...material
+                });
+            }
+
+            function removerItem(id_material) {
+
+                if (id_material > 0) carrinhoList.value = carrinhoList.value.filter((material) => material.id_material !== id_material);
+
+                else alert("ID não identificado!");
+
+            }
+
+            onMounted(() => {
+                getMateriais();
+
+                document.getElementById("buscarMaterial").addEventListener("keyup", function() {
+                    offset.value = 0;
+                    getMateriais();
+                });
+
+                document.getElementById("buscarMaterialModal").addEventListener("keyup", function() {
+                    offsetModal.value = 0
+                    getMateriaisModal();
+                });
+
+                document.getElementById('fltrCategoria').addEventListener("change", function() {
+                    offset.value = 0;
+                    getMateriais();
+                });
+
+                document.querySelectorAll('input[name="evento"]').forEach(radio => {
+                    radio.addEventListener('click', function() {
+
+                        const idx = carrinhoList.value.findIndex((material) => material.quantidade == 0);
+
+                        if (this.value === "SAIDA" && idx >= 0) {
+
+                            if (confirm("Existem materiais sem saldo que serão removidos!\nDeseja continuar?")) {
+                                carrinhoList.value = carrinhoList.value.filter((material) => material.quantidade > 0);
+
+
+                            } else return false;
+                        }
+
+                        tipoMov = this.value;
+
+                        document.getElementById('tituloMov').innerText = tipoMov === 'ENTRADA' ? 'Entrada de Material' : 'Saída de Material';
+                        document.getElementById('areaSolicitante').style.display = tipoMov === 'ENTRADA' ? "none" : 'flex';
+                        document.getElementById('areaSigma').style.display = tipoMov === 'ENTRADA' ? "initial" : "none";
+
+                    });
+                });
+
+                document.querySelectorAll('.fltrCheck').forEach(chcks => {
+                    chcks.addEventListener('click', function(chck) {
+                        offset.value = 0;
+                        getMateriais();
+                    });
+                });
+            });
+
+
+            return {
+                lines,
+                materiais,
+                carrinhoList,
+                materiaisModal,
+                abrirMovimentacao,
+                adicionarItem,
+                removerItem,
+                getMateriais
+            };
+        },
+    }).mount("#app");
+
+
+
+    // let carrinhoList = [];
+    // let materiais = [];
+    // let qtdMateriais = 0;
+    // let paginaAtual = 0;
+    // let linhaSelecionada = null;
+    // let offset = 0
 
     let tipoMov = null;
     let offsetModal = 0
     let qtdMateriaisModal = 0;
     let paginaAtualModal = 0;
     let linhaSelecionadaModal = null;
+    let materiaisModal = [];
 
     const lines = 12;
 
     mostrarLoading()
-    getMateriais();
-
-    document.getElementById("buscarMaterial").addEventListener("keyup", function() {
-        offset = 0;
-        getMateriais();
-    });
-
-    document.getElementById("buscarMaterialModal").addEventListener("keyup", function() {
-        offsetModal = 0
-        getMateriaisModal();
-    });
-
-    document.getElementById('fltrCategoria').addEventListener("change", function() {
-        offset = 0;
-        getMateriais();
-    });
-
-    document.querySelectorAll('input[name="evento"]').forEach(radio => {
-        radio.addEventListener('click', function() {
-
-            const idx = carrinhoList.findIndex((material) => material.quantidade == 0);
-
-            if (this.value === "SAIDA" && idx >= 0) {
-
-                if (confirm("Existem materiais sem saldo que serão removidos!\nDeseja continuar?")) {
-                    carrinhoList = carrinhoList.filter((material) => material.quantidade > 0);
-                    atualizarCarrinhoList();
-
-                } else return false;
-            }
-
-            tipoMov = this.value;
+    // getMateriais();
+
+    // document.getElementById("buscarMaterial").addEventListener("keyup", function() {
+    //     offset = 0;
+    //     getMateriais();
+    // });
+
+    // document.getElementById("buscarMaterialModal").addEventListener("keyup", function() {
+    //     offsetModal = 0
+    //     getMateriaisModal();
+    // });
+
+    // document.getElementById('fltrCategoria').addEventListener("change", function() {
+    //     offset = 0;
+    //     getMateriais();
+    // });
+
+    // document.querySelectorAll('input[name="evento"]').forEach(radio => {
+    //     radio.addEventListener('click', function() {
+
+    //         const idx = carrinhoList.findIndex((material) => material.quantidade == 0);
+
+    //         if (this.value === "SAIDA" && idx >= 0) {
+
+    //             if (confirm("Existem materiais sem saldo que serão removidos!\nDeseja continuar?")) {
+    //                 carrinhoList = carrinhoList.filter((material) => material.quantidade > 0);
+    //                 atualizarCarrinhoList();
+
+    //             } else return false;
+    //         }
+
+    //         tipoMov = this.value;
 
-            document.getElementById('tituloMov').innerText = tipoMov === 'ENTRADA' ? 'Entrada de Material' : 'Saída de Material';
-            document.getElementById('areaSolicitante').style.display = tipoMov === 'ENTRADA' ? "none" : 'flex';
-            document.getElementById('areaSigma').style.display = tipoMov === 'ENTRADA' ? "initial" : "none";
-
-            atualizarMaterialListModal()
-        });
-    });
-
-    document.querySelectorAll('.fltrCheck').forEach(chcks => {
-        chcks.addEventListener('click', function(chck) {
-            offset = 0;
-            getMateriais();
-        });
-    });
-
-    function getMateriais(increment = 0) {
-
-        offset += increment;
-
-        const search = document.getElementById("buscarMaterial").value.trim();
-        const fltrCategoria = document.getElementById('fltrCategoria').selectedOptions[0].value;
-        const fltrStatusNormal = document.getElementById("fltrStatusNormal").checked;
-        const fltrStatusAcabando = document.getElementById("fltrStatusAcabando").checked;
-        const fltrStatusSemEstoque = document.getElementById("fltrStatusSemEstoque").checked;
-
-        $.ajax({
-            type: "POST",
-            url: "<?= url("/") ?>",
-            data: {
-                offset: offset,
-                search: search,
-                fltrCategoria: fltrCategoria,
-                fltrStatusNormal: fltrStatusNormal,
-                fltrStatusAcabando: fltrStatusAcabando,
-                fltrStatusSemEstoque: fltrStatusSemEstoque,
-            },
-            dataType: "json",
-            success: function(response) {
-
-                if (response.code == 200) {
-                    materiais = response.data.materiais;
-                    qtdMateriais = response.data.qtdMateriais;
-
-                    atualizarMaterialList();
-                } else {
-                    alert(response.message);
-                }
-
-                ocultarLoading();
-            }
-        });
-    }
-
-    function getMateriaisModal(increment = 0) {
-
-        offsetModal += increment;
-
-        const search = document.getElementById("buscarMaterialModal").value.trim();
-
-        $.ajax({
-            type: "POST",
-            url: "<?= url("/") ?>",
-            data: {
-                offset: offsetModal,
-                search: search
-            },
-            dataType: "json",
-            success: function(response) {
-
-                if (response.code == 200) {
-                    materiaisModal = response.data.materiais;
-                    qtdMateriaisModal = response.data.qtdMateriais;
+    //         document.getElementById('tituloMov').innerText = tipoMov === 'ENTRADA' ? 'Entrada de Material' : 'Saída de Material';
+    //         document.getElementById('areaSolicitante').style.display = tipoMov === 'ENTRADA' ? "none" : 'flex';
+    //         document.getElementById('areaSigma').style.display = tipoMov === 'ENTRADA' ? "initial" : "none";
+
+    //         atualizarMaterialListModal()
+    //     });
+    // });
+
+    // document.querySelectorAll('.fltrCheck').forEach(chcks => {
+    //     chcks.addEventListener('click', function(chck) {
+    //         offset = 0;
+    //         getMateriais();
+    //     });
+    // });
+
+    // function getMateriais(increment = 0) {
+
+    //     offset += increment;
+
+    //     const search = document.getElementById("buscarMaterial").value.trim();
+    //     const fltrCategoria = document.getElementById('fltrCategoria').selectedOptions[0].value;
+    //     const fltrStatusNormal = document.getElementById("fltrStatusNormal").checked;
+    //     const fltrStatusAcabando = document.getElementById("fltrStatusAcabando").checked;
+    //     const fltrStatusSemEstoque = document.getElementById("fltrStatusSemEstoque").checked;
+
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "<?= url("/") ?>",
+    //         data: {
+    //             offset: offset,
+    //             search: search,
+    //             fltrCategoria: fltrCategoria,
+    //             fltrStatusNormal: fltrStatusNormal,
+    //             fltrStatusAcabando: fltrStatusAcabando,
+    //             fltrStatusSemEstoque: fltrStatusSemEstoque,
+    //         },
+    //         dataType: "json",
+    //         success: function(response) {
+
+    //             if (response.code == 200) {
+    //                 materiais = response.data.materiais;
+    //                 qtdMateriais = response.data.qtdMateriais;
+
+    //                 atualizarMaterialList();
+    //             } else {
+    //                 alert(response.message);
+    //             }
+
+    //             ocultarLoading();
+    //         }
+    //     });
+    // }
+
+    // function getMateriaisModal(increment = 0) {
+
+    //     offsetModal += increment;
+
+    //     const search = document.getElementById("buscarMaterialModal").value.trim();
+
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "<?= url("/") ?>",
+    //         data: {
+    //             offset: offsetModal,
+    //             search: search
+    //         },
+    //         dataType: "json",
+    //         success: function(response) {
+
+    //             if (response.code == 200) {
+    //                 materiaisModal = response.data.materiais;
+    //                 qtdMateriaisModal = response.data.qtdMateriais;
 
-                    atualizarMaterialListModal();
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    }
+    //                 atualizarMaterialListModal();
+    //             } else {
+    //                 alert(response.message);
+    //             }
+    //         }
+    //     });
+    // }
 
-    function atualizarMaterialList() {
-        const tabela = document.getElementById('tabelaMateriais');
+    // function atualizarMaterialList() {
+    //     const tabela = document.getElementById('tabelaMateriais');
 
-        tabela.innerHTML = "";
+    //     tabela.innerHTML = "";
 
-        materiais.forEach(material => {
-            const tr = document.createElement('tr');
-
-            const quantidade = Number(material.quantidade);
-            const minimo = Number(material.quantidade_minima);
-
-            let statusClss = "ok";
-
-            if (quantidade == 0) statusClss = "out";
+    //     materiais.forEach(material => {
+    //         const tr = document.createElement('tr');
+
+    //         const quantidade = Number(material.quantidade);
+    //         const minimo = Number(material.quantidade_minima);
+
+    //         let statusClss = "ok";
+
+    //         if (quantidade == 0) statusClss = "out";
 
-            else if (quantidade < minimo) statusClss = "low"
+    //         else if (quantidade < minimo) statusClss = "low"
 
-            tr.innerHTML = `
-            <td class="codigo">${material.codigo}</td>
-            <td class="left descricao">${material.descricao}</td>
-            <td class="left">${material.categoria}</td>
-            <td class="saldo">${material.quantidade}</td>
-            <td class="left">${material.unidade_base}</td>
-            <td class="left">${material.unidade_compra}</td>
-            <td class="minimo">${material.quantidade_minima}</td>
-            <td>${material.localizacao}</td>
-            <td><span class="badge ${statusClss}">${material.status}</span></td>
-            <td class="actions">
-                <button class="btn-entry" onclick="abrirMovimentacao('ENTRADA', this)">Entrada 🡇</button>
-                <button class="btn-alert" onclick="abrirMovimentacao('SAIDA', this)">Saída 🡅</button>
-                <button class="btn-edit" onclick="editarMaterial(this)">Editar</button>
-                <button class="btn-exit" onclick="excluirMaterial(this)">Excluir</button>
-            </td>
-        `;
-            tabela.appendChild(tr);
-
-        });
+    //         tr.innerHTML = `
+    //         <td class="codigo">${material.codigo}</td>
+    //         <td class="left descricao">${material.descricao}</td>
+    //         <td class="left">${material.categoria}</td>
+    //         <td class="saldo">${material.quantidade}</td>
+    //         <td class="left">${material.unidade_base}</td>
+    //         <td class="left">${material.unidade_compra}</td>
+    //         <td class="minimo">${material.quantidade_minima}</td>
+    //         <td>${material.localizacao}</td>
+    //         <td><span class="badge ${statusClss}">${material.status}</span></td>
+    //         <td class="actions">
+    //             <button class="btn-entry" onclick="abrirMovimentacao('ENTRADA', this)">Entrada 🡇</button>
+    //             <button class="btn-alert" onclick="abrirMovimentacao('SAIDA', this)">Saída 🡅</button>
+    //             <button class="btn-edit" onclick="editarMaterial(this)">Editar</button>
+    //             <button class="btn-exit" onclick="excluirMaterial(this)">Excluir</button>
+    //         </td>
+    //     `;
+    //         tabela.appendChild(tr);
+
+    //     });
 
-        const navIdx = document.getElementById("nav-index");
+    //     const navIdx = document.getElementById("nav-index");
 
-        const paginaFinal = Math.ceil(qtdMateriais <= lines ? 1 : qtdMateriais / lines);
+    //     const paginaFinal = Math.ceil(qtdMateriais <= lines ? 1 : qtdMateriais / lines);
 
-        paginaAtual = (offset / lines) + 1;
+    //     paginaAtual = (offset / lines) + 1;
 
-        const navVoltar = document.getElementById("navVoltar");
-        const navAvancar = document.getElementById("navAvancar");
+    //     const navVoltar = document.getElementById("navVoltar");
+    //     const navAvancar = document.getElementById("navAvancar");
 
-        if (paginaAtual == 1) {
-            navVoltar.disabled = true;
-            navVoltar.classList.add("disabled-button");
-        } else if (paginaAtual > 1) {
-            navVoltar.disabled = false;
-            navVoltar.classList.remove("disabled-button");
-        }
+    //     if (paginaAtual == 1) {
+    //         navVoltar.disabled = true;
+    //         navVoltar.classList.add("disabled-button");
+    //     } else if (paginaAtual > 1) {
+    //         navVoltar.disabled = false;
+    //         navVoltar.classList.remove("disabled-button");
+    //     }
 
-        if (paginaAtual == paginaFinal) {
-            navAvancar.disabled = true;
-            navAvancar.classList.add("disabled-button");
-        } else if (paginaAtual < paginaFinal && paginaAtual > 1 || paginaFinal > 1) {
-            navAvancar.disabled = false;
-            navAvancar.classList.remove("disabled-button");
-        }
+    //     if (paginaAtual == paginaFinal) {
+    //         navAvancar.disabled = true;
+    //         navAvancar.classList.add("disabled-button");
+    //     } else if (paginaAtual < paginaFinal && paginaAtual > 1 || paginaFinal > 1) {
+    //         navAvancar.disabled = false;
+    //         navAvancar.classList.remove("disabled-button");
+    //     }
 
-        navIdx.innerHTML = `${paginaAtual}/${paginaFinal} Páginas`;
-    }
+    //     navIdx.innerHTML = `${paginaAtual}/${paginaFinal} Páginas`;
+    // }
 
-    function atualizarMaterialListModal() {
+    // function atualizarMaterialListModal() {
 
-        const tabela = document.getElementById('tabelaMateriaisModal');
+    //     const tabela = document.getElementById('tabelaMateriaisModal');
 
-        tabela.innerHTML = "";
+    //     tabela.innerHTML = "";
 
-        materiaisModal.forEach(material => {
-            const tr = document.createElement('tr');
+    //     materiaisModal.forEach(material => {
+    //         const tr = document.createElement('tr');
 
-            tr.innerHTML = `
-            <td class="codigo">${material.codigo}</td>
-            <td class="left descricao">${material.descricao}</td>
-            <td>${material.quantidade}</td>
-            <td class="actions">
-                <button class="${tipoMov === "SAIDA" && material.quantidade == 0? "disabled-button ": "btn-entry "}" onclick="adicionarItem(this)">▲</button>
-            </td>
-        `;
-            tabela.appendChild(tr);
+    //         tr.innerHTML = `
+    //         <td class="codigo">${material.codigo}</td>
+    //         <td class="left descricao">${material.descricao}</td>
+    //         <td>${material.quantidade}</td>
+    //         <td class="actions">
+    //             <button class="${tipoMov === "SAIDA" && material.quantidade == 0? "disabled-button ": "btn-entry "}" onclick="adicionarItem(this)">▲</button>
+    //         </td>
+    //     `;
+    //         tabela.appendChild(tr);
 
-        });
+    //     });
 
-        const navIdx = document.getElementById("navModal-index");
+    //     const navIdx = document.getElementById("navModal-index");
 
-        const paginaFinal = Math.ceil(qtdMateriaisModal <= lines ? 1 : qtdMateriaisModal / lines);
+    //     const paginaFinal = Math.ceil(qtdMateriaisModal <= lines ? 1 : qtdMateriaisModal / lines);
 
-        paginaAtualModal = (offsetModal / lines) + 1;
+    //     paginaAtualModal = (offsetModal / lines) + 1;
 
-        const navVoltar = document.getElementById("navModalVoltar");
-        const navAvancar = document.getElementById("navModalAvancar");
+    //     const navVoltar = document.getElementById("navModalVoltar");
+    //     const navAvancar = document.getElementById("navModalAvancar");
 
-        if (paginaAtualModal == 1) {
-            navVoltar.disabled = true;
-            navVoltar.classList.add("disabled-button");
-        } else if (paginaAtualModal > 1) {
-            navVoltar.disabled = false;
-            navVoltar.classList.remove("disabled-button");
-        }
+    //     if (paginaAtualModal == 1) {
+    //         navVoltar.disabled = true;
+    //         navVoltar.classList.add("disabled-button");
+    //     } else if (paginaAtualModal > 1) {
+    //         navVoltar.disabled = false;
+    //         navVoltar.classList.remove("disabled-button");
+    //     }
 
-        if (paginaAtualModal == paginaFinal) {
-            navAvancar.disabled = true;
-            navAvancar.classList.add("disabled-button");
-        } else if (paginaAtualModal < paginaFinal && paginaAtualModal > 1 || paginaFinal > 1) {
-            navAvancar.disabled = false;
-            navAvancar.classList.remove("disabled-button");
-        }
+    //     if (paginaAtualModal == paginaFinal) {
+    //         navAvancar.disabled = true;
+    //         navAvancar.classList.add("disabled-button");
+    //     } else if (paginaAtualModal < paginaFinal && paginaAtualModal > 1 || paginaFinal > 1) {
+    //         navAvancar.disabled = false;
+    //         navAvancar.classList.remove("disabled-button");
+    //     }
 
-        navIdx.innerHTML = `${paginaAtualModal}/${paginaFinal} Páginas`;
+    //     navIdx.innerHTML = `${paginaAtualModal}/${paginaFinal} Páginas`;
 
-    }
+    // }
 
-    function atualizarCarrinhoList() {
-        const tabela = document.getElementById('tabelaCarrinho');
+    // function atualizarCarrinhoList() {
+    //     const tabela = document.getElementById('tabelaCarrinho');
 
-        tabela.innerHTML = "";
+    //     tabela.innerHTML = "";
 
-        carrinhoList.forEach(material => {
-            const tr = document.createElement('tr');
+    //     carrinhoList.forEach(material => {
+    //         const tr = document.createElement('tr');
 
-            tr.innerHTML = `
-            <td class="codigo">${material.codigo}</td>
-            <td class="left descricao">${material.descricao}</td>
-            <td><input type="number" onkeyup="editQtdItem(this)" min="1" value="${material.quantidadeMov}"></td>
-            <td class="actions">
-                <button class="btn-exit" onclick="removerItem(this)" >▼</button>
-            </td>
-        `;
-            tabela.appendChild(tr);
+    //         tr.innerHTML = `
+    //         <td class="codigo">${material.codigo}</td>
+    //         <td class="left descricao">${material.descricao}</td>
+    //         <td><input type="number" onkeyup="editQtdItem(this)" min="1" value="${material.quantidadeMov}"></td>
+    //         <td class="actions">
+    //             <button class="btn-exit" onclick="removerItem(this)" >▼</button>
+    //         </td>
+    //     `;
+    //         tabela.appendChild(tr);
 
-        });
+    //     });
 
-    }
+    // }
 
-    function abrirMovimentacao(tipo = "ENTRADA", btn = null) {
+    // function abrirMovimentacao(tipo = "ENTRADA", btn = null) {
 
-        tipoMov = tipo;
+    //     tipoMov = tipo;
 
-        if (tipoMov === 'ENTRADA') {
-            document.getElementById('tituloMov').innerText = 'Entrada de Material';
-            document.getElementById('areaSolicitante').style.display = "none";
-            document.getElementById('areaSigma').style.display = "initial";
+    //     if (tipoMov === 'ENTRADA') {
+    //         document.getElementById('tituloMov').innerText = 'Entrada de Material';
+    //         document.getElementById('areaSolicitante').style.display = "none";
+    //         document.getElementById('areaSigma').style.display = "initial";
 
-            document.getElementById("movEntrada").checked = true;
-        } else {
-            document.getElementById('tituloMov').innerText = 'Saída de Material';
-            document.getElementById('areaSolicitante').style.display = 'flex';
-            document.getElementById('areaSigma').style.display = "none";
+    //         document.getElementById("movEntrada").checked = true;
+    //     } else {
+    //         document.getElementById('tituloMov').innerText = 'Saída de Material';
+    //         document.getElementById('areaSolicitante').style.display = 'flex';
+    //         document.getElementById('areaSigma').style.display = "none";
 
-            document.getElementById("movSaida").checked = true;
-        }
+    //         document.getElementById("movSaida").checked = true;
+    //     }
 
-        if (btn !== null) {
-            linhaSelecionada = btn.closest('tr');
+    //     if (btn !== null) {
+    //         linhaSelecionada = btn.closest('tr');
 
-            const codigo = linhaSelecionada.querySelector('.codigo').innerText;
-            let line = materiais.find((material) => material.codigo == codigo);
-            line.quantidadeMov = line.quantidade;
+    //         const codigo = linhaSelecionada.querySelector('.codigo').innerText;
+    //         let line = materiais.find((material) => material.codigo == codigo);
+    //         line.quantidadeMov = line.quantidade;
 
-            if (line === undefined) {
-                alert("[INICAR] Material não encontrado!");
-                return false;
-            }
+    //         if (line === undefined) {
+    //             alert("[INICAR] Material não encontrado!");
+    //             return false;
+    //         }
 
-            if (tipoMov === 'SAIDA' && line.quantidade == 0) {
-                alert("Não é possivel dar saída para material sem estoque!");
-                return false;
-            }
+    //         if (tipoMov === 'SAIDA' && line.quantidade == 0) {
+    //             alert("Não é possivel dar saída para material sem estoque!");
+    //             return false;
+    //         }
 
-            carrinhoList.push(line);
-            atualizarCarrinhoList();
-        }
+    //         carrinhoList.push(line);
+    //         atualizarCarrinhoList();
+    //     }
 
-        getMateriaisModal();
+    //     getMateriaisModal();
 
-        document.getElementById('modalMov').classList.add('active');
-    }
+    //     document.getElementById('modalMov').classList.add('active');
+    // }
 
     function editarMaterial(btn) {
         linhaSelecionada = btn.closest('tr');
