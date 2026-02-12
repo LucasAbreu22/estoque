@@ -3,7 +3,7 @@
 <main>
     <div id="app">
         <div class="top-actions">
-            <div id="fltrArea">
+            <div class="fltrArea">
                 <div class="fltrColumn">
                     <label> <b> Digite o código ou descrição:</b> </label>
                     <input type="text" id="buscarMaterial">
@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div>
+            <div class="fltrArea">
                 <button class="btn-add btn-entry" @click="abrirMovimentacao('ENTRADA')">Novas Entrada</button>
                 <button class="btn-add btn-alert" @click="abrirMovimentacao('SAIDA')">Novas Saída</button>
                 <button class="btn-add" @click="abrirModalMaterial()">+ Novo Material</button>

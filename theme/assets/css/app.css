@@ -424,7 +424,7 @@ table input[type="number"] {
   padding: 8px;
 }
 
-#fltrArea {
+.fltrArea {
   display: flex;
   flex-direction: row;
   gap: 10px;
