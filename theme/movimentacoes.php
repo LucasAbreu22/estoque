@@ -4,7 +4,7 @@
 
     <div id="app">
         <div class="top-actions">
-            <div id="fltrArea">
+            <div class="fltrArea">
                 <div>
                     <label for="dateInicial"> <b>Périodo:</b></label>
                     <div>
@@ -56,24 +56,35 @@
                 </tr>
             </thead>
             <tbody id="tabelaMovimentacoes">
-
+                <tr v-for="(movimentacao, i) in movimentacoes" :key="i">
+                    <td>{{movimentacao.id_movimentacao}}</td>
+                    <td>{{movimentacao.codigo_sigma}}</td>
+                    <td>{{movimentacao.codigo}}</td>
+                    <td class="left">{{movimentacao.descricao}}</td>
+                    <td>{{movimentacao.quantidade}}</td>
+                    <td>{{movimentacao.data_movimentacao}}</td>
+                    <td class="left">{{movimentacao.tipo}}</td>
+                    <td class="left">{{movimentacao.ponto_solicitante}}</td>
+                    <td class="left">{{movimentacao.nome_solicitante}}</td>
+                    <td class="left">{{movimentacao.ponto}}</td>
+                    <td class="left">{{movimentacao.nome}}</td>
+                </tr>
             </tbody>
         </table>
 
         <div id="nav-table">
-            <button class="btn-nav" id="navVoltar" onclick="getMovimentacao(-lines)">
+            <button class="btn-nav" id="navVoltar" @click="getMovimentacao(-lines)">
                 < </button>
                     <span id="nav-index">1</span>
 
-                    <button class="btn-nav" id="navAvancar" onclick="getMovimentacao(lines)"> > </button>
+                    <button class="btn-nav" id="navAvancar" @click="getMovimentacao(lines)"> > </button>
         </div>
     </div>
 </main>
 <?php $this->start("js"); ?>
 <script>
     $(function() {
-        mostrarLoading()
-        getMovimentacao();
+        mostrarLoading();
 
     });
 
@@ -89,8 +100,10 @@
     createApp({
         setup() {
             const movimentacoes = ref([]);
-            const qtdMovimentacoes = ref(0);
-            const offset = ref(0);
+            let qtdMovimentacoes = 0;
+            let paginaAtual = 0;
+            let offset = 0;
+            const lines = 13;
 
             function getMovimentacao(increment = 0) {
                 let dataInicial = document.getElementById("dateInicial").value;
@@ -104,13 +117,13 @@
                 if (dataInicial !== "") dataInicial += " 23:59:59";
                 if (dataFinal !== "") dataFinal += " 23:59:59";
 
-                offset.value += increment;
+                offset += increment;
 
                 $.ajax({
                     type: "POST",
                     url: "<?= url("/movimentacoes/") ?>",
                     data: {
-                        offset: offset.value,
+                        offset: offset,
                         dataInicial: dataInicial,
                         dataFinal: dataFinal,
                         buscarCodSig: buscarCodSig,
@@ -127,8 +140,34 @@
 
                         } else {
                             movimentacoes.value = response.data.movimentacoes;
-                            qtdMovimentacoes.value = response.data.qtdMovimentacoes;
-                            atualizarMovimentacaoList();
+                            qtdMovimentacoes = response.data.qtdMovimentacoes;
+
+                            const navIdx = document.getElementById("nav-index");
+
+                            const paginaFinal = Math.ceil(qtdMovimentacoes <= lines ? 1 : qtdMovimentacoes / lines);
+
+                            paginaAtual = (offset / lines) + 1;
+
+                            const navVoltar = document.getElementById("navVoltar");
+                            const navAvancar = document.getElementById("navAvancar");
+
+                            if (paginaAtual == 1) {
+                                navVoltar.disabled = true;
+                                navVoltar.classList.add("disabled-button");
+                            } else if (paginaAtual > 1) {
+                                navVoltar.disabled = false;
+                                navVoltar.classList.remove("disabled-button");
+                            }
+
+                            if (paginaAtual == paginaFinal) {
+                                navAvancar.disabled = true;
+                                navAvancar.classList.add("disabled-button");
+                            } else if (paginaAtual < paginaFinal && paginaAtual > 1 || paginaFinal > 1) {
+                                navAvancar.disabled = false;
+                                navAvancar.classList.remove("disabled-button");
+                            }
+
+                            navIdx.innerHTML = `${paginaAtual}/${paginaFinal} Páginas`;
                         }
                         ocultarLoading()
                     }
@@ -137,47 +176,82 @@
 
             onMounted(() => {
                 getMovimentacao();
+
+                document.getElementById("dateInicial").addEventListener("change", function() {
+                    offset = 0
+                    getMovimentacao();
+
+                });
+                document.getElementById("dateFinal").addEventListener("change", function() {
+                    offset = 0
+                    getMovimentacao();
+
+                });
+
+                document.getElementById("buscarCodSig").addEventListener("keyup", function() {
+                    offset = 0
+                    getMovimentacao();
+                });
+
+                document.getElementById("buscarMaterial").addEventListener("keyup", function() {
+                    offset = 0
+                    getMovimentacao();
+                });
+
+                document.getElementById("buscarPessoa").addEventListener("keyup", function() {
+                    offset = 0
+                    getMovimentacao();
+                });
+
+                document.querySelectorAll('.fltrCheck').forEach(chcks => {
+                    chcks.addEventListener('click', function(chck) {
+                        offset = 0;
+                        getMovimentacao();
+                    });
+                });
             });
 
 
             return {
-
+                movimentacoes,
+                getMovimentacao,
+                lines
             };
         },
     }).mount("#app");
 
-    document.getElementById("dateInicial").addEventListener("change", function() {
-        offset = 0
-        getMovimentacao();
+    /*document.getElementById("dateInicial").addEventListener("change", function() {
+          offset = 0
+          getMovimentacao();
 
-    });
-    document.getElementById("dateFinal").addEventListener("change", function() {
-        offset = 0
-        getMovimentacao();
+      });
+      document.getElementById("dateFinal").addEventListener("change", function() {
+          offset = 0
+          getMovimentacao();
 
-    });
+      });
 
-    document.getElementById("buscarCodSig").addEventListener("keyup", function() {
-        offset = 0
-        getMovimentacao();
-    });
+      document.getElementById("buscarCodSig").addEventListener("keyup", function() {
+          offset = 0
+          getMovimentacao();
+      });
 
-    document.getElementById("buscarMaterial").addEventListener("keyup", function() {
-        offset = 0
-        getMovimentacao();
-    });
+      document.getElementById("buscarMaterial").addEventListener("keyup", function() {
+          offset = 0
+          getMovimentacao();
+      });
 
-    document.getElementById("buscarPessoa").addEventListener("keyup", function() {
-        offset = 0
-        getMovimentacao();
-    });
+      document.getElementById("buscarPessoa").addEventListener("keyup", function() {
+          offset = 0
+          getMovimentacao();
+      });
 
-    document.querySelectorAll('.fltrCheck').forEach(chcks => {
-        chcks.addEventListener('click', function(chck) {
-            offset = 0;
-            getMovimentacao();
-        });
-    })
+      document.querySelectorAll('.fltrCheck').forEach(chcks => {
+          chcks.addEventListener('click', function(chck) {
+              offset = 0;
+              getMovimentacao();
+          });
+      }); */
 
     let movimentacoes = [];
     let qtdMovimentacoes = 0;
@@ -186,7 +260,7 @@
     const lines = 13;
 
 
-    function getMovimentacao(increment = 0) {
+    /* function getMovimentacao(increment = 0) {
         let dataInicial = document.getElementById("dateInicial").value;
         let dataFinal = document.getElementById("dateFinal").value;
         const buscarCodSig = document.getElementById("buscarCodSig").value.trim();
@@ -227,9 +301,9 @@
                 ocultarLoading()
             }
         });
-    }
+    } */
 
-    function atualizarMovimentacaoList() {
+    /* function atualizarMovimentacaoList() {
         const tabela = document.getElementById('tabelaMovimentacoes');
 
         tabela.innerHTML = "";
@@ -283,6 +357,6 @@
         }
 
         navIdx.innerHTML = `${paginaAtual}/${paginaFinal} Páginas`;
-    }
+    } */
 </script>
 <?php $this->end("js"); ?>
