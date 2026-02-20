@@ -29,9 +29,9 @@
             </div>
 
             <div class="fltrArea">
-                <button class="btn-add btn-entry" @click="abrirMovimentacao('ENTRADA')">Novas Entrada</button>
-                <button class="btn-add btn-alert" @click="abrirMovimentacao('SAIDA')">Novas Saída</button>
-                <button class="btn-add" @click="abrirModalMaterial()">+ Novo Material</button>
+                <button class="btn-add btn-entry" @click="abrirMovimentacao('ENTRADA')">Incluir Entrada</button>
+                <button class="btn-add btn-alert" @click="abrirMovimentacao('SAIDA')">Incluir Saída</button>
+                <button class="btn-add" @click="abrirModalMaterial()">+ Incluir Material</button>
             </div>
         </div>
 
@@ -181,10 +181,10 @@
             </div>
         </div>
 
-        <!-- MODAL NOVO MATERIAL -->
+        <!-- MODAL Incluir MATERIAL -->
         <div class="modal" id="modalMaterial">
             <div class="modal-content">
-                <h2 id="titleModalMaterial">Novo Material</h2>
+                <h2 id="titleModalMaterial">Incluir Material</h2>
 
                 <label>Código</label>
                 <input type="text" id="codigo">
@@ -216,7 +216,7 @@
                 <label>Fator de Conversão</label>
                 <input type="number" id="fator">
 
-                <label>Quantidade Mínima</label>
+                <label>Quantidade Mínima em Estoque</label>
                 <input type="number" id="minimo">
 
                 <label>Localização</label>
@@ -289,7 +289,11 @@
                     success: function(response) {
 
                         if (response.code == 200) {
-                            materiais.value = response.data.materiais;
+                            materiais.value = response.data.materiais.map(material => ({
+                                ...material,
+                                quantidade: Number(material.quantidade),
+                                quantidade_minima: Number(material.quantidade_minima),
+                            }));
                             qtdMateriais = response.data.qtdMateriais;
 
                             const navIdx = document.getElementById("nav-index");
@@ -465,14 +469,14 @@
                             if (material.id_material === null) {
                                 material.id_material = response.data.newId;
                                 qtdMateriais = response.data.qtdMateriais;
-                                materiais.unshift(material)
-                                materiais.pop()
+                                materiais.value.unshift(material)
+                                materiais.value.pop()
 
                             } else {
 
-                                const idx = materiais.findIndex((material) => material.id_material === materialReg.id_material);
+                                const idx = materiais.value.findIndex((material) => material.id_material === materialReg.id_material);
 
-                                materiais[idx] = material;
+                                materiais.value[idx] = material;
                             }
 
                             // atualizarMaterialList();
@@ -510,7 +514,12 @@
                     success: function(response) {
 
                         if (response.code == 200) {
-                            materiaisModal.value = response.data.materiais;
+                            materiaisModal.value = response.data.materiais.map(material => ({
+                                ...material,
+                                quantidade: Number(material.quantidade),
+                                quantidade_minima: Number(material.quantidade_minima),
+                            }));
+
                             qtdMateriaisModal = response.data.qtdMateriais;
 
                             const navIdx = document.getElementById("navModal-index");
@@ -737,7 +746,7 @@
                 document.getElementById('modalMaterial').classList.add('active');
 
                 if (evento === "novo") {
-                    document.getElementById('titleModalMaterial').innerText = "Novo Material";
+                    document.getElementById('titleModalMaterial').innerText = "Incluir Material";
                 } else {
                     document.getElementById('titleModalMaterial').innerText = "Editar Material";
                 }
@@ -851,7 +860,8 @@
                 fecharModal,
                 getStatusClss,
                 criarMovimentacao,
-                editQtdItem
+                editQtdItem,
+                abrirModalMaterial
             };
         },
     }).mount("#app");

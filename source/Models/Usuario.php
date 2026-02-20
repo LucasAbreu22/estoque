@@ -11,8 +11,8 @@ class Usuario
     private STRING $nome;
     private STRING $ponto;
     private ?STRING $senha;
-    private STRING $data_criacao;
-    private STRING $data_edicao;
+    private ?STRING $data_criacao;
+    private ?STRING $data_edicao;
     private BOOL $visibilidade;
 
     function __construct(
@@ -116,7 +116,7 @@ class Usuario
     /**
      * Set the value of data_criacao
      */
-    public function setDataCriacao(STRING $data_criacao): self
+    public function setDataCriacao(?STRING $data_criacao): self
     {
         $this->data_criacao = $data_criacao;
 
@@ -134,7 +134,7 @@ class Usuario
     /**
      * Set the value of data_edicao
      */
-    public function setDataEdicao(STRING $data_edicao): self
+    public function setDataEdicao(?STRING $data_edicao): self
     {
         $this->data_edicao = $data_edicao;
 
