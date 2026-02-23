@@ -49,6 +49,28 @@ class UsuarioDAO
         }
     }
 
+    public function consultarPonto(?int $ponto = null)
+    {
+        try {
+            $sql = "SELECT 
+            *
+            FROM usuarios
+            WHERE visibilidade = 1
+            AND ponto = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->bindValue(1, $ponto, PDO::PARAM_INT);
+
+            // $stmt->debugDumpParams();
+
+            $stmt->execute();
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            throw new Exception("[ERRO][Usuário DAO 03]" . $e->getMessage());
+        }
+    }
+
     public function getUsuarios(int $offset = 0)
     {
         try {

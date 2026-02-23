@@ -30,6 +30,11 @@ $router->group("movimentacoes");
 $router->get("/", "Web:movimentacoes");
 $router->post("/", "Movimentacoes:getMovimentacoes");
 
+/* ROTA USUARIO */
+$router->group("usuario");
+// $router->get("/", "Web:movimentacoes");
+$router->post("/consultarPonto", "Usuarios:consultarPonto");
+
 /* ROTA DE ERRO */
 $router->group("error");
 $router->get("/{errcode}", "Web:error");

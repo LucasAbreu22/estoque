@@ -9,7 +9,7 @@ class Usuario
 {
     private INT $id_usuario;
     private STRING $nome;
-    private STRING $ponto;
+    private ?INT $ponto;
     private ?STRING $senha;
     private ?STRING $data_criacao;
     private ?STRING $data_edicao;
@@ -18,7 +18,7 @@ class Usuario
     function __construct(
         INT $id_usuario = 0,
         STRING $nome = "",
-        STRING $ponto = "",
+        ?INT $ponto = null,
         ?STRING $senha = null,
         STRING $data_criacao = "",
         STRING $data_edicao = "",
@@ -72,7 +72,7 @@ class Usuario
     /**
      * Get the value of ponto
      */
-    public function getPonto(): STRING
+    public function getPonto(): INT
     {
         return $this->ponto;
     }
@@ -80,7 +80,7 @@ class Usuario
     /**
      * Set the value of ponto
      */
-    public function setPonto(STRING $ponto): self
+    public function setPonto(?INT $ponto): self
     {
         $this->ponto = $ponto;
 
@@ -176,5 +176,12 @@ class Usuario
         $this->setDataCriacao($data->data_criacao);
         $this->setDataEdicao($data->data_edicao);
         $this->setVisibilidade($data->visibilidade);
+    }
+
+    public function consultarPonto()
+    {
+        if (empty($this->getPonto())) throw new Exception("[ERRO][Usuário 02] Informação de PONTO vazia!", 1);
+        $usuarioDAO = new UsuarioDAO();
+        return $usuarioDAO->consultarPonto($this->getPonto());
     }
 }
