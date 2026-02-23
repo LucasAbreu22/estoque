@@ -237,10 +237,6 @@
 <?php $this->start("js"); ?>
 <script>
     const {
-        createApp,
-        ref,
-        computed,
-        onMounted,
         onBeforeUnmount,
         watch,
     } = Vue;
@@ -799,17 +795,17 @@
                 getMateriais();
 
                 document.getElementById("buscarMaterial").addEventListener("keyup", function() {
-                    offset.value = 0;
+                    offset = 0;
                     getMateriais();
                 });
 
                 document.getElementById("buscarMaterialModal").addEventListener("keyup", function() {
-                    offsetModal.value = 0
+                    offsetModal = 0
                     getMateriaisModal();
                 });
 
                 document.getElementById('fltrCategoria').addEventListener("change", function() {
-                    offset.value = 0;
+                    offset = 0;
                     getMateriais();
                 });
 
@@ -837,7 +833,7 @@
 
                 document.querySelectorAll('.fltrCheck').forEach(chcks => {
                     chcks.addEventListener('click', function(chck) {
-                        offset.value = 0;
+                        offset = 0;
                         getMateriais();
                     });
                 });
