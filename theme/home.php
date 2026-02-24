@@ -39,7 +39,7 @@
             <thead>
                 <tr>
                     <th>Código</th>
-                    <th>Descrição</th>
+                    <th>Descrição de material</th>
                     <th>Categoria</th>
                     <th>Saldo</th>
                     <th>Un. Base</th>
@@ -125,7 +125,8 @@
                         <thead>
                             <tr>
                                 <th>Código</th>
-                                <th>Descrição</th>
+                                <th>Descrição de material</th>
+                                <th>Lote</th>
                                 <th>QTD</th>
                                 <th>Ações</th>
                             </tr>
@@ -134,6 +135,7 @@
                             <tr v-for="(material, i) in carrinhoList" :key="i">
                                 <td class="codigo">{{material.codigo}}</td>
                                 <td class="left descricao">{{material.descricao}}</td>
+                                <td><input type="text" min="1" :value="material.lote" :disabled="tipoMov==='ENTRADA' ? true : false"></td>
                                 <td><input type="number" @input="editQtdItem($event, i)" min="1" :value="material.quantidadeMov"></td>
                                 <td class="actions">
                                     <button class="btn-exit" @click="removerItem(material.id_material)">▼</button>
@@ -150,7 +152,7 @@
                         <thead>
                             <tr>
                                 <th>Código</th>
-                                <th>Descrição</th>
+                                <th>Descrição de material</th>
                                 <th>Saldo</th>
                                 <th>Ações</th>
                             </tr>

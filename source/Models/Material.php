@@ -325,7 +325,20 @@ class Material
     {
 
         $materialDAO = new MaterialDAO();
-        return $materialDAO->getMateriais($offset, $search, $fltrCategoria, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque);
+        $materiaisList = $materialDAO->getMateriais($offset, $search, $fltrCategoria, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque);
+
+        foreach ($materiaisList as $material) {
+            $lote = new Lote();
+            $lote->setIdMaterial($material["id_material"]);
+
+            $material["loteList"] = $lote->getLotesByMaterial();
+
+            $ids = array_column($materiaisList, 'id_material');
+            $key = array_search($material["id_material"], $ids);
+            $materiaisList[$key] = $material;
+        }
+
+        return $materiaisList;
     }
 
     public function contarMateriais(string $search = "", ?int $fltrCategoria = null, bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
