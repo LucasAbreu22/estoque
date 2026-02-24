@@ -356,6 +356,10 @@ input[type="date"] {
   cursor: not-allowed !important;
 }
 
+#ponto-content {
+  width: 300px;
+}
+
 #eventoArea {
   display: flex;
   align-items: center;

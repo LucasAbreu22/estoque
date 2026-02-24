@@ -34,10 +34,9 @@
   <div id="loader"></div>
 
   <div class="modal" id="modalPonto">
-    <div class="modal-content">
+    <div class="modal-content" id="ponto-content">
       <h2>Ponto responsável</h2>
 
-      <label>Ponto</label>
       <input type="number" @input="setPonto">
 
       <div class="modal-actions">
