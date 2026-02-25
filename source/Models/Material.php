@@ -328,13 +328,33 @@ class Material
         $materiaisList = $materialDAO->getMateriais($offset, $search, $fltrCategoria, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque);
 
         foreach ($materiaisList as $material) {
+            $material["quantidade"] = 0;
+
             $lote = new Lote();
             $lote->setIdMaterial($material["id_material"]);
 
-            $material["loteList"] = $lote->getLotesByMaterial();
+            $loteList = $lote->getLotesByMaterial();
+            if (count($loteList) > 0) {
+                foreach ($loteList as $lote) {
+                    $material["quantidade"] += (int)$lote["quantidade"];
+                }
+            }
+
+            $material["loteList"] = $loteList;
+
+            if ($material["quantidade"] == 0)
+                $material["status"] = "Sem Estoque";
+
+            else if ($material["quantidade"] < $material["quantidade_minima"])
+                $material["status"] = "Acabando";
+
+            else
+                $material["status"] = "Normal";
+
 
             $ids = array_column($materiaisList, 'id_material');
             $key = array_search($material["id_material"], $ids);
+
             $materiaisList[$key] = $material;
         }
 

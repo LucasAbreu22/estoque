@@ -130,8 +130,9 @@ class Lote
             $date = new DateTime($lote["vencimento"]);
             $lote["vencimento"] = $date->format('d/m/Y');
 
-            $ids = array_column($lotes, 'id_material');
-            $key = array_search($lote["id_material"], $ids);
+            $ids = array_column($lotes, 'id_lote');
+            $key = array_search($lote["id_lote"], $ids);
+
             $lotes[$key] = $lote;
         }
 

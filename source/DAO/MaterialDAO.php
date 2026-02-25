@@ -34,16 +34,10 @@ class MaterialDAO
                 ma.id_material, ma.id_categoria, ma.codigo,
                 ma.descricao, ma.unidade_base, ma.unidade_compra,
                 ma.fator_conversao, ma.quantidade_minima, ma.custo_unitario,
-                ma.localizacao, SUM(lo.quantidade) AS quantidade,
-                 CASE
-                    WHEN quantidade = 0 THEN 'Sem Estoque'
-                    WHEN quantidade < ma.quantidade_minima THEN 'Acabando'
-                    ELSE 'Normal'
-                END AS status,
+                ma.localizacao,
                 ca.nome AS categoria
             FROM materiais ma
             INNER JOIN categorias ca ON ma.id_categoria = ca.id_categoria
-            INNER JOIN lotes lo ON ma.id_material = lo.id_material
             WHERE ma.visibilidade = 1
         ";
 
@@ -135,7 +129,7 @@ class MaterialDAO
                 $sql .= " AND ma.id_categoria = :fltrCategoria";
             }
 
-            /*             if ($fltrStatusNormal) {
+            if ($fltrStatusNormal) {
                 $sql .= " AND ma.quantidade > ma.quantidade_minima";
             }
 
@@ -153,7 +147,7 @@ class MaterialDAO
                 }
 
                 $sql .= " ma.quantidade = 0";
-            } */
+            }
 
             $stmt = $this->connect->prepare($sql);
 

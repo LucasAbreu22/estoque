@@ -360,6 +360,19 @@ input[type="date"] {
   width: 300px;
 }
 
+.sublist {
+  background-color: #d4eaff;
+}
+
+.sublist:hover {
+  background-color: #c0dffd;
+}
+
+.sublist td {
+  padding: 4px;
+  border: 0;
+}
+
 #eventoArea {
   display: flex;
   align-items: center;

@@ -51,25 +51,45 @@
                 </tr>
             </thead>
             <tbody id="tabelaMateriais">
+                <template v-for="(material, i) in materiais" :key="i">
+                    <tr>
+                        <td class="codigo">{{material.codigo}}</td>
+                        <td class="left descricao">{{material.descricao}}</td>
+                        <td class="left">{{material.categoria}}</td>
+                        <td class="saldo">{{material.quantidade}}</td>
+                        <td class="left">{{material.unidade_base}}</td>
+                        <td class="left">{{material.unidade_compra}}</td>
+                        <td class="minimo">{{material.quantidade_minima}}</td>
+                        <td>{{material.localizacao}}</td>
+                        <td>
+                            <span class="badge" :class="getStatusClss(material)">
+                                {{material.status}}
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <button class="btn-entry" @click="abrirMovimentacao('ENTRADA', material.id_material)">Entrada 🡇</button>
+                            <button class="btn-edit" @click="editarMaterial(material.id_material)">Editar</button>
+                            <button class="btn-exit" @click="excluirMaterial(material.id_material)">Excluir</button>
+                        </td>
+                    </tr>
 
-                <tr v-for="(material, i) in materiais" :key="i">
-                    <td class="codigo">{{material.codigo}}</td>
-                    <td class="left descricao">{{material.descricao}}</td>
-                    <td class="left">{{material.categoria}}</td>
-                    <td class="saldo">{{material.quantidade}}</td>
-                    <td class="left">{{material.unidade_base}}</td>
-                    <td class="left">{{material.unidade_compra}}</td>
-                    <td class="minimo">{{material.quantidade_minima}}</td>
-                    <td>{{material.localizacao}}</td>
-                    <td><span class="badge" :class="getStatusClss(material)">{{material.status}}</span></td>
-                    <td class="actions">
-                        <button class="btn-entry" @click="abrirMovimentacao('ENTRADA', material.id_material)">Entrada 🡇</button>
-                        <button class="btn-alert" @click="abrirMovimentacao('SAIDA', material.id_material)">Saída 🡅</button>
-                        <button class="btn-edit" @click="editarMaterial(material.id_material)">Editar</button>
-                        <button class="btn-exit" @click="excluirMaterial(material.id_material)">Excluir</button>
-                    </td>
-                </tr>
-
+                    <tr v-for="(lote, index) in material.loteList" :key="'lote-'+index" class="sublist">
+                        <td colspan="2">
+                            <span><b>Lote: </b>{{ lote.lote }}</span>
+                        </td>
+                        <td colspan="4">
+                            <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
+                        </td>
+                        <td colspan="3">
+                            <span><b>Vencimento: </b>{{ lote.vencimento }}</span>
+                        </td>
+                        <td class="actions">
+                            <button class="btn-alert" @click="abrirMovimentacao('SAIDA', lote.id_lote)">Saída 🡅</button>
+                            <button class="btn-edit" @click="editarMaterial(lote.id_lote)">Editar</button>
+                            <button class="btn-exit" @click="excluirMaterial(lote.id_lote)">Excluir</button>
+                        </td>
+                    </tr>
+                </template>
             </tbody>
         </table>
 
