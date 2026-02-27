@@ -35,63 +35,65 @@
             </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Descrição de material</th>
-                    <th>Categoria</th>
-                    <th>Saldo</th>
-                    <th>Un. Base</th>
-                    <th>Un. Compra</th>
-                    <th>Mínimo</th>
-                    <th>Localização</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaMateriais">
-                <template v-for="(material, i) in materiais" :key="i">
+        <div class="table-container">
+            <table>
+                <thead>
                     <tr>
-                        <td class="codigo">{{material.codigo}}</td>
-                        <td class="left descricao">{{material.descricao}}</td>
-                        <td class="left">{{material.categoria}}</td>
-                        <td class="saldo">{{material.quantidade}}</td>
-                        <td class="left">{{material.unidade_base}}</td>
-                        <td class="left">{{material.unidade_compra}}</td>
-                        <td class="minimo">{{material.quantidade_minima}}</td>
-                        <td>{{material.localizacao}}</td>
-                        <td>
-                            <span class="badge" :class="getStatusClss(material)">
-                                {{material.status}}
-                            </span>
-                        </td>
-                        <td class="actions">
-                            <button class="btn-entry" @click="abrirMovimentacao('ENTRADA', material.id_material)">Entrada 🡇</button>
-                            <button class="btn-edit" @click="editarMaterial(material.id_material)">Editar</button>
-                            <button class="btn-exit" @click="excluirMaterial(material.id_material)">Excluir</button>
-                        </td>
+                        <th>Código</th>
+                        <th>Descrição de material</th>
+                        <th>Categoria</th>
+                        <th>Saldo</th>
+                        <th>Un. Base</th>
+                        <th>Un. Compra</th>
+                        <th>Mínimo</th>
+                        <th>Localização</th>
+                        <th>Status</th>
+                        <th>Ações</th>
                     </tr>
+                </thead>
+                <tbody id="tabelaMateriais">
+                    <template v-for="(material, i) in materiais" :key="i">
+                        <tr @click="toggleMaterial(material.id_material)" style="cursor:pointer">
+                            <td class="codigo">{{material.codigo}}</td>
+                            <td class="left descricao">{{material.descricao}}</td>
+                            <td class="left">{{material.categoria}}</td>
+                            <td class="saldo">{{material.quantidade}}</td>
+                            <td class="left">{{material.unidade_base}}</td>
+                            <td class="left">{{material.unidade_compra}}</td>
+                            <td class="minimo">{{material.quantidade_minima}}</td>
+                            <td>{{material.localizacao}}</td>
+                            <td>
+                                <span class="badge" :class="getStatusClss(material)">
+                                    {{material.status}}
+                                </span>
+                            </td>
+                            <td class="actions">
+                                <button class="btn-entry" @click="abrirMovimentacao('ENTRADA', material.id_material)">Entrada 🡇</button>
+                                <button class="btn-edit" @click="editarMaterial(material.id_material)">Editar</button>
+                                <button class="btn-exit" @click="excluirMaterial(material.id_material)">Excluir</button>
+                            </td>
+                        </tr>
 
-                    <tr v-for="(lote, index) in material.loteList" :key="'lote-'+index" class="sublist">
-                        <td colspan="2">
-                            <span><b>Lote: </b>{{ lote.lote }}</span>
-                        </td>
-                        <td colspan="4">
-                            <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
-                        </td>
-                        <td colspan="3">
-                            <span><b>Vencimento: </b>{{ lote.vencimento }}</span>
-                        </td>
-                        <td class="actions">
-                            <button class="btn-alert" @click="abrirMovimentacao('SAIDA', lote.id_lote)">Saída 🡅</button>
-                            <button class="btn-edit" @click="editarMaterial(lote.id_lote)">Editar</button>
-                            <button class="btn-exit" @click="excluirMaterial(lote.id_lote)">Excluir</button>
-                        </td>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
+                        <tr v-if="materiaisAbertos.has(material.id_material)" v-for="(lote, index) in material.loteList" :key="'lote-'+index" class="sublist">
+                            <td colspan="2">
+                                <span><b>Lote: </b>{{ lote.lote }}</span>
+                            </td>
+                            <td colspan="4">
+                                <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
+                            </td>
+                            <td colspan="3">
+                                <span><b>Vencimento: </b>{{ lote.vencimento }}</span>
+                            </td>
+                            <td class="actions">
+                                <button class="btn-alert" @click="abrirMovimentacao('SAIDA', lote.id_lote)">Saída 🡅</button>
+                                <button class="btn-edit" @click="editarMaterial(lote.id_lote)">Editar</button>
+                                <button class="btn-exit" @click="excluirMaterial(lote.id_lote)">Excluir</button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
 
         <div id="nav-table">
             <button class="btn-nav disabled-button" id="navVoltar" @click="getMateriais(-lines)" disabled>
@@ -126,7 +128,7 @@
                 </div>
 
                 <label>Ponto responsável</label>
-                <input type="number" id="pontoResponsavel">
+                <input type="number" id="pontoResponsavel" disabled>
 
                 <div id="areaSolicitante">
                     <div id="areaPontoSolicitante">
@@ -155,10 +157,10 @@
                             <tr v-for="(material, i) in carrinhoList" :key="i">
                                 <td class="codigo">{{material.codigo}}</td>
                                 <td class="left descricao">{{material.descricao}}</td>
-                                <td><input type="text" min="1" :value="material.lote" :disabled="tipoMov==='ENTRADA' ? true : false"></td>
+                                <td class="columnLote"><input type="number" min="1" @input="editQtdLote($event, i)" :value="material.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
                                 <td><input type="number" @input="editQtdItem($event, i)" min="1" :value="material.quantidadeMov"></td>
                                 <td class="actions">
-                                    <button class="btn-exit" @click="removerItem(material.id_material)">▼</button>
+                                    <button class="btn-exit" @click="removerItem(i)">▼</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -178,14 +180,30 @@
                             </tr>
                         </thead>
                         <tbody id="tabelaMateriaisModal">
-                            <tr v-for="(material, i) in materiaisModal" :key="i">
-                                <td class="codigo">{{material.codigo}}</td>
-                                <td class="left descricao">{{material.descricao}}</td>
-                                <td>{{material.quantidade}}</td>
-                                <td class="actions">
-                                    <button :class="tipoMov === 'SAIDA' && material.quantidade == 0? 'disabled-button ': 'btn-entry '" @click="adicionarItem(material.id_material)">▲</button>
-                                </td>
-                            </tr>
+                            <template v-for="(materialModal, i) in materiaisModal" :key="i">
+                                <tr>
+                                    <td class="codigo">{{materialModal.codigo}}</td>
+                                    <td class="left descricao">{{materialModal.descricao}}</td>
+                                    <td>{{materialModal.quantidade}}</td>
+                                    <td class="actions">
+                                        <button :class="tipoMov === 'SAIDA' && materialModal.quantidade == 0? 'disabled-button ': 'btn-entry '" @click="toggleMaterialModal(materialModal.id_material)">▲</button>
+                                    </td>
+                                </tr>
+                                <tr v-if="materiaisAbertosModal.has(materialModal.id_material) && tipoMov === 'SAIDA'" v-for="(lote, index) in materialModal.loteList" :key="'loteModal-'+index" class="sublist">
+                                    <td>
+                                        <span><b>Lote: </b>{{ lote.lote }}</span>
+                                    </td>
+                                    <td>
+                                        <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
+                                    </td>
+                                    <td>
+                                        <span><b>Vencimento: </b>{{ lote.vencimento }}</span>
+                                    </td>
+                                    <td class="actions">
+                                        <button :class="tipoMov === 'SAIDA' && lote.quantidade == 0? 'disabled-button ': 'btn-entry '" @click="adicionarItem(lote.id_material, lote.id_lote)">▲</button>
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                 </div>
@@ -280,6 +298,41 @@
             let paginaAtualModal = 0;
 
             let linhaSelecionada = null;
+            const materiaisAbertos = ref(new Set());
+            const materiaisAbertosModal = ref(new Set());
+
+            function toggleMaterial(id) {
+                if (materiaisAbertos.value.has(id)) {
+                    materiaisAbertos.value.delete(id);
+                } else {
+                    materiaisAbertos.value.add(id);
+                }
+            }
+
+            function toggleMaterialModal(id) {
+                if (tipoMov.value === "SAIDA") {
+                    if (materiaisAbertosModal.value.has(id)) {
+                        materiaisAbertosModal.value.delete(id);
+                    } else {
+                        materiaisAbertosModal.value.add(id);
+                    }
+                } else {
+                    adicionarItem(id);
+                }
+            }
+
+            function getCookie(nomeCookie) {
+                let nome = nomeCookie + "=";
+                let cookiesArray = document.cookie.split(';');
+
+                for (let i = 0; i < cookiesArray.length; i++) {
+                    let c = cookiesArray[i].trim();
+                    if (c.indexOf(nome) === 0) {
+                        return c.substring(nome.length, c.length);
+                    }
+                }
+                return ""; // Retorna vazio se não encontrar
+            }
 
             // MATERIAIS
             function getMateriais(increment = 0) {
@@ -511,7 +564,6 @@
                 else if (material.quantidade < material.quantidade_minima) return "low"
 
                 else return "ok"
-
             }
 
             // MOVIMENTAÇÃO
@@ -574,36 +626,60 @@
                 });
             }
 
-            function adicionarItem(id_material) {
+            function adicionarItem(id_material = null, id_lote = null) {
 
-                const material = materiaisModal.value.find((material) => material.id_material === id_material);
-                if (material === undefined) {
+                let material = {
+                    ...materiaisModal.value.find((material) => material.id_material === id_material)
+                };
+
+                if (material === null) {
                     alert("[ADD] Material não encontrado!");
                     return false;
                 }
 
-                if (carrinhoList.value.findIndex((material) => material.id_material === id_material) >= 0) {
-                    alert("Material já incluído para movimentação!");
+                if (id_lote !== null) {
+                    const lote = material.loteList.find((lote) => lote.id_lote === id_lote);
+
+                    material.quantidadeMov = lote.quantidade;
+                    material.id_lote = lote.id_lote;
+                    material.lote = lote.lote;
+
+                    if (lote === undefined) {
+                        alert("[ADD] Lote não encontrado!");
+                        return false;
+                    }
+                } else {
+                    material.quantidadeMov = 0;
+                }
+
+                if (carrinhoList.value.findIndex((material) => material.id_lote === id_lote) >= 0) {
+                    alert("[ADD] Lote já incluído para movimentação!");
                     return false;
                 }
 
                 if (tipoMov.value === 'SAIDA' && material.quantidade == 0) {
-                    alert("Não é possivel dar saída para material sem estoque!");
+                    alert("[ADD] Não é possivel dar saída para material sem estoque!");
                     return false;
                 }
 
-                material.quantidadeMov = material.quantidade;
+                if (tipoMov.value === 'SAIDA' && lote.quantidade == 0) {
+                    alert("[ADD] Não é possivel dar saída para lote sem estoque!");
+                    return false;
+                }
+
+                delete material.loteList;
 
                 carrinhoList.value.push({
                     ...material
                 });
             }
 
-            function removerItem(id_material) {
+            function removerItem(index) {
 
-                if (id_material > 0) carrinhoList.value = carrinhoList.value.filter((material) => material.id_material !== id_material);
-
-                else alert("ID não identificado!");
+                if (index !== undefined) {
+                    const linha = carrinhoList.value[0];
+                    carrinhoList.value = carrinhoList.value.filter((material) => material !== linha)
+                } else alert("Material não identificado não identificado!");
 
             }
 
@@ -712,8 +788,22 @@
                 carrinhoList.value[index].quantidadeMov = Number(event.target.value);
             }
 
+            function editQtdLote(event, index) {
+
+                carrinhoList.value[index].lote = Number(event.target.value);
+            }
+
             // MODAL
             function abrirMovimentacao(tipo = "ENTRADA", id_material = null) {
+
+                const ponto = getCookie('usuario');
+
+                if (ponto == "") {
+                    alert("Não há usuário autenticado para realizar essa ação!");
+                    return false;
+                }
+
+                document.getElementById('pontoResponsavel').value = ponto;
 
                 tipoMov.value = tipo;
 
@@ -879,7 +969,12 @@
                 getStatusClss,
                 criarMovimentacao,
                 editQtdItem,
-                abrirModalMaterial
+                editQtdLote,
+                abrirModalMaterial,
+                materiaisAbertos,
+                toggleMaterial,
+                materiaisAbertosModal,
+                toggleMaterialModal
             };
         },
     }).mount("#app");

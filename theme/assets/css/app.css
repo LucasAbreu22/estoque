@@ -170,12 +170,27 @@ table td {
 tr {
   border-bottom: 2px solid #ededed;
 }
+
 table tbody tr:hover {
   background: #f8fafc;
 }
 
 table .left {
   text-align: left;
+}
+
+.table-container {
+  max-height: 690px;
+  overflow-y: scroll;
+}
+
+.sublist {
+  background-color: #f6f6f6;
+}
+
+.sublist td {
+  padding: 4px;
+  border: 0;
 }
 
 input[type="text"],
@@ -246,7 +261,7 @@ input[type="number"] {
 
 .modal-content {
   background: #fff;
-  width: 650px;
+  width: 740px;
   max-height: 890px;
   padding: 20px;
   border-radius: 8px;
@@ -269,12 +284,6 @@ input[type="number"] {
 
 input[type="date"] {
   padding: 7px;
-  margin: 6px 0 12px;
-}
-
-.modal-content input[type="text"] {
-  width: 100%;
-  padding: 8px;
   margin: 6px 0 12px;
 }
 
@@ -360,19 +369,6 @@ input[type="date"] {
   width: 300px;
 }
 
-.sublist {
-  background-color: #d4eaff;
-}
-
-.sublist:hover {
-  background-color: #c0dffd;
-}
-
-.sublist td {
-  padding: 4px;
-  border: 0;
-}
-
 #eventoArea {
   display: flex;
   align-items: center;
@@ -424,6 +420,10 @@ input[type="date"] {
 
 #areaNomeSolicitante {
   width: 80%;
+}
+
+table .columnLote input[type="number"] {
+  width: 140px;
 }
 
 table input[type="number"] {
