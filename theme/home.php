@@ -636,25 +636,30 @@
                     alert("[ADD] Material não encontrado!");
                     return false;
                 }
-
                 if (id_lote !== null) {
-                    const lote = material.loteList.find((lote) => lote.id_lote === id_lote);
+                    if (carrinhoList.value.findIndex((material) => material.id_lote === id_lote) >= 0) {
+                        alert("[ADD] Lote já incluído para movimentação!");
+                        return false;
+                    }
 
-                    material.quantidadeMov = lote.quantidade;
-                    material.id_lote = lote.id_lote;
-                    material.lote = lote.lote;
+                    const lote = material.loteList.find((lote) => lote.id_lote === id_lote);
 
                     if (lote === undefined) {
                         alert("[ADD] Lote não encontrado!");
                         return false;
                     }
+
+                    if (tipoMov.value === 'SAIDA' && lote.quantidade == 0) {
+                        alert("[ADD] Não é possivel dar saída para lote sem estoque!");
+                        return false;
+                    }
+
+                    material.quantidadeMov = lote.quantidade;
+                    material.id_lote = lote.id_lote;
+                    material.lote = lote.lote;
+
                 } else {
                     material.quantidadeMov = 0;
-                }
-
-                if (carrinhoList.value.findIndex((material) => material.id_lote === id_lote) >= 0) {
-                    alert("[ADD] Lote já incluído para movimentação!");
-                    return false;
                 }
 
                 if (tipoMov.value === 'SAIDA' && material.quantidade == 0) {
@@ -662,10 +667,6 @@
                     return false;
                 }
 
-                if (tipoMov.value === 'SAIDA' && lote.quantidade == 0) {
-                    alert("[ADD] Não é possivel dar saída para lote sem estoque!");
-                    return false;
-                }
 
                 delete material.loteList;
 
