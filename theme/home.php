@@ -667,7 +667,6 @@
                     return false;
                 }
 
-
                 delete material.loteList;
 
                 carrinhoList.value.push({
@@ -795,7 +794,7 @@
             }
 
             // MODAL
-            function abrirMovimentacao(tipo = "ENTRADA", id_material = null) {
+            function abrirMovimentacao(tipo = "ENTRADA", id_item = null) {
 
                 const ponto = getCookie('usuario');
 
@@ -822,13 +821,29 @@
                     document.getElementById("movSaida").checked = true;
                 }
 
-                if (id_material !== null && id_material > 0) {
-                    let material = materiais.value.find((material) => material.id_material == id_material);
+                if (id_item !== null && id_item > 0) {
+                    let material = {};
+
+                    console.log(tipoMov.value)
+                    if (tipoMov.value === 'ENTRADA') {
+                        material = materiais.value.find((material) => material.id_material == id_item);
+                    } else {
+
+                        const lotes = materiais.value.flatMap((material) => material.loteList);
+                        const loteFind = lotes.find((lote) => lote.id_lote == id_item);
+
+                        material = materiais.value.find((material) => material.id_material == loteFind.id_material);
+
+                        material.quantidadeMov = loteFind.quantidade;
+                        material.id_lote = loteFind.id_lote;
+                        material.lote = loteFind.lote;
+                    }
 
                     if (material === undefined) {
                         alert("[MOV] Material não encontrado!");
                         return false;
                     }
+
                     material.quantidadeMov = material.quantidade;
 
                     if (material === undefined) {
