@@ -181,28 +181,25 @@ class MovimentacaoEstoqueDAO
     public function criarMovimentacao(array $movimentacao)
     {
         try {
-            $sql = "INSERT INTO movimentacoes_estoque(id_material, id_usuario, tipo, quantidade, unidade_utilizada, fator_conversao_aplicado, quantidade_convertida, ponto_solicitante, nome_solicitante, codigo_sigma)
+            $sql = "INSERT INTO movimentacoes_estoque( id_usuario, tipo,  unidade_utilizada, fator_conversao_aplicado, quantidade_convertida, ponto_solicitante, nome_solicitante, codigo_sigma)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $this->connect->prepare($sql);
 
-            $stmt->bindValue(1, $movimentacao["id_material"], PDO::PARAM_STR); // Formulário
-            $stmt->bindValue(2, $movimentacao["id_usuario"], PDO::PARAM_STR); // Formulário
-            $stmt->bindValue(3, $movimentacao["tipo"], PDO::PARAM_STR); // EVENTO
-            $stmt->bindValue(4, $movimentacao["quantidade"], PDO::PARAM_STR); // Formulário
-            $stmt->bindValue(5, "BASE", PDO::PARAM_STR);
-            $stmt->bindValue(6, NULL, PDO::PARAM_STR);
-            $stmt->bindValue(7, $movimentacao["quantidade_convertida"], PDO::PARAM_STR); // CALCULADO
-            $stmt->bindValue(8, $movimentacao["ponto_solicitante"], PDO::PARAM_STR); // Formulário
-            $stmt->bindValue(9, $movimentacao["nome_solicitante"], PDO::PARAM_STR); // Formulário
-            $stmt->bindValue(10, $movimentacao["codigoSigma"], PDO::PARAM_STR); // Formulário
-
+            $stmt->bindValue(1, $movimentacao["id_usuario"], PDO::PARAM_STR); // Formulário
+            $stmt->bindValue(2, $movimentacao["tipo"], PDO::PARAM_STR); // EVENTO
+            $stmt->bindValue(3, "BASE", PDO::PARAM_STR);
+            $stmt->bindValue(4, NULL, PDO::PARAM_STR);
+            $stmt->bindValue(5, $movimentacao["quantidade_convertida"], PDO::PARAM_STR); // CALCULADO
+            $stmt->bindValue(6, $movimentacao["ponto_solicitante"], PDO::PARAM_STR); // Formulário
+            $stmt->bindValue(7, $movimentacao["nome_solicitante"], PDO::PARAM_STR); // Formulário
+            $stmt->bindValue(8, $movimentacao["codigoSigma"], PDO::PARAM_STR); // Formulário
 
             /* $stmt->debugDumpParams(); */
 
             $stmt->execute();
 
-            return "Dados criados com sucesso!";
+            return $stmt->lastInsertId();
         } catch (PDOException $e) {
             $msg = "[ERRO][Movimentação DAO 02] ";
             $msg .= str_contains($e->getMessage(), "Duplicate entry") ? "Código de movimentação já existente!" : $e->getMessage();

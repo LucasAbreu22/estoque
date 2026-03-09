@@ -44,4 +44,22 @@ class LoteDAO
             throw new Exception("[ERRO 01][Lote DAO] " . $th->getMessage(), 1);
         }
     }
+
+    public function getLotesById(int $id_lote)
+    {
+        try {
+            $sql = "SELECT * FROM lotes WHERE id_lote = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->bindValue(1, $id_lote, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // $stmt->debugDumpParams();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $th) {
+            throw new Exception("[ERRO 02][Lote DAO] " . $th->getMessage(), 1);
+        }
+    }
 }

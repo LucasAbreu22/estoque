@@ -4,9 +4,6 @@ namespace Source\Models;
 
 use Exception;
 use Source\DAO\MaterialDAO;
-use Throwable;
-
-use function PHPSTORM_META\type;
 
 class Material
 {
@@ -14,6 +11,7 @@ class Material
     private  ?Categoria $categoria;
     private  STRING $codigo;
     private  STRING $descricao;
+    private  array $lotes;
     private  INT $quantidade;
     private  STRING $unidade_base;
     private  STRING $unidade_compra;
@@ -30,6 +28,7 @@ class Material
         ?Categoria $categoria = null,
         STRING $codigo = "",
         STRING $descricao = "",
+        array $lotes = [],
         INT $quantidade = 0,
         STRING $unidade_base = "",
         STRING $unidade_compra = "",
@@ -45,6 +44,7 @@ class Material
         $this->setCategoria($categoria);
         $this->setCodigo($codigo);
         $this->setDescricao($descricao);
+        $this->setLotes($lotes);
         $this->setQuantidade($quantidade);
         $this->setUnidadeBase($unidade_base);
         $this->setUnidadeCompra($unidade_compra);
@@ -111,6 +111,24 @@ class Material
     public function setCodigo(STRING $codigo): self
     {
         $this->codigo = $codigo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of lotes
+     */
+    public function getLotes(): array
+    {
+        return $this->lotes;
+    }
+
+    /**
+     * Set the value of lotes
+     */
+    public function setLotes(array $lotes): self
+    {
+        $this->lotes = $lotes;
 
         return $this;
     }
@@ -428,10 +446,23 @@ class Material
         $categoria = new Categoria($data->id_categoria);
         $categoria->getCategoriaById();
 
+        $lote = new Lote();
+        $lote->setIdMaterial($data->id_material);
+
+        $loteList = $lote->getLotesByMaterial();
+
+        $quantidade = 0;
+
+        if (count($loteList) > 0) {
+            foreach ($loteList as $lote) {
+                $quantidade += (int)$lote["quantidade"];
+            }
+        }
+
         $this->setIdMaterial($data->id_material);
         $this->setCodigo($data->codigo);
         $this->setDescricao($data->descricao);
-        $this->setQuantidade($data->quantidade);
+        $this->setQuantidade($quantidade);
         $this->setUnidadeBase($data->unidade_base);
         $this->setUnidadeCompra($data->unidade_compra);
         $this->setFatorConversao($data->fator_conversao);

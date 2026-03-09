@@ -401,6 +401,8 @@
                         ocultarLoading();
                     }
                 });
+
+                materiaisAbertos.value = new Set();
             }
 
             function editarMaterial(id_material) {
@@ -624,6 +626,9 @@
                         }
                     }
                 });
+
+                materiaisAbertosModal.value = new Set();
+
             }
 
             function adicionarItem(id_material = null, id_lote = null) {
@@ -659,7 +664,7 @@
                     material.lote = lote.lote;
 
                 } else {
-                    material.quantidadeMov = 0;
+                    material.quantidadeMov = 1;
                 }
 
                 if (tipoMov.value === 'SAIDA' && material.quantidade == 0) {
@@ -684,7 +689,7 @@
             }
 
             function criarMovimentacao() {
-                const pontoResponsavel = document.getElementById('pontoResponsavel').value.trim();
+                const pontoResponsavel = getCookie('usuario');
 
                 let codigoSigma = document.getElementById('codigoSigma').value;
 
@@ -909,7 +914,7 @@
                     buscarMaterialModal.value = "";
 
                     carrinhoList.value = [];
-                    // atualizarCarrinhoList();
+                    materiaisAbertosModal.value = new Set();
                 }
 
                 document.getElementById(id).classList.remove('active');

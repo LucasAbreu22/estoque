@@ -4,7 +4,9 @@ namespace Source\App;
 
 use Exception;
 use Source\Models\Categoria;
+use Source\Models\Lote;
 use Source\Models\Material;
+use Source\Models\MaterialMovimentacao;
 use Source\Models\MovimentacaoEstoque;
 use Source\Models\Usuario;
 
@@ -50,6 +52,7 @@ class Materiais
                 $categoria,
                 $param["codigo"],
                 $param["descricao"],
+                [],
                 (int)$param["quantidade"],
                 $param["unidade_base"],
                 $param["unidade_compra"],
@@ -104,18 +107,52 @@ class Materiais
 
             $materiais = $param["materiais"];
 
+            $formatedMateriais = [];
+
             foreach ($materiais as $material) {
-                $materialObj = new Material($material["id_material"]);
-                $materialObj->getMaterialById();
+                $loteObj = new Lote();
+                $loteObj->setIdLote((int)$material["id_lote"]);
+                $loteObj->setQuantidade($material["quantidadeMov"]);
+
+                if (!isset($formatedMateriais[$material["id_material"]])) {
+                    $materialObj = new Material($material["id_material"]);
+                    $materialObj->getMaterialById();
+                    $materialObj->setLotes([$loteObj]);
+
+                    $formatedMateriais[$material["id_material"]] = $materialObj;
+                } else {
+
+                    $newListLote = $formatedMateriais[$material["id_material"]]->getLotes();
+
+                    array_push($newListLote, $loteObj);
+
+                    $formatedMateriais[$material["id_material"]]->setLotes($newListLote);
+                }
+            }
+
+            $msg = "";
+            $lotesList = [];
+
+            foreach ($formatedMateriais as $material) {
 
                 $movimentacao = new MovimentacaoEstoque();
                 $movimentacao->setCodigoSigma(empty($param["codigoSigma"]) ? null : $param["codigoSigma"]);
-                $movimentacao->setMaterial($materialObj);
                 $movimentacao->setUsuario($usuario);
                 $movimentacao->setTipo($param["tipo"]);
-                $movimentacao->setQuantidade($material["quantidadeMov"]);
                 $movimentacao->setPontoSolicitante($param["pontoSolicitante"]);
                 $movimentacao->setNomeSolicitante($param["nomeSolicitante"]);
+
+                $materialMovimentacao = new MaterialMovimentacao();
+                $materialMovimentacao->setMaterial($material);
+
+                foreach ($material->getLotes() as $lote) {
+                    $materialMovimentacao->setLote($lote);
+                    $materialMovimentacao->setQuantidade($lote->getQuantidade());
+
+                    $lotesList[] = $materialMovimentacao;
+                }
+
+                $movimentacao->setMateriais($lotesList);
 
                 $msg = $movimentacao->criarMovimentacao();
             }
