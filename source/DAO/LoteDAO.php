@@ -41,11 +41,11 @@ class LoteDAO
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Throwable $th) {
-            throw new Exception("[ERRO 01][Lote DAO] " . $th->getMessage(), 1);
+            throw new Exception("[ERRO][Lote DAO 01] " . $th->getMessage(), 1);
         }
     }
 
-    public function getLotesById(int $id_lote)
+    public function getLoteById(int $id_lote)
     {
         try {
             $sql = "SELECT * FROM lotes WHERE id_lote = ?";
@@ -57,9 +57,31 @@ class LoteDAO
 
             // $stmt->debugDumpParams();
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (\Throwable $th) {
-            throw new Exception("[ERRO 02][Lote DAO] " . $th->getMessage(), 1);
+            throw new Exception("[ERRO][Lote DAO 02] " . $th->getMessage(), 1);
+        }
+    }
+
+
+    public function atualizarEstoque(int $id_lote, int $quantidade)
+    {
+        try {
+            $sql = "UPDATE lotes SET quantidade = ?
+            WHERE id_lote = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->bindValue(1, convertNull($quantidade), PDO::PARAM_INT);
+            $stmt->bindValue(2, convertNull($id_lote), PDO::PARAM_INT);
+
+            /* $stmt->debugDumpParams(); */
+
+            $stmt->execute();
+
+            return "Estoque atualizado com sucesso!";
+        } catch (PDOException $e) {
+            throw new Exception("[ERRO][Lote DAO 03]" . $e->getMessage());
         }
     }
 }

@@ -27,6 +27,11 @@ class MovimentacaoEstoqueDAO
         return $this->connect->commit();
     }
 
+    public function rollBack()
+    {
+        return $this->connect->rollBack();
+    }
+
     public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
     {
         try {
@@ -182,7 +187,7 @@ class MovimentacaoEstoqueDAO
     {
         try {
             $sql = "INSERT INTO movimentacoes_estoque( id_usuario, tipo,  unidade_utilizada, fator_conversao_aplicado, quantidade_convertida, ponto_solicitante, nome_solicitante, codigo_sigma)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $this->connect->prepare($sql);
 
@@ -190,7 +195,7 @@ class MovimentacaoEstoqueDAO
             $stmt->bindValue(2, $movimentacao["tipo"], PDO::PARAM_STR); // EVENTO
             $stmt->bindValue(3, "BASE", PDO::PARAM_STR);
             $stmt->bindValue(4, NULL, PDO::PARAM_STR);
-            $stmt->bindValue(5, $movimentacao["quantidade_convertida"], PDO::PARAM_STR); // CALCULADO
+            $stmt->bindValue(5, 0, PDO::PARAM_STR); // CALCULADO
             $stmt->bindValue(6, $movimentacao["ponto_solicitante"], PDO::PARAM_STR); // Formulário
             $stmt->bindValue(7, $movimentacao["nome_solicitante"], PDO::PARAM_STR); // Formulário
             $stmt->bindValue(8, $movimentacao["codigoSigma"], PDO::PARAM_STR); // Formulário
@@ -199,9 +204,9 @@ class MovimentacaoEstoqueDAO
 
             $stmt->execute();
 
-            return $stmt->lastInsertId();
+            return $this->connect->lastInsertId();
         } catch (PDOException $e) {
-            $msg = "[ERRO][Movimentação DAO 02] ";
+            $msg = "[ERRO][Movimentação DAO 03] ";
             $msg .= str_contains($e->getMessage(), "Duplicate entry") ? "Código de movimentação já existente!" : $e->getMessage();
 
             throw new Exception($msg);

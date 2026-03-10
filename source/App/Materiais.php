@@ -110,6 +110,7 @@ class Materiais
             $formatedMateriais = [];
 
             foreach ($materiais as $material) {
+
                 $loteObj = new Lote();
                 $loteObj->setIdLote((int)$material["id_lote"]);
                 $loteObj->setQuantidade($material["quantidadeMov"]);
@@ -141,15 +142,15 @@ class Materiais
                 $movimentacao->setTipo($param["tipo"]);
                 $movimentacao->setPontoSolicitante($param["pontoSolicitante"]);
                 $movimentacao->setNomeSolicitante($param["nomeSolicitante"]);
-
-                $materialMovimentacao = new MaterialMovimentacao();
-                $materialMovimentacao->setMaterial($material);
+                $movimentacao->setUnidadeUtilizada('BASE');
 
                 foreach ($material->getLotes() as $lote) {
+                    $materialMovimentacao = new MaterialMovimentacao();
+                    $materialMovimentacao->setMaterial($material);
                     $materialMovimentacao->setLote($lote);
                     $materialMovimentacao->setQuantidade($lote->getQuantidade());
 
-                    $lotesList[] = $materialMovimentacao;
+                    array_push($lotesList, $materialMovimentacao);
                 }
 
                 $movimentacao->setMateriais($lotesList);

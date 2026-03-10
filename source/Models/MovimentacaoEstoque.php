@@ -6,6 +6,8 @@ use DateTime;
 use Exception;
 use Source\DAO\MovimentacaoEstoqueDAO;
 
+use function PHPSTORM_META\type;
+
 class MovimentacaoEstoque
 {
     private int $id_movimentacao;
@@ -19,6 +21,21 @@ class MovimentacaoEstoque
     private ?string $ponto_solicitante;
     private ?string $nome_solicitante;
     private ?string $data_movimentacao;
+
+    function __construct()
+    {
+        $this->setIdMovimentacao(0);
+        $this->setUsuario(null);
+        $this->setCodigoSigma(null);
+        $this->setmateriais(null);
+        $this->settipo(null);
+        $this->setUnidadeUtilizada(null);
+        $this->setFatorConversaoAplicado(null);
+        $this->setQuantidadeConvertida(null);
+        $this->setPontoSolicitante(null);
+        $this->setNomeSolicitante(null);
+        $this->setDataMovimentacao(null);
+    }
 
 
     public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
@@ -55,33 +72,53 @@ class MovimentacaoEstoque
         if ($this->getTipo() === "SAIDA" && $this->getMateriais()[0]->getQuantidade() === 0) throw new Exception("[ERRO][Movimentacao 06] Material sem estoque!", 1);
 
         $movimentacaoDAO =  new MovimentacaoEstoqueDAO();
+        try {
+            // USAR TRANSACTION PARA ESSA AÇÃO PARA CASO DÊ ERRO DE CRIAR A MOVIMENTAÇÃO
+            $movimentacao = [
+                "id_usuario" => $this->getUsuario()->getIdUsuario(),
+                "codigoSigma" => $this->getCodigoSigma(),
+                "tipo" => $this->getTipo(),
+                "quantidade_convertida" => $this->getQuantidadeConvertida(),
+                "ponto_solicitante" => $this->getPontoSolicitante(),
+                "nome_solicitante" => $this->getNomeSolicitante(),
+            ];
 
-        $movimentacao = [
-            "id_usuario" => $this->getUsuario()->getIdUsuario(),
-            "codigoSigma" => $this->getCodigoSigma(),
-            "tipo" => $this->getTipo(),
-            "quantidade_convertida" => $this->getQuantidadeConvertida(),
-            "ponto_solicitante" => $this->getPontoSolicitante(),
-            "nome_solicitante" => $this->getNomeSolicitante(),
-        ];
+            $movimentacaoDAO->beginTransaction();
 
-        $idMovimentacao = $movimentacaoDAO->criarMovimentacao($movimentacao);
+            $this->setIdMovimentacao($movimentacaoDAO->criarMovimentacao($movimentacao));
 
-        $callback = "Movimentação criada com sucesso!";
+            foreach ($this->getMateriais() as $materialMov) {
 
-        foreach ($this->getMateriais() as $material) {
+                $loteCallback =  $materialMov->getLote()->getLoteById();
 
-            if ($this->getTipo() === "SAIDA" && $material->getQuantidade() > $this->getMateriais()[0]->getQuantidade()) throw new Exception("[ERRO][Movimentacao 07] Quantidade maior que há no estoque!", 1);
+                if (empty($loteCallback["quantidade"])) throw new Exception("[ERRO][Movimentacao 08] Lote não encontrado!", 1);
 
+                if ($this->getTipo() === "SAIDA" && $materialMov->getQuantidade() > $loteCallback["quantidade"]) throw new Exception("[ERRO][Movimentacao 07] Quantidade maior que há no estoque!", 1);
 
-            // if ($this->getTipo() === "ENTRADA") $novoEstoque = $material->getQuantidade() + $this->getQuantidade();
-            // else $novoEstoque = $material->getQuantidade() - $this->getQuantidade();
+                $novoEstoque = 0;
+
+                if ($this->getTipo() === "ENTRADA") $novoEstoque = $loteCallback["quantidade"] + $materialMov->getQuantidade();
+
+                else $novoEstoque = $loteCallback["quantidade"] - $materialMov->getQuantidade();
+
+                $materialMov->setIdMovimentacao($this->getIdMovimentacao());
+                $materialMov->salvarMaterialMov();
+
+                $materialMov->getLote()->setQuantidade($novoEstoque);
+                $materialMov->getLote()->atualizarEstoque();
+            }
+
+            // $movimentacaoDAO->rollBack();
+
+            $movimentacaoDAO->commit();
+
+            $callback = "Movimentação criada com sucesso!";
+
+            return $callback;
+        } catch (\Throwable $th) {
+            $movimentacaoDAO->rollBack();
+            throw new Exception($th->getMessage(), 1);
         }
-
-
-
-
-        return $callback;
     }
 
     /**

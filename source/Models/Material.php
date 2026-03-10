@@ -385,6 +385,47 @@ class Material
         return $materialDAO->contarMateriais($search, $fltrCategoria, $fltrStatusNormal, $fltrStatusAcabando, $fltrStatusSemEstoque);
     }
 
+    public function getMaterialById()
+    {
+        if (is_null($this->getIdMaterial()) || empty($this->getIdMaterial())) {
+            throw new Exception("[ERRO][Materiais 02] Informação vazia ou inválida de MATERIAL!");
+        }
+
+        $categoriaDAO = new MaterialDAO();
+        $data = $categoriaDAO->getMaterialById($this->getIdMaterial());
+
+        if (empty($data)) throw new Exception("Nenhum material encontrado com o ID!", 1);
+
+
+        $categoria = new Categoria($data->id_categoria);
+        $categoria->getCategoriaById();
+
+        $lote = new Lote();
+        $lote->setIdMaterial($data->id_material);
+
+        $loteList = $lote->getLotesByMaterial();
+
+        $quantidade = 0;
+
+        if (count($loteList) > 0) {
+            foreach ($loteList as $lote) {
+                $quantidade += (int)$lote["quantidade"];
+            }
+        }
+
+        $this->setIdMaterial($data->id_material);
+        $this->setCodigo($data->codigo);
+        $this->setDescricao($data->descricao);
+        $this->setQuantidade($quantidade);
+        $this->setUnidadeBase($data->unidade_base);
+        $this->setUnidadeCompra($data->unidade_compra);
+        $this->setFatorConversao($data->fator_conversao);
+        $this->setQuantidadeMinima($data->quantidade_minima);
+        $this->setCustoUnitario($data->custo_unitario);
+        $this->setLocalizacao($data->localizacao);
+        $this->setCategoria($categoria);
+    }
+
     public function salvarMaterial(): string
     {
 
@@ -429,46 +470,5 @@ class Material
 
         $materialDAO = new MaterialDAO();
         return $materialDAO->excluirMaterial($this->getIdMaterial());
-    }
-
-    public function getMaterialById()
-    {
-        if (is_null($this->getIdMaterial()) || empty($this->getIdMaterial())) {
-            throw new Exception("[ERRO][Materiais 02] Informação vazia ou inválida de MATERIAL!");
-        }
-
-        $categoriaDAO = new MaterialDAO();
-        $data = $categoriaDAO->getMaterialById($this->getIdMaterial());
-
-        if (empty($data)) throw new Exception("Nenhum material encontrado com o ID!", 1);
-
-
-        $categoria = new Categoria($data->id_categoria);
-        $categoria->getCategoriaById();
-
-        $lote = new Lote();
-        $lote->setIdMaterial($data->id_material);
-
-        $loteList = $lote->getLotesByMaterial();
-
-        $quantidade = 0;
-
-        if (count($loteList) > 0) {
-            foreach ($loteList as $lote) {
-                $quantidade += (int)$lote["quantidade"];
-            }
-        }
-
-        $this->setIdMaterial($data->id_material);
-        $this->setCodigo($data->codigo);
-        $this->setDescricao($data->descricao);
-        $this->setQuantidade($quantidade);
-        $this->setUnidadeBase($data->unidade_base);
-        $this->setUnidadeCompra($data->unidade_compra);
-        $this->setFatorConversao($data->fator_conversao);
-        $this->setQuantidadeMinima($data->quantidade_minima);
-        $this->setCustoUnitario($data->custo_unitario);
-        $this->setLocalizacao($data->localizacao);
-        $this->setCategoria($categoria);
     }
 }

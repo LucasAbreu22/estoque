@@ -3,6 +3,8 @@
 namespace Source\Models;
 
 use Exception;
+use Source\DAO\LoteDAO;
+use Source\DAO\MaterialMovimentacaoDAO;
 
 class MaterialMovimentacao
 {
@@ -79,10 +81,23 @@ class MaterialMovimentacao
     public function setQuantidade(?int $quantidade = 1): self
     {
 
-        if ($quantidade < 1) throw new Exception("[ERRO][Movimentacao 04] Informação QUANTIDADE de vazia!", 1);
+        if ($quantidade < 1) throw new Exception("[ERRO][Material Movimentacao 01] Informação QUANTIDADE de vazia!", 1);
 
         $this->quantidade = $quantidade;
 
         return $this;
+    }
+
+    public function salvarMaterialMov(): string
+    {
+        if (is_null($this->getIdMovimentacao()) || $this->getIdMovimentacao() < 1) throw new Exception("[ERRO][Material Movimentacao 02] Número de ID inválido!", 1);
+        if (is_null($this->getMaterial())) throw new Exception("[ERRO][Material Movimentacao 03] Não tem MATERIAL informado!", 1);
+        if (is_null($this->getLote())) throw new Exception("[ERRO][Material Movimentacao 03] Não tem LOTE informado!", 1);
+        if (is_null($this->getQuantidade()) || $this->getQuantidade() < 1) throw new Exception("[ERRO][Material Movimentacao 04] Informação QUANTIDADE de vazia!", 1);
+
+        $materialMovDAO = new MaterialMovimentacaoDAO();
+        $callback  = $materialMovDAO->salvarMaterialMov($this->getIdMovimentacao(), $this->getMaterial()->getIdMaterial(), $this->getLote()->getIdLote(), $this->getQuantidade());
+
+        return $callback;
     }
 }

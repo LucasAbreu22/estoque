@@ -121,7 +121,7 @@ class Lote
 
     public function getLotesByMaterial()
     {
-        if (is_null($this->getIdMaterial())) throw new Exception("[ERRO 01][Lote Clss] ID de material nulo!", 1);
+        if (is_null($this->getIdMaterial())) throw new Exception("[ERRO][Lote Clss 01] ID de material nulo!", 1);
 
         $loteDAO = new LoteDAO();
         $lotes = $loteDAO->getLotesByMaterial($this->getIdMaterial());
@@ -137,5 +137,24 @@ class Lote
         }
 
         return $lotes;
+    }
+
+    public function getLoteById()
+    {
+        if (is_null($this->getIdLote()) || $this->getIdLote() < 0) throw new Exception("[ERRO][Lote Clss 02] ID de lote inválido!", 1);
+
+        $loteDAO = new LoteDAO();
+        return $loteDAO->getLoteById($this->getIdLote());
+    }
+
+
+    public function atualizarEstoque(): string
+    {
+        if (is_null($this->getIdLote()) || $this->getIdLote() < 1) throw new Exception("[ERRO][Lote Clss 03] ID de lote nulo!", 1);
+        if ($this->getQuantidade() < 0) throw new Exception("[ERRO][Lote Clss 04] Quantidade do lote inválida!", 1);
+
+        $loteDAO = new LoteDAO();
+        $callback = $loteDAO->atualizarEstoque($this->getIdLote(), $this->getQuantidade());
+        return $callback;
     }
 }
