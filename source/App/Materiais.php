@@ -112,7 +112,15 @@ class Materiais
             foreach ($materiais as $material) {
 
                 $loteObj = new Lote();
-                $loteObj->setIdLote((int)$material["id_lote"]);
+
+                if ($param["tipo"] === "ENTRADA") {
+                    $loteObj->setIdMaterial((int)$material["id_material"]);
+                    $loteObj->setLote((int)$material["lote"]);
+                    $loteObj->setVencimento($material["vencimento"]);
+                } else {
+                    $loteObj->setIdLote((int)$material["id_lote"]);
+                }
+
                 $loteObj->setQuantidade($material["quantidadeMov"]);
 
                 if (!isset($formatedMateriais[$material["id_material"]])) {

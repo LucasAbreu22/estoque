@@ -128,7 +128,7 @@ class Lote
 
         foreach ($lotes as $lote) {
             $date = new DateTime($lote["vencimento"]);
-            $lote["vencimento"] = $date->format('d/m/Y');
+            $lote["vencimentoFormatted"] = $date->format('d/m/Y');
 
             $ids = array_column($lotes, 'id_lote');
             $key = array_search($lote["id_lote"], $ids);
@@ -147,6 +147,21 @@ class Lote
         return $loteDAO->getLoteById($this->getIdLote());
     }
 
+
+    public function salvarLote()
+    {
+        if (is_null($this->getIdMaterial()) || $this->getIdMaterial() < 1) throw new Exception("[ERRO][Lote Clss 03] Informação de ID de Material vazia!", 1);
+        if (is_null($this->getLote()) || $this->getLote() < 1) throw new Exception("[ERRO][Lote Clss 04] Informação de LOTE inválido!", 1);
+        if (is_null($this->getVencimento()) || empty($this->getVencimento())) throw new Exception("[ERRO][Lote Clss 05] Informação de VENCIMENTO vazia!", 1);
+        if ($this->getQuantidade() < 1) throw new Exception("[ERRO][Lote Clss 06] Informação de QUANTIDADE inválido!", 1);
+
+        $loteDAO = new LoteDAO();
+        $idLote = $loteDAO->salvarLote($this->getIdMaterial(), $this->getLote(), $this->getVencimento(), $this->getQuantidade());
+
+        $this->setIdLote($idLote);
+
+        return "Lote criado com sucessor!";
+    }
 
     public function atualizarEstoque(): string
     {

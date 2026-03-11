@@ -82,7 +82,7 @@
                                 <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
                             </td>
                             <td colspan="3">
-                                <span><b>Vencimento: </b>{{ lote.vencimento }}</span>
+                                <span><b>Vencimento: </b>{{ lote.vencimentoFormatted }}</span>
                             </td>
                             <td class="actions">
                                 <button class="btn-alert" @click="abrirMovimentacao('SAIDA', lote.id_lote)">Saída 🡅</button>
@@ -150,19 +150,34 @@
                                 <th>Descrição de material</th>
                                 <th>Lote</th>
                                 <th>QTD</th>
+                                <th>Vencimento</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaCarrinho">
-                            <tr v-for="(material, i) in carrinhoList" :key="i">
+                            <template v-for="(material, i) in carrinhoList" :key="i">
+                                <tr v-for="(lote, j) in material.loteList" :key="j">
+                                    <td class="codigo">{{material.codigo}}</td>
+                                    <td class="left descricao">{{material.descricao}}</td>
+                                    <td class="columnLote"><input type="number" min="1" @input="editQtdLote($event, j)" :value="lote.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
+                                    <td><input type="number" @input="editQtdItem($event, j)" min="1" :value="lote.quantidade"></td>
+                                    <td><input type="date" @input="editVencLote($event, j)" :value="lote.vencimento" :disabled="tipoMov==='SAIDA' ? true : false"></td>
+                                    <td class="actions">
+                                        <button class="btn-exit" @click="removerItem(j)">▼</button>
+                                    </td>
+                                </tr>
+                            </template>
+
+                            <!--  <tr v-for="(material, i) in carrinhoList" :key="i">
                                 <td class="codigo">{{material.codigo}}</td>
                                 <td class="left descricao">{{material.descricao}}</td>
                                 <td class="columnLote"><input type="number" min="1" @input="editQtdLote($event, i)" :value="material.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
                                 <td><input type="number" @input="editQtdItem($event, i)" min="1" :value="material.quantidadeMov"></td>
+                                <td><input type="date" @input="editVencLote($event, i)" :value="material.vencimento" :disabled="tipoMov==='SAIDA' ? true : false"></td>
                                 <td class="actions">
                                     <button class="btn-exit" @click="removerItem(i)">▼</button>
                                 </td>
-                            </tr>
+                            </tr> -->
                         </tbody>
                     </table>
                 </div>
@@ -197,7 +212,7 @@
                                         <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
                                     </td>
                                     <td>
-                                        <span><b>Vencimento: </b>{{ lote.vencimento }}</span>
+                                        <span><b>Vencimento: </b>{{ lote.vencimentoFormatted }}</span>
                                     </td>
                                     <td class="actions">
                                         <button :class="tipoMov === 'SAIDA' && lote.quantidade == 0? 'disabled-button ': 'btn-entry '" @click="adicionarItem(lote.id_material, lote.id_lote)">▲</button>
@@ -637,12 +652,17 @@
                     ...materiaisModal.value.find((material) => material.id_material === id_material)
                 };
 
-                if (material === null) {
+                if (material === undefined) {
                     alert("[ADD] Material não encontrado!");
                     return false;
                 }
+
                 if (id_lote !== null) {
-                    if (carrinhoList.value.findIndex((material) => material.id_lote === id_lote) >= 0) {
+
+                    const lotes = carrinhoList.value.flatMap((material) => material.loteList);
+                    const loteFind = lotes.find((lote) => lote.id_lote == id_lote);
+
+                    if (loteFind !== undefined) {
                         alert("[ADD] Lote já incluído para movimentação!");
                         return false;
                     }
@@ -654,41 +674,55 @@
                         return false;
                     }
 
-                    if (tipoMov.value === 'SAIDA' && lote.quantidade == 0) {
-                        alert("[ADD] Não é possivel dar saída para lote sem estoque!");
-                        return false;
+                    let carrinhoMaterial = carrinhoList.value.find((item) => item.id_material === material.id_material);
+
+                    if (carrinhoMaterial === undefined) {
+                        material.loteList = [];
+                        material.loteList.push(lote);
+
+                        carrinhoList.value.push({
+                            ...material
+                        });
+
+                    } else {
+                        carrinhoMaterial.loteList.push(lote);
                     }
 
-                    material.quantidadeMov = lote.quantidade;
-                    material.id_lote = lote.id_lote;
-                    material.lote = lote.lote;
-
                 } else {
-                    material.quantidadeMov = 1;
+                    material.loteList = [{
+                        lote: null,
+                        quantidade: 0,
+                        vencimento: null
+                    }];
+
+                    carrinhoList.value.push({
+                        ...material
+                    });
                 }
-
-                if (tipoMov.value === 'SAIDA' && material.quantidade == 0) {
-                    alert("[ADD] Não é possivel dar saída para material sem estoque!");
-                    return false;
-                }
-
-                delete material.loteList;
-
-                carrinhoList.value.push({
-                    ...material
-                });
             }
 
             function removerItem(index) {
 
                 if (index !== undefined) {
-                    const linha = carrinhoList.value[0];
-                    carrinhoList.value = carrinhoList.value.filter((material) => material !== linha)
-                } else alert("Material não identificado não identificado!");
-
+                    const linha = carrinhoList.value.loteList[index];
+                    carrinhoList.value.loteList = carrinhoList.value.loteList.filter((material) => material !== linha)
+                } else {
+                    alert("Material não identificado não identificado!");
+                }
             }
 
             function criarMovimentacao() {
+                const resultado = Object.values(
+                    carrinhoList.value.reduce((acc, obj) => {
+
+                        // acc.find((item) => item.id_material === )
+                        // console.log(obj)
+                        return acc;
+                    }, {})
+                )
+                // console.log(resultado)
+                return false;
+
                 const pontoResponsavel = getCookie('usuario');
 
                 let codigoSigma = document.getElementById('codigoSigma').value;
@@ -732,7 +766,17 @@
 
                 carrinhoList.value.forEach(element => {
                     if (element.quantidadeMov < 1 || element.quantidadeMov === "") {
-                        alert(`O material "${element.descricao}" não pode movimentar uma quantidade zerada!`)
+                        alert(`O material "${element.descricao}" não pode movimentar uma QUANTIDADE zerada!`)
+                        erroQTD = true
+                        return false;
+                    }
+                    if (element.lote === undefined) {
+                        alert(`O material "${element.descricao}" não possui NÚMERO de lote informado!`)
+                        erroQTD = true
+                        return false;
+                    }
+                    if (element.vencimento === undefined) {
+                        alert(`O material "${element.descricao}" não possui VENCIMENTO de lote informado!`)
                         erroQTD = true
                         return false;
                     }
@@ -779,7 +823,6 @@
                             });
 
                             tipoMov.value = "SAIR";
-                            // atualizarMaterialList();
 
                             fecharModal('modalMov');
                         }
@@ -791,6 +834,10 @@
             function editQtdItem(event, index) {
 
                 carrinhoList.value[index].quantidadeMov = Number(event.target.value);
+            }
+
+            function editVencLote(event, index) {
+                carrinhoList.value[index].vencimento = event.target.value;
             }
 
             function editQtdLote(event, index) {
@@ -829,19 +876,27 @@
                 if (id_item !== null && id_item > 0) {
                     let material = {};
 
-                    console.log(tipoMov.value)
                     if (tipoMov.value === 'ENTRADA') {
-                        material = materiais.value.find((material) => material.id_material == id_item);
+                        material = {
+                            ...materiais.value.find((material) => material.id_material == id_item)
+                        };
+
+                        material.loteList = [{
+                            lote: null,
+                            quantidade: 0,
+                            vencimento: null
+                        }];
+
                     } else {
 
                         const lotes = materiais.value.flatMap((material) => material.loteList);
                         const loteFind = lotes.find((lote) => lote.id_lote == id_item);
 
-                        material = materiais.value.find((material) => material.id_material == loteFind.id_material);
+                        material = {
+                            ...materiais.value.find((material) => material.id_material == loteFind.id_material)
+                        };
 
-                        material.quantidadeMov = loteFind.quantidade;
-                        material.id_lote = loteFind.id_lote;
-                        material.lote = loteFind.lote;
+                        material.loteList = [loteFind];
                     }
 
                     if (material === undefined) {
@@ -849,15 +904,8 @@
                         return false;
                     }
 
-                    material.quantidadeMov = material.quantidade;
-
                     if (material === undefined) {
                         alert("[INICAR] Material não encontrado!");
-                        return false;
-                    }
-
-                    if (tipoMov.value === 'SAIDA' && material.quantidade == 0) {
-                        alert("Não é possivel dar saída para material sem estoque!");
                         return false;
                     }
 
@@ -947,13 +995,7 @@
 
                         const idx = carrinhoList.value.findIndex((material) => material.quantidade == 0);
 
-                        if (this.value === "SAIDA" && idx >= 0) {
-
-                            if (confirm("Existem materiais sem saldo que serão removidos!\nDeseja continuar?")) {
-                                carrinhoList.value = carrinhoList.value.filter((material) => material.quantidade > 0);
-
-                            } else return false;
-                        }
+                        carrinhoList.value = [];
 
                         tipoMov.value = this.value;
 
@@ -990,6 +1032,7 @@
                 getStatusClss,
                 criarMovimentacao,
                 editQtdItem,
+                editVencLote,
                 editQtdLote,
                 abrirModalMaterial,
                 materiaisAbertos,

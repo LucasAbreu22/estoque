@@ -89,23 +89,23 @@ class MovimentacaoEstoque
 
             foreach ($this->getMateriais() as $materialMov) {
 
-                $loteCallback =  $materialMov->getLote()->getLoteById();
+                if ($this->getTipo() === "ENTRADA") {
+                    $materialMov->getLote()->salvarLote();
+                } else {
+                    $loteCallback =  $materialMov->getLote()->getLoteById();
 
-                if (empty($loteCallback["quantidade"])) throw new Exception("[ERRO][Movimentacao 08] Lote não encontrado!", 1);
+                    if (empty($loteCallback)) throw new Exception("[ERRO][Movimentacao 08] Lote não encontrado!", 1);
 
-                if ($this->getTipo() === "SAIDA" && $materialMov->getQuantidade() > $loteCallback["quantidade"]) throw new Exception("[ERRO][Movimentacao 07] Quantidade maior que há no estoque!", 1);
+                    if ($materialMov->getQuantidade() > $loteCallback["quantidade"]) throw new Exception("[ERRO][Movimentacao 07] Quantidade maior que há no estoque!", 1);
 
-                $novoEstoque = 0;
+                    $novoEstoque = $loteCallback["quantidade"] - $materialMov->getQuantidade();
 
-                if ($this->getTipo() === "ENTRADA") $novoEstoque = $loteCallback["quantidade"] + $materialMov->getQuantidade();
-
-                else $novoEstoque = $loteCallback["quantidade"] - $materialMov->getQuantidade();
+                    $materialMov->getLote()->setQuantidade($novoEstoque);
+                    $materialMov->getLote()->atualizarEstoque();
+                }
 
                 $materialMov->setIdMovimentacao($this->getIdMovimentacao());
                 $materialMov->salvarMaterialMov();
-
-                $materialMov->getLote()->setQuantidade($novoEstoque);
-                $materialMov->getLote()->atualizarEstoque();
             }
 
             // $movimentacaoDAO->rollBack();
