@@ -105,66 +105,45 @@ class Materiais
             $usuario->setPonto($param["pontoResponsavel"]);
             $usuario->getUsuarioByPonto();
 
+            $movimentacao = new MovimentacaoEstoque();
+            $movimentacao->setCodigoSigma(empty($param["codigoSigma"]) ? null : $param["codigoSigma"]);
+            $movimentacao->setUsuario($usuario);
+            $movimentacao->setTipo($param["tipo"]);
+            $movimentacao->setPontoSolicitante($param["pontoSolicitante"]);
+            $movimentacao->setNomeSolicitante($param["nomeSolicitante"]);
+            $movimentacao->setUnidadeUtilizada('BASE');
+
             $materiais = $param["materiais"];
 
-            $formatedMateriais = [];
-
             foreach ($materiais as $material) {
+                $materialObj = new Material($material["id_material"]);
+                $materialObj->getMaterialById();
 
-                $loteObj = new Lote();
-
-                if ($param["tipo"] === "ENTRADA") {
+                foreach ($material["loteList"] as $lote) {
+                    $loteObj = new Lote();
                     $loteObj->setIdMaterial((int)$material["id_material"]);
-                    $loteObj->setLote((int)$material["lote"]);
-                    $loteObj->setVencimento($material["vencimento"]);
-                } else {
-                    $loteObj->setIdLote((int)$material["id_lote"]);
+                    $loteObj->setIdLote(isset($lote["id_lote"]) ? (int)$lote["id_lote"] : null);
+                    $loteObj->setLote((int)$lote["lote"]);
+                    $loteObj->setVencimento($lote["vencimento"]);
+                    $loteObj->setQuantidade($lote["quantidade"]);
+
+                    $result = array_merge($materialObj->getLotes(), [$loteObj]);
+                    $materialObj->setLotes($result);
                 }
 
-                $loteObj->setQuantidade($material["quantidadeMov"]);
-
-                if (!isset($formatedMateriais[$material["id_material"]])) {
-                    $materialObj = new Material($material["id_material"]);
-                    $materialObj->getMaterialById();
-                    $materialObj->setLotes([$loteObj]);
-
-                    $formatedMateriais[$material["id_material"]] = $materialObj;
-                } else {
-
-                    $newListLote = $formatedMateriais[$material["id_material"]]->getLotes();
-
-                    array_push($newListLote, $loteObj);
-
-                    $formatedMateriais[$material["id_material"]]->setLotes($newListLote);
-                }
-            }
-
-            $msg = "";
-            $lotesList = [];
-
-            foreach ($formatedMateriais as $material) {
-
-                $movimentacao = new MovimentacaoEstoque();
-                $movimentacao->setCodigoSigma(empty($param["codigoSigma"]) ? null : $param["codigoSigma"]);
-                $movimentacao->setUsuario($usuario);
-                $movimentacao->setTipo($param["tipo"]);
-                $movimentacao->setPontoSolicitante($param["pontoSolicitante"]);
-                $movimentacao->setNomeSolicitante($param["nomeSolicitante"]);
-                $movimentacao->setUnidadeUtilizada('BASE');
-
-                foreach ($material->getLotes() as $lote) {
+                foreach ($materialObj->getLotes() as $lote) {
                     $materialMovimentacao = new MaterialMovimentacao();
-                    $materialMovimentacao->setMaterial($material);
+                    $materialMovimentacao->setMaterial($materialObj);
                     $materialMovimentacao->setLote($lote);
                     $materialMovimentacao->setQuantidade($lote->getQuantidade());
 
-                    array_push($lotesList, $materialMovimentacao);
+                    $result = array_merge($movimentacao->getMateriais(), [$materialMovimentacao]);
+                    $movimentacao->setMateriais($result);
                 }
-
-                $movimentacao->setMateriais($lotesList);
-
-                $msg = $movimentacao->criarMovimentacao();
             }
+
+            $msg = $movimentacao->criarMovimentacao();
+
 
             $callback = [
                 "code" => 200,

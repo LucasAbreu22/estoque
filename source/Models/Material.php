@@ -128,6 +128,13 @@ class Material
      */
     public function setLotes(array $lotes): self
     {
+        if (!empty($lotes)) {
+            $index = 0;
+            foreach ($lotes as $lote) {
+                if (!($lote instanceof  Lote)) throw new Exception("[ERRO][Movimentação  12] Classe de Lote não reconhecida no index $index!", 1);
+                $index++;
+            }
+        }
         $this->lotes = $lotes;
 
         return $this;

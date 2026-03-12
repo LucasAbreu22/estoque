@@ -159,25 +159,14 @@
                                 <tr v-for="(lote, j) in material.loteList" :key="j">
                                     <td class="codigo">{{material.codigo}}</td>
                                     <td class="left descricao">{{material.descricao}}</td>
-                                    <td class="columnLote"><input type="number" min="1" @input="editQtdLote($event, j)" :value="lote.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
-                                    <td><input type="number" @input="editQtdItem($event, j)" min="1" :value="lote.quantidade"></td>
-                                    <td><input type="date" @input="editVencLote($event, j)" :value="lote.vencimento" :disabled="tipoMov==='SAIDA' ? true : false"></td>
+                                    <td class="columnLote"><input type="number" min="1" @input="editLote($event, i, j)" :value="lote.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
+                                    <td><input type="number" @input="editQtdItem($event, i, j)" min="1" :value="lote.quantidade"></td>
+                                    <td><input type="date" @input="editVencLote($event, i, j)" :value="lote.vencimento" :disabled="tipoMov==='SAIDA' ? true : false"></td>
                                     <td class="actions">
-                                        <button class="btn-exit" @click="removerItem(j)">▼</button>
+                                        <button class="btn-exit" @click="removerItem(i)">▼</button>
                                     </td>
                                 </tr>
                             </template>
-
-                            <!--  <tr v-for="(material, i) in carrinhoList" :key="i">
-                                <td class="codigo">{{material.codigo}}</td>
-                                <td class="left descricao">{{material.descricao}}</td>
-                                <td class="columnLote"><input type="number" min="1" @input="editQtdLote($event, i)" :value="material.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
-                                <td><input type="number" @input="editQtdItem($event, i)" min="1" :value="material.quantidadeMov"></td>
-                                <td><input type="date" @input="editVencLote($event, i)" :value="material.vencimento" :disabled="tipoMov==='SAIDA' ? true : false"></td>
-                                <td class="actions">
-                                    <button class="btn-exit" @click="removerItem(i)">▼</button>
-                                </td>
-                            </tr> -->
                         </tbody>
                     </table>
                 </div>
@@ -689,40 +678,38 @@
                     }
 
                 } else {
-                    material.loteList = [{
+                    let materialCarrinho = carrinhoList.value.find((item) => item.id_material === material.id_material);
+
+                    const loteList = [{
                         lote: null,
                         quantidade: 0,
                         vencimento: null
                     }];
 
-                    carrinhoList.value.push({
-                        ...material
-                    });
+                    if (materialCarrinho === undefined) {
+                        material.loteList = loteList;
+
+                        carrinhoList.value.push({
+                            ...material
+                        });
+                    } else {
+                        materialCarrinho.loteList.push(...loteList);
+                    }
                 }
             }
 
-            function removerItem(index) {
+            function removerItem(idxMat) {
+                console.log(carrinhoList.value)
+                return false;
+                if (idxMat !== undefined) {
+                    carrinhoList.value.splice(idxMat, 1);
 
-                if (index !== undefined) {
-                    const linha = carrinhoList.value.loteList[index];
-                    carrinhoList.value.loteList = carrinhoList.value.loteList.filter((material) => material !== linha)
                 } else {
                     alert("Material não identificado não identificado!");
                 }
             }
 
             function criarMovimentacao() {
-                const resultado = Object.values(
-                    carrinhoList.value.reduce((acc, obj) => {
-
-                        // acc.find((item) => item.id_material === )
-                        // console.log(obj)
-                        return acc;
-                    }, {})
-                )
-                // console.log(resultado)
-                return false;
-
                 const pontoResponsavel = getCookie('usuario');
 
                 let codigoSigma = document.getElementById('codigoSigma').value;
@@ -764,22 +751,24 @@
 
                 let erroQTD = false;
 
-                carrinhoList.value.forEach(element => {
-                    if (element.quantidadeMov < 1 || element.quantidadeMov === "") {
-                        alert(`O material "${element.descricao}" não pode movimentar uma QUANTIDADE zerada!`)
-                        erroQTD = true
-                        return false;
-                    }
-                    if (element.lote === undefined) {
-                        alert(`O material "${element.descricao}" não possui NÚMERO de lote informado!`)
-                        erroQTD = true
-                        return false;
-                    }
-                    if (element.vencimento === undefined) {
-                        alert(`O material "${element.descricao}" não possui VENCIMENTO de lote informado!`)
-                        erroQTD = true
-                        return false;
-                    }
+                carrinhoList.value.forEach(material => {
+                    material.loteList.forEach(lote => {
+                        if (lote.lote === undefined) {
+                            alert(`O material "${material.descricao}" não possui NÚMERO de lote informado!`)
+                            erroQTD = true
+                            return false;
+                        }
+                        if (lote.quantidade < 1 || lote.quantidade === "") {
+                            alert(`O material "${material.descricao}" não pode movimentar uma QUANTIDADE zerada!`)
+                            erroQTD = true
+                            return false;
+                        }
+                        if (lote.vencimento === undefined) {
+                            alert(`O material "${material.descricao}" não possui VENCIMENTO de lote informado!`)
+                            erroQTD = true
+                            return false;
+                        }
+                    });
                 });
 
                 if (erroQTD) return false;
@@ -831,18 +820,19 @@
                 });
             }
 
-            function editQtdItem(event, index) {
+            function editQtdItem(event, idxMat, idxLot) {
 
-                carrinhoList.value[index].quantidadeMov = Number(event.target.value);
+
+                carrinhoList.value[idxMat].loteList[idxLot].quantidade = Number(event.target.value);
             }
 
-            function editVencLote(event, index) {
-                carrinhoList.value[index].vencimento = event.target.value;
+            function editVencLote(event, idxMat, idxLot) {
+                carrinhoList.value[idxMat].loteList[idxLot].vencimento = event.target.value;
             }
 
-            function editQtdLote(event, index) {
+            function editLote(event, idxMat, idxLot) {
 
-                carrinhoList.value[index].lote = Number(event.target.value);
+                carrinhoList.value[idxMat].loteList[idxLot].lote = Number(event.target.value);
             }
 
             // MODAL
@@ -1033,7 +1023,7 @@
                 criarMovimentacao,
                 editQtdItem,
                 editVencLote,
-                editQtdLote,
+                editLote,
                 abrirModalMaterial,
                 materiaisAbertos,
                 toggleMaterial,
