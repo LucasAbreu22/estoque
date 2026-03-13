@@ -1016,6 +1016,9 @@
                                 return false;
                             }
 
+                            material.quantidade -= lote.quantidade;
+                            material.quantidade += loteModal.value.quantidade;
+
                             lote.lote = loteModal.value.lote;
                             lote.quantidade = loteModal.value.quantidade;
                             lote.vencimento = loteModal.value.vencimento;

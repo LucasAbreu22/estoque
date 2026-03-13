@@ -177,7 +177,7 @@ class Materiais
 
             $loteObj = new Lote();
             $loteObj->setIdLote((int)$param["id_lote"]);
-            $loteObj->setIdMaterial((bool)$param["id_material"]);
+            $loteObj->setIdMaterial((int)$param["id_material"]);
             $loteObj->setLote((int)$param["lote"]);
             $loteObj->setQuantidade((int)$param["quantidade"]);
             $loteObj->setVencimento($param["vencimento"]);

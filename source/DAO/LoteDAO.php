@@ -112,7 +112,7 @@ class LoteDAO
 
             return "Lote editado com sucesso!";
         } catch (\Throwable $e) {
-            $msg = "[ERRO][Lote DAO 04]";
+            $msg = "[ERRO][Lote DAO 05]";
             $msg .= str_contains($e->getMessage(), "Duplicate entry") ? " Número de LOTE já existente! " : $e->getMessage();
 
             throw new Exception($msg);
