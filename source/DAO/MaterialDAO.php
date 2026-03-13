@@ -29,7 +29,8 @@ class MaterialDAO
 
     public function getMateriais(int $offset = 0, string $search = "", ?int $fltrCategoria = null, bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
-        $sql = "
+        try {
+            $sql = "
             SELECT 
                 ma.id_material, ma.id_categoria, ma.codigo,
                 ma.descricao, ma.unidade_base, ma.unidade_compra,
@@ -41,52 +42,55 @@ class MaterialDAO
             WHERE ma.visibilidade = 1
         ";
 
-        if (!empty($search)) {
-            $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
-        }
-
-        if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
-            $sql .= " AND ma.id_categoria = :fltrCategoria";
-        }
-
-        if ($fltrStatusNormal) {
-            $sql .= " AND ma.quantidade > ma.quantidade_minima";
-        }
-
-        if ($fltrStatusAcabando) {
-            $sql .= !$fltrStatusNormal ? " AND" : " OR";
-            $sql .= " (ma.quantidade > 0 AND ma.quantidade < ma.quantidade_minima)";
-        }
-
-        if ($fltrStatusSemEstoque) {
-
-            if ($fltrStatusNormal || $fltrStatusAcabando) {
-                $sql .= " OR ";
-            } else {
-                $sql .= " AND ";
+            if (!empty($search)) {
+                $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
             }
 
-            $sql .= " ma.quantidade = 0";
+            if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
+                $sql .= " AND ma.id_categoria = :fltrCategoria";
+            }
+
+            if ($fltrStatusNormal) {
+                $sql .= " AND (SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material) > ma.quantidade_minima";
+            }
+
+            if ($fltrStatusAcabando) {
+                $sql .= !$fltrStatusNormal ? " AND" : " OR";
+                $sql .= " ((SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material) > 0 AND(SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material) < ma.quantidade_minima)";
+            }
+
+            if ($fltrStatusSemEstoque) {
+
+                if ($fltrStatusNormal || $fltrStatusAcabando) {
+                    $sql .= " OR ";
+                } else {
+                    $sql .= " AND ";
+                }
+
+                $sql .= " COALESCE((SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material), 0) = 0";
+            }
+
+            $sql .= " ORDER BY ma.descricao ASC LIMIT 12 OFFSET :offset";
+
+            $stmt = $this->connect->prepare($sql);
+
+            if (!empty($search)) {
+                $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+            }
+
+            if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
+                $stmt->bindValue(':fltrCategoria', $fltrCategoria, PDO::PARAM_INT);
+            }
+
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+            // $stmt->debugDumpParams();
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            throw new Exception("[ERRO][Material DAO 06]" . $e->getMessage());
         }
-
-        $sql .= " ORDER BY ma.descricao ASC LIMIT 12 OFFSET :offset";
-
-        $stmt = $this->connect->prepare($sql);
-
-        if (!empty($search)) {
-            $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
-        }
-
-        if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
-            $stmt->bindValue(':fltrCategoria', $fltrCategoria, PDO::PARAM_INT);
-        }
-
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-
-        // $stmt->debugDumpParams();
-
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getMaterialById(int $id_material)
@@ -130,12 +134,12 @@ class MaterialDAO
             }
 
             if ($fltrStatusNormal) {
-                $sql .= " AND ma.quantidade > ma.quantidade_minima";
+                $sql .= " AND (SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material) > ma.quantidade_minima";
             }
 
             if ($fltrStatusAcabando) {
                 $sql .= !$fltrStatusNormal ? " AND" : " OR";
-                $sql .= " (ma.quantidade > 0 AND ma.quantidade < ma.quantidade_minima)";
+                $sql .= " ((SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material) > 0 AND (SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material) < ma.quantidade_minima)";
             }
 
             if ($fltrStatusSemEstoque) {
@@ -146,7 +150,7 @@ class MaterialDAO
                     $sql .= " AND ";
                 }
 
-                $sql .= " ma.quantidade = 0";
+                $sql .= " COALESCE((SELECT SUM(quantidade) FROM lotes lo WHERE lo.id_material = ma.id_material), 0) = 0";
             }
 
             $stmt = $this->connect->prepare($sql);
@@ -155,9 +159,9 @@ class MaterialDAO
                 $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
             }
 
-            /*     if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
+            if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
                 $stmt->bindValue(':fltrCategoria', $fltrCategoria, PDO::PARAM_INT);
-            } */
+            }
 
             $stmt->execute();
             return (int) $stmt->fetchColumn();;
