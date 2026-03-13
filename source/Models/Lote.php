@@ -148,19 +148,27 @@ class Lote
     }
 
 
-    public function salvarLote()
+    public function salvarLote(): ?string
     {
-        if (is_null($this->getIdMaterial()) || $this->getIdMaterial() < 1) throw new Exception("[ERRO][Lote Clss 03] Informação de ID de Material vazia!", 1);
-        if (is_null($this->getLote()) || $this->getLote() < 1) throw new Exception("[ERRO][Lote Clss 04] Informação de LOTE inválido!", 1);
-        if (is_null($this->getVencimento()) || empty($this->getVencimento())) throw new Exception("[ERRO][Lote Clss 05] Informação de VENCIMENTO vazia!", 1);
-        if ($this->getQuantidade() < 1) throw new Exception("[ERRO][Lote Clss 06] Informação de QUANTIDADE inválido!", 1);
-
+        $msg = null;
         $loteDAO = new LoteDAO();
-        $idLote = $loteDAO->salvarLote($this->getIdMaterial(), $this->getLote(), $this->getVencimento(), $this->getQuantidade());
 
-        $this->setIdLote($idLote);
+        if (is_null($this->getIdLote())) {
+            if (is_null($this->getIdMaterial()) || $this->getIdMaterial() < 1) throw new Exception("[ERRO][Lote Clss 03] Informação de ID de Material vazia!", 1);
+            if (is_null($this->getLote()) || $this->getLote() < 1) throw new Exception("[ERRO][Lote Clss 04] Informação de LOTE inválido!", 1);
+            if (is_null($this->getVencimento()) || empty($this->getVencimento())) throw new Exception("[ERRO][Lote Clss 05] Informação de VENCIMENTO vazia!", 1);
+            if ($this->getQuantidade() < 1) throw new Exception("[ERRO][Lote Clss 06] Informação de QUANTIDADE inválido!", 1);
 
-        return "Lote criado com sucessor!";
+            $idLote = $loteDAO->salvarLote($this->getIdMaterial(), $this->getLote(), $this->getVencimento(), $this->getQuantidade());
+
+            $this->setIdLote($idLote);
+
+            $msg = "Lote criado com sucesso!";
+        } else {
+            $msg = $loteDAO->editarLote($this->getIdLote(), $this->getIdMaterial(), $this->getLote(), $this->getVencimento(), $this->getQuantidade());
+        }
+
+        return $msg;
     }
 
     public function atualizarEstoque(): string

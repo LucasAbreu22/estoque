@@ -93,6 +93,32 @@ class LoteDAO
         }
     }
 
+    public function editarLote(int $id_lote, int $id_material, int $lote, string $vencimento, int $quantidade)
+    {
+        try {
+            $sql = "UPDATE lotes SET id_material = ?, lote = ?, vencimento = ?, quantidade = ? WHERE id_lote = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->bindValue(1, $id_material, PDO::PARAM_INT);
+            $stmt->bindValue(2, $lote, PDO::PARAM_INT);
+            $stmt->bindValue(3, $vencimento, PDO::PARAM_STR);
+            $stmt->bindValue(4, $quantidade, PDO::PARAM_INT);
+            $stmt->bindValue(5, $id_lote, PDO::PARAM_INT);
+
+            /* $stmt->debugDumpParams(); */
+
+            $stmt->execute();
+
+            return "Lote editado com sucesso!";
+        } catch (\Throwable $e) {
+            $msg = "[ERRO][Lote DAO 04]";
+            $msg .= str_contains($e->getMessage(), "Duplicate entry") ? " Número de LOTE já existente! " : $e->getMessage();
+
+            throw new Exception($msg);
+        }
+    }
+
     public function atualizarEstoque(int $id_lote, int $quantidade)
     {
         try {

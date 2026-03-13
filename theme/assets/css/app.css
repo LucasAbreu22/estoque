@@ -282,6 +282,10 @@ input[type="number"] {
   margin: 6px 0 12px;
 }
 
+#modalLote .modal-content {
+  width: 300px;
+}
+
 input[type="date"] {
   padding: 7px;
   margin: 6px 0 12px;

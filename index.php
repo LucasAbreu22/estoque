@@ -24,6 +24,7 @@ $router->post("/", "Materiais:getMateriais");
 $router->post("/salvarMaterial", "Materiais:salvarMaterial");
 $router->post("/excluirMaterial", "Materiais:excluirMaterial");
 $router->post("/criarMovimentacao", "Materiais:criarMovimentacao");
+$router->post("/salvarLote", "Materiais:salvarLote");
 
 /* ROTA MOVIMENTAÇÃO */
 $router->group("movimentacoes");

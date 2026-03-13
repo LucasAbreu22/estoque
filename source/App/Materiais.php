@@ -155,4 +155,36 @@ class Materiais
             echo json_encode(["code" => 501, "message" => $th->getMessage()]);
         }
     }
+
+    function salvarLote($param): void
+    {
+        try {
+            if (!isset($param["id_material"])) {
+                throw new Exception("[ERRO][Materiais 01] Informação de ID de MATERIAL não encontrada!", 1);
+            }
+            if (!isset($param["id_lote"])) {
+                throw new Exception("[ERRO][Materiais 02] Informação de ID de LOTE não encontrada!", 1);
+            }
+            if (!isset($param["lote"])) {
+                throw new Exception("[ERRO][Materiais 03] Informação de LOTE não encontrada!", 1);
+            }
+            if (!isset($param["quantidade"])) {
+                throw new Exception("[ERRO][Materiais 04] Informação de QUANTIDADE não encontrada!", 1);
+            }
+            if (!isset($param["vencimento"])) {
+                throw new Exception("[ERRO][Materiais 05] Informação de VENCIMENTO não encontrada!", 1);
+            }
+
+            $loteObj = new Lote();
+            $loteObj->setIdLote((int)$param["id_lote"]);
+            $loteObj->setIdMaterial((bool)$param["id_material"]);
+            $loteObj->setLote((int)$param["lote"]);
+            $loteObj->setQuantidade((int)$param["quantidade"]);
+            $loteObj->setVencimento($param["vencimento"]);
+
+            echo json_encode(["code" => 200, "message" => $loteObj->salvarLote()]);
+        } catch (\Throwable $th) {
+            echo json_encode(["code" => 501, "message" => $th->getMessage()]);
+        }
+    }
 }

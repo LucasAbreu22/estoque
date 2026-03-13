@@ -68,9 +68,9 @@
                                 </span>
                             </td>
                             <td class="actions">
-                                <button class="btn-entry" @click="abrirMovimentacao('ENTRADA', material.id_material)">Entrada 🡇</button>
-                                <button class="btn-edit" @click="editarMaterial(material.id_material)">Editar</button>
-                                <button class="btn-exit" @click="excluirMaterial(material.id_material)">Excluir</button>
+                                <button class="btn-entry" @click.stop="abrirMovimentacao('ENTRADA', material.id_material)">Entrada 🡇</button>
+                                <button class="btn-edit" @click.stop="editarMaterial(material.id_material)">Editar</button>
+                                <button class="btn-exit" @click.stop="excluirMaterial(material.id_material)">Excluir</button>
                             </td>
                         </tr>
 
@@ -86,8 +86,8 @@
                             </td>
                             <td class="actions">
                                 <button class="btn-alert" @click="abrirMovimentacao('SAIDA', lote.id_lote)">Saída 🡅</button>
-                                <button class="btn-edit" @click="editarMaterial(lote.id_lote)">Editar</button>
-                                <button class="btn-exit" @click="excluirMaterial(lote.id_lote)">Excluir</button>
+                                <button class="btn-edit" @click="editarLote(lote)">Editar</button>
+                                <button class="btn-exit" @click="excluirLote(lote)">Excluir</button>
                             </td>
                         </tr>
                     </template>
@@ -228,7 +228,7 @@
         <!-- MODAL Incluir MATERIAL -->
         <div class="modal" id="modalMaterial">
             <div class="modal-content">
-                <h2 id="titleModalMaterial">Incluir Material</h2>
+                <h2 id="titleModalMaterial">Material</h2>
 
                 <label>Código</label>
                 <input type="text" id="codigo">
@@ -272,6 +272,27 @@
                 </div>
             </div>
         </div>
+
+        <!-- MODAL Incluir LOTE -->
+        <div class="modal" id="modalLote">
+            <div class="modal-content">
+                <h2 id="titleModalLote">Lote</h2>
+
+                <label>Lote</label>
+                <input type="number" id="iptLote" min="1" @input="editLoteModal($event)" :value="loteModal.lote">
+
+                <label>Quantidade</label>
+                <input type="number" id="iptQTDLote" @input="editQtdItemModal($event)" min="1" :value="loteModal.quantidade">
+
+                <label>Vencimento</label>
+                <input type="date" id="iptVencLote" @input="editVencLoteModal($event)" :value="loteModal.vencimento">
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" @click="fecharModal('modalLote')">Cancelar</button>
+                    <button class="btn-confirm" @click="salvarLote()">Salvar</button>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 
@@ -304,6 +325,8 @@
             let linhaSelecionada = null;
             const materiaisAbertos = ref(new Set());
             const materiaisAbertosModal = ref(new Set());
+
+            const loteModal = ref({});
 
             function toggleMaterial(id) {
                 if (materiaisAbertos.value.has(id)) {
@@ -656,7 +679,9 @@
                         return false;
                     }
 
-                    const lote = material.loteList.find((lote) => lote.id_lote === id_lote);
+                    const lote = {
+                        ...material.loteList.find((lote) => lote.id_lote === id_lote)
+                    };
 
                     if (lote === undefined) {
                         alert("[ADD] Lote não encontrado!");
@@ -796,19 +821,36 @@
 
                                 line.quantidade = parseFloat(line.quantidade)
 
-                                material.quantidadeMov = parseFloat(material.quantidadeMov)
+                                material.quantidade = parseFloat(material.quantidade)
 
-                                line.quantidade = tipoMov.value === 'ENTRADA' ? line.quantidade + material.quantidadeMov : line.quantidade - material.quantidadeMov;
+                                material.loteList.forEach(lote => {
+                                    if (tipoMov.value === 'ENTRADA') {
+                                        line.quantidade += lote.quantidade;
 
-                                if (line.quantidade < 0) line.quantidade = 0;
+                                        const data = new Date(lote.vencimento);
 
-                                if (material.quantidade == 0) line.status = "Sem Estoque";
+                                        lote.vencimentoFormatted = data.toLocaleDateString('pt-BR', {
+                                            timeZone: 'UTC'
+                                        });
 
-                                else if (material.quantidade < material.quantidade_minima) line.status = "Acabando"
+                                        line.loteList.push(lote);
+                                    } else {
+                                        let idxLoteLine = line.loteList.findIndex((item) => item.id_lote === lote.id_lote);
+
+                                        line.loteList[idxLoteLine].quantidade -= lote.quantidade;
+
+                                        if (line.loteList[idxLoteLine].quantidade === 0) line.loteList.splice(idxLoteLine, 1);
+
+                                        line.quantidade -= lote.quantidade;
+                                    }
+                                });
+
+                                if (line.quantidade == 0) line.status = "Sem Estoque";
+
+                                else if (line.quantidade < line.quantidade_minima) line.status = "Acabando"
 
                                 else line.status = "Normal"
-
-                                material = line;
+                                // material = line;
                             });
 
                             tipoMov.value = "SAIR";
@@ -821,8 +863,6 @@
             }
 
             function editQtdItem(event, idxMat, idxLot) {
-
-
                 carrinhoList.value[idxMat].loteList[idxLot].quantidade = Number(event.target.value);
             }
 
@@ -831,7 +871,6 @@
             }
 
             function editLote(event, idxMat, idxLot) {
-
                 carrinhoList.value[idxMat].loteList[idxLot].lote = Number(event.target.value);
             }
 
@@ -919,6 +958,83 @@
                 }
             }
 
+            function editarLote(lote) {
+                document.getElementById('modalLote').classList.add('active');
+
+                loteModal.value = {
+                    ...lote
+                };
+            }
+
+            function editQtdItemModal(event) {
+                loteModal.value.quantidade = Number(event.target.value);
+            }
+
+            function editVencLoteModal(event) {
+                loteModal.value.vencimento = event.target.value;
+            }
+
+            function editLoteModal(event) {
+                loteModal.value.lote = Number(event.target.value);
+            }
+
+            function salvarLote() {
+                if (loteModal.value.lote < 1) {
+                    alert("[ERRO][Salvar LOTE 01] Informação de LOTE vazia!");
+                    return false;
+                }
+                if (loteModal.value.quantidade < 0) {
+                    alert("[ERRO][Salvar LOTE 02] Informação de QUANTIDADE inválida!");
+                    return false;
+                }
+                if (loteModal.value.vencimento === "") {
+                    alert("[ERRO][Salvar LOTE 03] Informação de VENCIMENTO vazia!");
+                    return false;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?= url("/salvarLote") ?>",
+                    data: loteModal.value,
+                    dataType: "json",
+                    success: function(response) {
+
+                        alert(response.message);
+
+                        if (response.code == 200) {
+                            let material = materiais.value.find((material) => material.id_material === loteModal.value.id_material);
+
+                            if (material === undefined) {
+                                alert("[ERRO][Salvar LOTE 04] Material não encontrado!");
+                                return false;
+                            }
+
+                            let lote = material.loteList.find((lote) => lote.id_lote === loteModal.value.id_lote);
+
+                            if (lote === undefined) {
+                                alert("[ERRO][Salvar LOTE 05] Lote não encontrado!");
+                                return false;
+                            }
+
+                            lote.lote = loteModal.value.lote;
+                            lote.quantidade = loteModal.value.quantidade;
+                            lote.vencimento = loteModal.value.vencimento;
+
+                            const data = new Date(lote.vencimento);
+
+                            lote.vencimentoFormatted = data.toLocaleDateString('pt-BR', {
+                                timeZone: 'UTC'
+                            });
+
+                            fecharModal('modalLote');
+                        }
+
+                    }
+                });
+
+
+            }
+
             function fecharModal(id) {
 
                 if (id === "modalMaterial") {
@@ -927,6 +1043,10 @@
                     document.getElementById('fator').value = "";
                     document.getElementById('minimo').value = "";
                     document.getElementById('localizacao').value = "";
+                } else if (id === "modalLote") {
+                    document.getElementById('iptLote').value = "";
+                    document.getElementById('iptQTDLote').value = "";
+                    document.getElementById('iptVencLote').value = "";
                 } else {
 
                     let fechar = true;
@@ -1028,7 +1148,13 @@
                 materiaisAbertos,
                 toggleMaterial,
                 materiaisAbertosModal,
-                toggleMaterialModal
+                toggleMaterialModal,
+                loteModal,
+                editarLote,
+                salvarLote,
+                editQtdItemModal,
+                editVencLoteModal,
+                editLoteModal
             };
         },
     }).mount("#app");
