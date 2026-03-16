@@ -454,6 +454,9 @@
             }
 
             function excluirMaterial(id_material) {
+                if (!confirm('Desejar realmente excluir o LOTE? \nClique "OK" para prosseguir')) {
+                    return false
+                }
 
                 const material = materiais.value.find((material) => material.id_material === id_material);
 
@@ -594,6 +597,46 @@
 
                 else return "ok"
             }
+
+            // LOTE
+            function editarLote(lote) {
+                document.getElementById('modalLote').classList.add('active');
+
+                loteModal.value = {
+                    ...lote
+                };
+            }
+
+            function excluirLote(lote) {
+                if (!confirm('Desejar realmente excluir o LOTE? \nClique "OK" para prosseguir')) {
+                    return false
+                }
+
+                if (lote.id_lote < 1 || lote.id_lote === undefined) {
+                    alert("Número de ID de lote inválido!");
+                    return false;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?= url("/excluirLote") ?>",
+                    data: lote.id_lote,
+                    dataType: "json",
+                    success: function(response) {
+                        alert(response.message);
+
+                        if (response.code == 200) {
+                            let material = materiais.value.find((material) => material.id_material === lote.id_material);
+
+                            const idxLote = material.loteList.findIndex((item) => item.id_lote == lote.id_lote);
+
+                            material.loteList.splice(idxLote, 1);
+                            material.quantidade -= Number(lote.quantidade);
+                        }
+                    }
+                });
+            }
+
 
             // MOVIMENTAÇÃO
             function getMateriaisModal(increment = 0) {
@@ -958,14 +1001,6 @@
                 }
             }
 
-            function editarLote(lote) {
-                document.getElementById('modalLote').classList.add('active');
-
-                loteModal.value = {
-                    ...lote
-                };
-            }
-
             function editQtdItemModal(event) {
                 loteModal.value.quantidade = Number(event.target.value);
             }
@@ -1157,7 +1192,8 @@
                 salvarLote,
                 editQtdItemModal,
                 editVencLoteModal,
-                editLoteModal
+                editLoteModal,
+                excluirLote
             };
         },
     }).mount("#app");

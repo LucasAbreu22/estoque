@@ -180,4 +180,14 @@ class Lote
         $callback = $loteDAO->atualizarEstoque($this->getIdLote(), $this->getQuantidade());
         return $callback;
     }
+
+    public function excluirLote(): string
+    {
+        if (is_null($this->getIdLote())) throw new Exception("[ERRO][Lote Clss 09] Não há informação de lote informada!", 1);
+
+        $loteDAO = new LoteDAO();
+        $callback = $loteDAO->excluirLote($this->getIdLote());
+
+        return $callback;
+    }
 }

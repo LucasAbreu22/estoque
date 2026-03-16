@@ -27,6 +27,11 @@ class LoteDAO
         return $this->connect->commit();
     }
 
+    public function rollBack()
+    {
+        return $this->connect->rollBack();
+    }
+
     public function getLotesByMaterial(int $id_material, bool $all = false)
     {
         try {
@@ -114,6 +119,28 @@ class LoteDAO
         } catch (\Throwable $e) {
             $msg = "[ERRO][Lote DAO 05]";
             $msg .= str_contains($e->getMessage(), "Duplicate entry") ? " Número de LOTE já existente! " : $e->getMessage();
+
+            throw new Exception($msg);
+        }
+    }
+
+    public function excluirLote(int $id_lote)
+    {
+        try {
+            $sql = "DELETE FROM lotes WHERE id_lote = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->bindValue(1, $id_lote, PDO::PARAM_INT);
+
+            /* $stmt->debugDumpParams(); */
+
+            $stmt->execute();
+
+            return "Lote excluído com sucesso!";
+        } catch (PDOException $e) {
+            $msg = "[ERRO][Lote DAO 06]";
+            $msg .= str_contains($e->getMessage(), " Cannot delete or update a parent row: a foreign key constraint fails") ? " Lote não pôde ser apagado, pois há movimentação vinculada! " : $e->getMessage();
 
             throw new Exception($msg);
         }

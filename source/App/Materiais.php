@@ -187,4 +187,20 @@ class Materiais
             echo json_encode(["code" => 501, "message" => $th->getMessage()]);
         }
     }
+
+    function excluirLote($param): void
+    {
+        try {
+            if (!isset($param) || empty($param)) {
+                throw new Exception("[ERRO][Materiais 08] Informação de ID de LOTE não encontrada!", 1);
+            }
+
+            $loteObj = new Lote();
+            $loteObj->setIdLote((int)$param);
+
+            echo json_encode(["code" => 200, "message" => $loteObj->excluirLote()]);
+        } catch (\Throwable $th) {
+            echo json_encode(["code" => 501, "message" => $th->getMessage()]);
+        }
+    }
 }
