@@ -56,7 +56,7 @@
                 <template v-for="(movimentacao, i) in movimentacoes" :key="i">
                     <tr @click="toggleMovimentacao(movimentacao.id_movimentacao)" style="cursor:pointer">
                         <td>{{movimentacao.id_movimentacao}}</td>
-                        <td>{{movimentacao.quantidade}}</td>
+                        <td>{{movimentacao.codigo_sigma}}</td>
                         <td>{{movimentacao.data_movimentacao}}</td>
                         <td class="left">{{movimentacao.tipo}}</td>
                         <td class="left">{{movimentacao.ponto_solicitante}}</td>
@@ -65,13 +65,16 @@
                         <td class="left">{{movimentacao.nome}}</td>
                     </tr>
                     <tr v-if="movimentacoesAbertas.has(movimentacao.id_movimentacao)" v-for="(material, j) in movimentacao.materialList" :key="'material-'+j" class="sublist">
+                        <td>
+                            <span><b>Código: </b>{{ material.codigo }}</span>
+                        </td>
                         <td colspan="3">
                             <span><b>Material: </b>{{ material.descricao }}</span>
                         </td>
                         <td colspan="2">
                             <span><b>Lote: </b>{{ material.lote }}</span>
                         </td>
-                        <td colspan="2">
+                        <td>
                             <span><b>Quantidade: </b>{{ material.quantidade }}</span>
                         </td>
                         <td class="actions">
@@ -192,6 +195,9 @@
                         ocultarLoading()
                     }
                 });
+
+                materiaisAbertos.value = new Set();
+
             }
 
             function excluirMaterial(material) {

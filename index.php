@@ -38,6 +38,10 @@ $router->group("usuario");
 // $router->get("/", "Web:movimentacoes");
 $router->post("/consultarPonto", "Usuarios:consultarPonto");
 
+$router->group("documento");
+$router->get("/getComprovanteSaida", "Documentos:getComprovanteSaida");
+
+
 /* ROTA DE ERRO */
 $router->group("error");
 $router->get("/{errcode}", "Web:error");

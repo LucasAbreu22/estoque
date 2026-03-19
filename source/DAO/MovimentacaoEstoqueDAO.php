@@ -61,8 +61,9 @@ class MovimentacaoEstoqueDAO
             me.nome_solicitante, me.data_movimentacao,
             us.ponto, us.nome
             FROM movimentacoes_estoque me 
-            INNER JOIN usuarios us 
-            ON me.id_usuario = us.id_usuario 
+            INNER JOIN usuarios us ON me.id_usuario = us.id_usuario 
+            INNER JOIN materiais_movimentacao mm ON me.id_movimentacao = mm.id_movimentacao
+            INNER JOIN materiais ma ON mm.id_material = ma.id_material
             WHERE 1=1";
 
             if (!empty($dataInicial)) {
@@ -93,7 +94,9 @@ class MovimentacaoEstoqueDAO
                 else if ($fltrMovSaida) $sql .= " AND me.tipo = 'SAIDA'";
             }
 
-            $sql .= " ORDER BY me.id_movimentacao DESC
+            $sql .= " 
+            GROUP BY me.id_movimentacao
+            ORDER BY me.id_movimentacao DESC
             LIMIT 13 OFFSET :offset";
 
             $stmt = $this->connect->prepare($sql);
@@ -135,8 +138,9 @@ class MovimentacaoEstoqueDAO
             $sql = "SELECT 
             count(*) AS qtdMovimentacoes
             FROM movimentacoes_estoque me
-            INNER JOIN usuarios us 
-            ON me.id_usuario = us.id_usuario 
+            INNER JOIN usuarios us ON me.id_usuario = us.id_usuario 
+            INNER JOIN materiais_movimentacao mm ON me.id_movimentacao = mm.id_movimentacao
+            INNER JOIN materiais ma ON mm.id_material = ma.id_material
             WHERE 1=1";
 
             if (!empty($dataInicial)) {
@@ -167,6 +171,8 @@ class MovimentacaoEstoqueDAO
 
                 else if ($fltrMovSaida) $sql .= " AND me.tipo = 'SAIDA'";
             }
+
+            $sql .= " GROUP BY me.id_movimentacao";
 
             $stmt = $this->connect->prepare($sql);
 
