@@ -252,6 +252,10 @@ class MovimentacaoEstoque
         foreach ($movimentacoes as $movimentacao) {
             $date = new DateTime($movimentacao->data_movimentacao);
             $movimentacao->data_movimentacao = $date->format('d/m/Y H:i:s');
+
+            $materialMov = new MaterialMovimentacao();
+            $materialMov->setIdMovimentacao($movimentacao->id_movimentacao);
+            $movimentacao->materialList = $materialMov->getMateriaisByMovimentacao();
         }
 
         return $movimentacoes;
@@ -262,7 +266,6 @@ class MovimentacaoEstoque
         $movimentacaoDAO = new MovimentacaoEstoqueDAO();
         return $movimentacaoDAO->contarMovimentacoes($dataInicial, $dataFinal, $buscarCodSig, $buscarMaterial, $buscarPessoa, $fltrMovEntrada, $fltrMovSaida);
     }
-
 
     public function criarMovimentacao()
     {
@@ -325,5 +328,24 @@ class MovimentacaoEstoque
             $movimentacaoDAO->rollBack();
             throw new Exception($th->getMessage(), 1);
         }
+    }
+
+    public function getMovimentacaoById()
+    {
+
+        if (is_null($this->getIdMovimentacao()) || $this->getIdMovimentacao() < 0) throw new Exception("[ERRO][Movimentacao Clss 01] Informação de ID de movimentação inválida!", 1);
+
+        $movimentacaoDAO = new MovimentacaoEstoqueDAO();
+        $callback = $movimentacaoDAO->getMovimentacaoById($this->getIdMovimentacao());
+
+        return $callback;
+    }
+
+    public function excluirMovimentacao()
+    {
+        if (is_null($this->getIdMovimentacao()) || $this->getIdMovimentacao() < 1) throw new Exception("[ERRO][Movimentação Clss 11] Informação de ID de movimentação vazia!", 1);
+
+        $movimentacaoDAO = new MovimentacaoEstoqueDAO();
+        $movimentacaoDAO->excluirMovimentacao($this->getIdMovimentacao());
     }
 }

@@ -100,4 +100,58 @@ class MaterialMovimentacao
 
         return $callback;
     }
+
+    public function getMateriaisByMovimentacao(): array
+    {
+        if (is_null($this->getIdMovimentacao()) || $this->getIdMovimentacao() < 1) throw new Exception("[ERRO][Material Movimentação Clss 06] Informação de ID de movimentação inválido!", 1);
+
+        $materialMovDAO = new MaterialMovimentacaoDAO();
+        $callback = $materialMovDAO->getMateriaisByMovimentacao($this->getIdMovimentacao());
+
+        return $callback;
+    }
+
+    public function excluirMaterial(): string
+    {
+
+        try {
+            if (is_null($this->getMaterial()) || is_null($this->getMaterial()->getIdMaterial()) || $this->getMaterial()->getIdMaterial() < 1) throw new Exception("[ERRO][Material Movimentação Clss 07] Sem informação de Material informada!", 1);
+            if (is_null($this->getLote()) || is_null($this->getLote()->getIdLote()) || $this->getMaterial()->getIdMaterial() < 1) throw new Exception("[ERRO][Material Movimentação Clss 08] Sem informação de Lote informada!", 1);
+            if (is_null($this->getIdMovimentacao()) || $this->getIdMovimentacao() < 1) throw new Exception("[ERRO][Material Movimentação Clss 09] Informação de  ID de Movimentação não informada!", 1);
+
+            $movimentacaoObj = new MovimentacaoEstoque();
+            $movimentacaoObj->setIdMovimentacao($this->getIdMovimentacao());
+
+            $movimentacao = $movimentacaoObj->getMovimentacaoById();
+
+            $materiaisMov = $this->getMateriaisByMovimentacao();
+
+            $materialMovDAO = new MaterialMovimentacaoDAO();
+            $materialMovDAO->beginTransaction();
+
+            $callback = $materialMovDAO->excluirMaterial($this->getMaterial()->getIdMaterial(), $this->getLote()->getIdLote(), $this->getIdMovimentacao());
+
+            $lote = $this->getLote()->getLoteById();
+
+            if ($movimentacao->tipo === "ENTRADA") {
+
+                $this->getLote()->excluirLote();
+
+                if (count($materiaisMov) === 1) {
+                    $movimentacaoObj->excluirMovimentacao();
+                }
+            } else {
+                $this->getLote()->setQuantidade($lote["quantidade"] + $this->getQuantidade());
+                $this->getLote()->atualizarEstoque();
+            }
+
+            $materialMovDAO->rollBack();
+            // $materialMovDAO->commit();
+
+            return $callback;
+        } catch (\Throwable $e) {
+            $materialMovDAO->rollBack();
+            throw new Exception($e->getMessage(), 1);
+        }
+    }
 }

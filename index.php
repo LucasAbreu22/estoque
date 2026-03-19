@@ -31,6 +31,7 @@ $router->post("/excluirLote", "Materiais:excluirLote");
 $router->group("movimentacoes");
 $router->get("/", "Web:movimentacoes");
 $router->post("/", "Movimentacoes:getMovimentacoes");
+$router->post("/excluirMaterial", "Movimentacoes:excluirMaterial");
 
 /* ROTA USUARIO */
 $router->group("usuario");

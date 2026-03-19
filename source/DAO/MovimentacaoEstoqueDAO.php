@@ -32,19 +32,37 @@ class MovimentacaoEstoqueDAO
         return $this->connect->rollBack();
     }
 
+    public function getMovimentacaoById(int $id_movimentacao)
+    {
+        try {
+            $sql = "SELECT 
+            *
+            FROM movimentacoes_estoque 
+            WHERE id_movimentacao = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->bindValue(1, $id_movimentacao, PDO::PARAM_INT);
+
+            // $stmt->debugDumpParams();
+
+            $stmt->execute();
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            throw new Exception("[ERRO][Movimentação DAO 04]" . $e->getMessage());
+        }
+    }
+
     public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
     {
         try {
             $sql = "SELECT 
-            me.id_movimentacao, me.codigo_sigma, me.tipo, me.quantidade, me.ponto_solicitante, 
+            me.id_movimentacao, me.codigo_sigma, me.tipo, me.ponto_solicitante, 
             me.nome_solicitante, me.data_movimentacao,
-            us.ponto, us.nome,
-            ma.codigo, ma.descricao
+            us.ponto, us.nome
             FROM movimentacoes_estoque me 
             INNER JOIN usuarios us 
             ON me.id_usuario = us.id_usuario 
-            INNER JOIN materiais ma 
-            ON me.id_material = ma.id_material
             WHERE 1=1";
 
             if (!empty($dataInicial)) {
@@ -119,8 +137,6 @@ class MovimentacaoEstoqueDAO
             FROM movimentacoes_estoque me
             INNER JOIN usuarios us 
             ON me.id_usuario = us.id_usuario 
-            INNER JOIN materiais ma 
-            ON me.id_material = ma.id_material
             WHERE 1=1";
 
             if (!empty($dataInicial)) {
@@ -210,6 +226,24 @@ class MovimentacaoEstoqueDAO
             $msg .= str_contains($e->getMessage(), "Duplicate entry") ? "Código de movimentação já existente!" : $e->getMessage();
 
             throw new Exception($msg);
+        }
+    }
+
+    public function excluirMovimentacao(int $id_movimentacao)
+    {
+        try {
+            $sql = "DELETE FROM movimentacoes_estoque WHERE id_movimentacao = ?";
+
+            $stmt = $this->connect->prepare($sql);
+            $stmt->bindValue(1, $id_movimentacao, PDO::PARAM_INT);
+
+            // $stmt->debugDumpParams();
+
+            $stmt->execute();
+
+            return "Movimentação excluída com sucesso!";
+        } catch (\Throwable $e) {
+            throw new Exception("[ERRO][Movimentação DAO 05]" . $e->getMessage(), 1);
         }
     }
 }
