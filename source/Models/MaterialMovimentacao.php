@@ -13,6 +13,14 @@ class MaterialMovimentacao
     private ?Lote $lote;
     private ?int $quantidade;
 
+    public function __construct()
+    {
+        $this->setMaterial(null);
+        $this->setIdMovimentacao(null);
+        $this->setLote(null);
+        $this->setQuantidade(null);
+    }
+
     /**
      * Get the value of material
      */
@@ -80,8 +88,6 @@ class MaterialMovimentacao
      */
     public function setQuantidade(?int $quantidade = 1): self
     {
-
-        if ($quantidade < 1) throw new Exception("[ERRO][Material Movimentacao 01] Informação QUANTIDADE de vazia!", 1);
 
         $this->quantidade = $quantidade;
 
