@@ -148,6 +148,7 @@ class Materiais
             $callback = [
                 "code" => 200,
                 "message" => $msg,
+                "id_movimentacao" => $movimentacao->getIdMovimentacao()
             ];
 
             echo json_encode($callback);
