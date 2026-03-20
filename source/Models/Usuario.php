@@ -178,6 +178,25 @@ class Usuario
         $this->setVisibilidade($data->visibilidade);
     }
 
+    public function getUsuarioById()
+    {
+
+        if (empty($this->getIdUsuario())) throw new Exception("[ERRO][Usuário 03] Informação de ID vazia!", 1);
+
+        $usuarioDAO = new UsuarioDAO();
+        $data = $usuarioDAO->getUsuarioById($this->getIdUsuario());
+
+        if (empty($data)) throw new Exception("Nenhum usuário encontrado com o ID!", 1);
+
+        $this->setIdUsuario($data->id_usuario);
+        $this->setNome($data->nome);
+        $this->setPonto($data->ponto);
+        $this->setSenha($data->senha);
+        $this->setDataCriacao($data->data_criacao);
+        $this->setDataEdicao($data->data_edicao);
+        $this->setVisibilidade($data->visibilidade);
+    }
+
     public function consultarPonto()
     {
         if (empty($this->getPonto())) throw new Exception("[ERRO][Usuário 02] Informação de PONTO vazia!", 1);
