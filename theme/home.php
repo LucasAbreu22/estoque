@@ -123,7 +123,7 @@
                 <br>
 
                 <div id="areaSigma">
-                    <label>Código do sigma</label>
+                    <label>Código de requisição do sigmas</label>
                     <input type="number" id="codigoSigma">
                 </div>
 
@@ -248,6 +248,7 @@
                     <option>Unidade</option>
                     <option>Folha</option>
                     <option>Metro</option>
+                    <option>Chapa</option>
                 </select>
 
                 <label>Unidade de Compra</label>
@@ -767,8 +768,6 @@
             }
 
             function removerItem(idxMat) {
-                console.log(carrinhoList.value)
-                return false;
                 if (idxMat !== undefined) {
                     carrinhoList.value.splice(idxMat, 1);
 
@@ -795,7 +794,7 @@
                     nomeSolicitante = "";
 
                     if (codigoSigma === "") {
-                        alert("Campo de Código do SiGMA está vazio!");
+                        alert("Campo de Código de requisição do SiGMA está vazio!");
                         return false;
                     }
                 } else {
