@@ -192,22 +192,21 @@ class MaterialDAO
     public function criarMaterial(array $material)
     {
         try {
-            $sql = "INSERT INTO materiais(codigo, descricao, quantidade, unidade_base, unidade_compra, fator_conversao, quantidade_minima, custo_unitario, localizacao, id_categoria)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO materiais(codigo, descricao,  unidade_base, unidade_compra, fator_conversao, quantidade_minima, custo_unitario, localizacao, id_categoria)
+            VALUES (?, ?,  ?, ?, ?, ?, ?, ?, ?)";
 
 
             $stmt = $this->connect->prepare($sql);
 
             $stmt->bindValue(1, convertNull($material["codigo"]), PDO::PARAM_STR);
             $stmt->bindValue(2, convertNull($material["descricao"]), PDO::PARAM_STR);
-            $stmt->bindValue(3, $material["quantidade"], PDO::PARAM_INT);
-            $stmt->bindValue(4, convertNull($material["unidade_base"]), PDO::PARAM_STR);
-            $stmt->bindValue(5, convertNull($material["unidade_compra"]), PDO::PARAM_STR);
-            $stmt->bindValue(6, convertNull($material["fator_conversao"]), PDO::PARAM_STR);
-            $stmt->bindValue(7, convertNull($material["quantidade_minima"]), PDO::PARAM_INT);
-            $stmt->bindValue(8, convertNull($material["custo_unitario"]), PDO::PARAM_STR);
-            $stmt->bindValue(9, convertNull($material["localizacao"]), PDO::PARAM_STR);
-            $stmt->bindValue(10, convertNull($material["id_categoria"]), PDO::PARAM_INT);
+            $stmt->bindValue(3, convertNull($material["unidade_base"]), PDO::PARAM_STR);
+            $stmt->bindValue(4, convertNull($material["unidade_compra"]), PDO::PARAM_STR);
+            $stmt->bindValue(5, convertNull($material["fator_conversao"]), PDO::PARAM_STR);
+            $stmt->bindValue(6, convertNull($material["quantidade_minima"]), PDO::PARAM_INT);
+            $stmt->bindValue(7, convertNull($material["custo_unitario"]), PDO::PARAM_STR);
+            $stmt->bindValue(8, convertNull($material["localizacao"]), PDO::PARAM_STR);
+            $stmt->bindValue(9, convertNull($material["id_categoria"]), PDO::PARAM_INT);
 
             /* $stmt->debugDumpParams(); */
 
