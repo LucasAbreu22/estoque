@@ -6,6 +6,8 @@ use Exception;
 use Source\DAO\LoteDAO;
 use Source\DAO\MaterialMovimentacaoDAO;
 
+use function PHPSTORM_META\type;
+
 class MaterialMovimentacao
 {
     private ?Material $material;
@@ -151,8 +153,8 @@ class MaterialMovimentacao
                 $this->getLote()->atualizarEstoque();
             }
 
-            $materialMovDAO->rollBack();
-            // $materialMovDAO->commit();
+            // $materialMovDAO->rollBack();
+            $materialMovDAO->commit();
 
             return $callback;
         } catch (\Throwable $e) {

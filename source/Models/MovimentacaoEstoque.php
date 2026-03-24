@@ -316,7 +316,6 @@ class MovimentacaoEstoque
                 $materialMov->setIdMovimentacao($this->getIdMovimentacao());
                 $materialMov->salvarMaterialMov();
             }
-
             // $movimentacaoDAO->rollBack();
 
             $movimentacaoDAO->commit();

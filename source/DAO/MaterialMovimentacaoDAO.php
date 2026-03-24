@@ -32,7 +32,7 @@ class MaterialMovimentacaoDAO
         return $this->connect->rollBack();
     }
 
-    public function salvarMaterialMov(int $id_material, int $id_movimentacao, int $id_lote, int $quantidade): string
+    public function salvarMaterialMov(int $id_movimentacao, int $id_material, int $id_lote, int $quantidade): string
     {
         try {
             $sql = "INSERT INTO materiais_movimentacao(id_material, id_movimentacao, id_lote, quantidade)
@@ -40,8 +40,8 @@ class MaterialMovimentacaoDAO
 
             $stmt = $this->connect->prepare($sql);
 
-            $stmt->bindValue(1, $id_material, PDO::PARAM_INT); // Formulário
-            $stmt->bindValue(2, $id_movimentacao, PDO::PARAM_INT); // EVENTO
+            $stmt->bindValue(1, $id_material, PDO::PARAM_INT);
+            $stmt->bindValue(2, $id_movimentacao, PDO::PARAM_INT);
             $stmt->bindValue(3, $id_lote, PDO::PARAM_INT);
             $stmt->bindValue(4, $quantidade, PDO::PARAM_INT);
 
