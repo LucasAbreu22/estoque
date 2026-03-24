@@ -62,7 +62,6 @@ final class Document
                 #cabecalho th{
                     border: none !important;
                     font-size: 16px;
-
                 }
 
                 table{
@@ -71,10 +70,10 @@ final class Document
                     font-size: 14px;
                 }
 
-                table,
-                td,
-                tr,
-                th{
+                #materiais,
+                #materiais td,
+                #materiais tr,
+                #materiais th{
                     border: solid 1px #000;
                 }
                 
@@ -130,60 +129,49 @@ final class Document
                 </tbody>
             </table>
             
-            <h2>Nº movimentação: #' . $movimentacao->id_movimentacao . '</h2>
+            <h2>Requisição: #' . $movimentacao->id_movimentacao . '</h2>
 
-            <p><b>Data de retirada:</b> ' . $formatedDate . '</p>
-
-            <table>
-                <tbody>
-                    <tr>
-                        <td style="width: 30%">
-                            <b>Nome do responsável</b>
-                        </td>
-                        <td>
-                            <b>Ponto do responsável</b>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span>' . $usuarioObj->getNome() . '</span>
-                        </td>
-                        <td>
-                            <span>P_' . $usuarioObj->getPonto() . '</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <p><b>Data da requisição:</b> ' . $formatedDate . '</p>
             
-            <br>
+            <fieldset>
+                <legend>Reponsável</legend>
 
             <table>
                 <tbody>
                     <tr>
                         <td style="width: 30%">
-                            <b>Nome do solicitante</b>
+                            <b>Nome: </b><span>' . $usuarioObj->getNome() . '</span>
                         </td>
                         <td>
-                            <b>Ponto do solicitante</b>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span>' . $movimentacao->nome_solicitante . '</span>
-                        </td>
-                        <td>
-                            <span>P_' . $movimentacao->ponto_solicitante . '</span>
+                            <b>Ponto: </b><span>P_' . $usuarioObj->getPonto() . '</span>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            </fieldset>
+            
+            <fieldset>
+                <legend>Solicitante</legend>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 30%">
+                                <b>Nome: </b><span>' . $movimentacao->nome_solicitante . '</span>
+                            </td>
+                            <td>
+                                <b>Ponto: </b><span>P_' . $movimentacao->ponto_solicitante . '</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
             
             <h3>Materiais</h3>
 
             <table id="materiais">
                 <thead>
                     <th style="width: 8%">
-                        Nº
+                        Item
                     </th>
                     <th style="width: 12%">
                         Código
@@ -192,7 +180,10 @@ final class Document
                         Descrição
                     </th>
                     <th style="width: 15%">
-                        Lote
+                    Lote
+                    </th>
+                    <th style="width: 15%">
+                        Unidade
                     </th>
                     <th style="width: 10%">
                         Quantidade
@@ -205,7 +196,7 @@ final class Document
             $html .= '
                         <tr>
                             <td class="center">
-                                <span>#' . $idx . '</span>
+                                <span>' . $idx . '</span>
                             </td>
                             <td>
                                 <span>' . $material->codigo . '</span>
@@ -217,9 +208,14 @@ final class Document
                                 <span>' . $material->lote . '</span>
                             </td>
                             <td>
+                                <span>' . $material->unidade_base . '</span>
+                            </td>
+                            <td>
                                 <span>' . $material->quantidade . '</span>
                             </td>
                         </tr>';
+
+            $idx++;
         }
 
         $html .= '
