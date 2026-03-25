@@ -163,7 +163,7 @@
                                     <td><input type="number" @input="editQtdItem($event, i, j)" min="1" :value="lote.quantidade"></td>
                                     <td><input type="date" @input="editVencLote($event, i, j)" :value="lote.vencimento" :disabled="tipoMov==='SAIDA' ? true : false"></td>
                                     <td class="actions">
-                                        <button class="btn-exit" @click="removerItem(i)">▼</button>
+                                        <button class="btn-exit" @click="removerItem(i, j)">▼</button>
                                     </td>
                                 </tr>
                             </template>
@@ -251,7 +251,7 @@
                     <option>Chapa</option>
                 </select>
 
-                <label>Unidade de Compra</label>
+                <label>Unidade por embalagem</label>
                 <select id="unCompra">
                     <option>Resma</option>
                     <option>Caixa</option>
@@ -516,7 +516,7 @@
                 }
 
                 if (unCompra === "" || unCompra === undefined) {
-                    alert("Campo de unidade de compra não selecionado!");
+                    alert("Campo de Unidade por embalagem não selecionado!");
                     return;
                 }
 
@@ -767,9 +767,9 @@
                 }
             }
 
-            function removerItem(idxMat) {
+            function removerItem(idxMat, idxLot) {
                 if (idxMat !== undefined) {
-                    carrinhoList.value.splice(idxMat, 1);
+                    carrinhoList.value[idxMat].loteList.splice(idxLot, 1);
 
                 } else {
                     alert("Material não identificado não identificado!");
