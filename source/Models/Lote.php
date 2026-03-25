@@ -159,6 +159,14 @@ class Lote
             if (is_null($this->getVencimento()) || empty($this->getVencimento())) throw new Exception("[ERRO][Lote Clss 05] Informação de VENCIMENTO vazia!", 1);
             if ($this->getQuantidade() < 1) throw new Exception("[ERRO][Lote Clss 06] Informação de QUANTIDADE inválido!", 1);
 
+            $material =  new Material();
+            $material->setIdMaterial($this->getIdMaterial());
+            $material->getMaterialById();
+
+            $newQtd = $material->getFatorConversao() * $this->getQuantidade();
+
+            $this->setQuantidade($newQtd);
+
             $idLote = $loteDAO->salvarLote($this->getIdMaterial(), $this->getLote(), $this->getVencimento(), $this->getQuantidade());
 
             $this->setIdLote($idLote);

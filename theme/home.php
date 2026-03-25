@@ -123,7 +123,7 @@
                 <br>
 
                 <div id="areaSigma">
-                    <label>Código de requisição do sigmas</label>
+                    <label>Código de requisição do SIGMAS</label>
                     <input type="number" id="codigoSigma">
                 </div>
 
@@ -495,8 +495,6 @@
                 const minimo = document.getElementById('minimo').value;
                 const localizacao = document.getElementById('localizacao').value;
 
-                let materialReg = {}
-
                 if (codigo === "" || codigo === undefined) {
                     alert("Campo de código vazio!");
                     return;
@@ -553,13 +551,7 @@
                     "localizacao": localizacao,
                 };
 
-                if (linhaSelecionada !== null) {
-
-                    const codigoLinhaSelec = linhaSelecionada.querySelector('.codigo').innerText;
-                    materialReg = materiais.find((material) => material.codigo === codigoLinhaSelec);
-
-                    material.id_material = materialReg.id_material;
-                }
+                if (linhaSelecionada !== null) material.id_material = linhaSelecionada.id_material;
 
                 $.ajax({
                     type: "POST",
@@ -580,8 +572,8 @@
 
                             } else {
 
-                                const idx = materiais.value.findIndex((material) => material.id_material === materialReg.id_material);
-
+                                const idx = materiais.value.findIndex((material) => material.id_material === linhaSelecionada.id_material);
+                                console.log(idx)
                                 materiais.value[idx] = material;
                             }
 
@@ -796,7 +788,7 @@
                     nomeSolicitante = "";
 
                     if (codigoSigma === "") {
-                        alert("Campo de Código de requisição do SiGMA está vazio!");
+                        alert("Campo de Código de requisição do SIGMAS está vazio!");
                         return false;
                     }
                 } else {
@@ -863,12 +855,12 @@
                             carrinhoList.value.forEach(material => {
                                 let line = materiais.value.find((item) => item.id_material === material.id_material);
 
-                                line.quantidade = parseFloat(line.quantidade)
-
-                                material.quantidade = parseFloat(material.quantidade)
+                                line.quantidade = parseFloat(line.quantidade);
 
                                 material.loteList.forEach(lote => {
+                                    lote.quantidade = Number(lote.quantidade)
                                     if (tipoMov.value === 'ENTRADA') {
+                                        lote.quantidade = Number(material.fator_conversao) * lote.quantidade;
                                         line.quantidade += lote.quantidade;
 
                                         const data = new Date(lote.vencimento);
@@ -886,21 +878,20 @@
                                         if (line.loteList[idxLoteLine].quantidade === 0) line.loteList.splice(idxLoteLine, 1);
 
                                         line.quantidade -= lote.quantidade;
-
-                                        const link = document.createElement('a');
-                                        link.href = `http://localhost/estoque_beta/documento/comprovanteSaida/${response.id_movimentacao}`;
-                                        link.target = '_blank';
-                                        link.click();
                                     }
+
+                                    if (line.quantidade == 0) line.status = "Sem Estoque";
+
+                                    else if (line.quantidade < line.quantidade_minima) line.status = "Acabando"
+
+                                    else line.status = "Normal"
                                 });
-
-                                if (line.quantidade == 0) line.status = "Sem Estoque";
-
-                                else if (line.quantidade < line.quantidade_minima) line.status = "Acabando"
-
-                                else line.status = "Normal"
-                                // material = line;
                             });
+
+                            const link = document.createElement('a');
+                            link.href = `http://localhost/estoque_beta/documento/comprovanteSaida/${response.id_movimentacao}`;
+                            link.target = '_blank';
+                            link.click();
 
                             tipoMov.value = "SAIR";
 
@@ -971,10 +962,11 @@
                         const loteFind = lotes.find((lote) => lote.id_lote == id_item);
 
                         material = {
-                            ...materiais.value.find((material) => material.id_material == loteFind.id_material)
+                            ...materiais.value.find((material) => material.id_material == loteFind.id_material),
+                            loteList: [{
+                                ...loteFind
+                            }]
                         };
-
-                        material.loteList = [loteFind];
                     }
 
                     if (material === undefined) {
