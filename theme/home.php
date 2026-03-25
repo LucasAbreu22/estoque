@@ -148,6 +148,7 @@
                             <tr>
                                 <th>Código</th>
                                 <th>Descrição de material</th>
+                                <th>Unidade</th>
                                 <th>Lote</th>
                                 <th>QTD</th>
                                 <th>Vencimento</th>
@@ -159,6 +160,7 @@
                                 <tr v-for="(lote, j) in material.loteList" :key="j">
                                     <td class="codigo">{{material.codigo}}</td>
                                     <td class="left descricao">{{material.descricao}}</td>
+                                    <td class="left">{{tipoMov ==='SAIDA' ? material.unidade_base : material.unidade_compra}}</td>
                                     <td class="columnLote"><input type="number" min="1" @input="editLote($event, i, j)" :value="lote.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
                                     <td><input type="number" @input="editQtdItem($event, i, j)" min="1" :value="lote.quantidade"></td>
                                     <td><input type="date" @input="editVencLote($event, i, j)" :value="lote.vencimento" :disabled="tipoMov==='SAIDA' ? true : false"></td>
@@ -768,7 +770,7 @@
             }
 
             function removerItem(idxMat, idxLot) {
-                if (idxMat !== undefined) {
+                if (idxMat !== undefined || idxLot !== undefined) {
                     carrinhoList.value[idxMat].loteList.splice(idxLot, 1);
 
                 } else {
