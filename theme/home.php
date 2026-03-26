@@ -904,7 +904,7 @@
                             });
 
                             const link = document.createElement('a');
-                            link.href = `http://localhost/estoque_beta/documento/comprovanteSaida/${response.id_movimentacao}`;
+                            link.href = `<?= url("/documento/comprovanteSaida/") ?>${response.id_movimentacao}`;
                             link.target = '_blank';
                             link.click();
 
