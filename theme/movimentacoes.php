@@ -39,55 +39,55 @@
             </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Cod. Sigma</th>
-                    <th>Data</th>
-                    <th>Tipo</th>
-                    <th>Ponto Solicitante</th>
-                    <th>Nome Solicitante</th>
-                    <th>Ponto Resp.</th>
-                    <th>Nome Resp.</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaMovimentacoes">
-                <template v-for="(movimentacao, i) in movimentacoes" :key="i">
-                    <tr @click="toggleMovimentacao(movimentacao.id_movimentacao)" style="cursor:pointer">
-                        <td>{{movimentacao.id_movimentacao}}</td>
-                        <td>{{movimentacao.codigo_sigma}}</td>
-                        <td>{{movimentacao.data_movimentacao}}</td>
-                        <td class="left">{{movimentacao.tipo}}</td>
-                        <td class="left">{{movimentacao.ponto_solicitante}}</td>
-                        <td class="left">{{movimentacao.nome_solicitante}}</td>
-                        <td class="left">{{movimentacao.ponto}}</td>
-                        <td class="left">{{movimentacao.nome}}</td>
-                        <td class="actions"><a v-if="isSaida(movimentacao.tipo)" @click.stop :href="'<?= url("/documento/comprovanteSaida/") ?>' + movimentacao.id_movimentacao" target="_blank"><button class="btn-edit">Visualizar</button></a></td>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cod. Sigma</th>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Ponto Solicitante</th>
+                        <th>Nome Solicitante</th>
+                        <th>Ponto Resp.</th>
+                        <th>Nome Resp.</th>
+                        <th>Ação</th>
                     </tr>
-                    <tr v-if="movimentacoesAbertas.has(movimentacao.id_movimentacao)" v-for="(material, j) in movimentacao.materialList" :key="'material-'+j" class="sublist">
-                        <td>
-                            <span><b>Código: </b>{{ material.codigo }}</span>
-                        </td>
-                        <td colspan="4">
-                            <span><b>Material: </b>{{ material.descricao }}</span>
-                        </td>
-                        <td colspan="2">
-                            <span><b>Lote: </b>{{ material.lote }}</span>
-                        </td>
-                        <td>
-                            <span><b>Quantidade: </b>{{ material.quantidade }}</span>
-                        </td>
-                        <td class="actions">
-                            <button class="btn-exit" @click="excluirMaterial(material)">Excluir</button>
-                        </td>
-                    </tr>
-                </template>
-
-            </tbody>
-        </table>
-
+                </thead>
+                <tbody id="tabelaMovimentacoes">
+                    <template v-for="(movimentacao, i) in movimentacoes" :key="i">
+                        <tr @click="toggleMovimentacao(movimentacao.id_movimentacao)" style="cursor:pointer">
+                            <td>{{movimentacao.id_movimentacao}}</td>
+                            <td>{{movimentacao.codigo_sigma}}</td>
+                            <td>{{movimentacao.data_movimentacao}}</td>
+                            <td class="left">{{movimentacao.tipo}}</td>
+                            <td class="left">{{movimentacao.ponto_solicitante}}</td>
+                            <td class="left">{{movimentacao.nome_solicitante}}</td>
+                            <td class="left">{{movimentacao.ponto}}</td>
+                            <td class="left">{{movimentacao.nome}}</td>
+                            <td class="actions"><a v-if="isSaida(movimentacao.tipo)" @click.stop :href="'<?= url("/documento/comprovanteSaida/") ?>' + movimentacao.id_movimentacao" target="_blank"><button class="btn-edit">Visualizar</button></a></td>
+                        </tr>
+                        <tr v-if="movimentacoesAbertas.has(movimentacao.id_movimentacao)" v-for="(material, j) in movimentacao.materialList" :key="'material-'+j" class="sublist">
+                            <td colspan="2">
+                                <span><b>Código: </b>{{ material.codigo }}</span>
+                            </td>
+                            <td colspan="3">
+                                <span><b>Material: </b>{{ material.descricao }}</span>
+                            </td>
+                            <td colspan="2">
+                                <span><b>Lote: </b>{{ material.lote }}</span>
+                            </td>
+                            <td>
+                                <span><b>Quantidade: </b>{{ material.quantidade }}</span>
+                            </td>
+                            <td class="actions">
+                                <button class="btn-exit" @click="excluirMaterial(material)">Excluir</button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
         <div id="nav-table">
             <button class="btn-nav" id="navVoltar" @click="getMovimentacao(-lines)">
                 < </button>
@@ -117,7 +117,7 @@
             let qtdMovimentacoes = 0;
             let paginaAtual = 0;
             let offset = 0;
-            const lines = 13;
+            const lines = 14;
 
             const movimentacoesAbertas = ref(new Set());
 
@@ -139,8 +139,8 @@
                 const fltrMovEntrada = document.getElementById("fltrTipoMovEntrada").checked;
                 const fltrMovSaida = document.getElementById("fltrTipoMovSaida").checked;
 
-                if (dataInicial !== "") dataInicial += " 23:59:59";
-                if (dataFinal !== "") dataFinal += " 23:59:59";
+                if (dataInicial !== "") dataInicial += " 00:00:00";
+                if (dataFinal !== "") dataFinal += " 00:00:00";
 
                 offset += increment;
 
@@ -198,7 +198,7 @@
                     }
                 });
 
-                materiaisAbertos.value = new Set();
+                movimentacoesAbertas.value = new Set();
 
             }
 

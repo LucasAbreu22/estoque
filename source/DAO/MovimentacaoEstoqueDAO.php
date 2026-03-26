@@ -97,7 +97,7 @@ class MovimentacaoEstoqueDAO
             $sql .= " 
             GROUP BY me.id_movimentacao
             ORDER BY me.id_movimentacao DESC
-            LIMIT 13 OFFSET :offset";
+            LIMIT 14 OFFSET :offset";
 
             $stmt = $this->connect->prepare($sql);
 
@@ -136,7 +136,7 @@ class MovimentacaoEstoqueDAO
     {
         try {
             $sql = "SELECT 
-            count(*) AS qtdMovimentacoes
+            count(DISTINCT me.id_movimentacao) AS qtdMovimentacoes
             FROM movimentacoes_estoque me
             INNER JOIN usuarios us ON me.id_usuario = us.id_usuario 
             INNER JOIN materiais_movimentacao mm ON me.id_movimentacao = mm.id_movimentacao
@@ -171,8 +171,6 @@ class MovimentacaoEstoqueDAO
 
                 else if ($fltrMovSaida) $sql .= " AND me.tipo = 'SAIDA'";
             }
-
-            $sql .= " GROUP BY me.id_movimentacao";
 
             $stmt = $this->connect->prepare($sql);
 
