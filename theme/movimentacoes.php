@@ -50,6 +50,7 @@
                     <th>Nome Solicitante</th>
                     <th>Ponto Resp.</th>
                     <th>Nome Resp.</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody id="tabelaMovimentacoes">
@@ -63,12 +64,13 @@
                         <td class="left">{{movimentacao.nome_solicitante}}</td>
                         <td class="left">{{movimentacao.ponto}}</td>
                         <td class="left">{{movimentacao.nome}}</td>
+                        <td class="actions"><a v-if="isSaida(movimentacao.tipo)" @click.stop :href="'<?= url("/documento/comprovanteSaida/") ?>' + movimentacao.id_movimentacao" target="_blank"><button class="btn-edit">Visualizar</button></a></td>
                     </tr>
                     <tr v-if="movimentacoesAbertas.has(movimentacao.id_movimentacao)" v-for="(material, j) in movimentacao.materialList" :key="'material-'+j" class="sublist">
                         <td>
                             <span><b>Código: </b>{{ material.codigo }}</span>
                         </td>
-                        <td colspan="3">
+                        <td colspan="4">
                             <span><b>Material: </b>{{ material.descricao }}</span>
                         </td>
                         <td colspan="2">
@@ -226,6 +228,18 @@
                 });
             }
 
+            function isSaida(movimentacao) {
+                let bool = false;
+
+                if (movimentacao === undefined) alert("Sem informação de movimentação encontrada!");
+
+                else if (movimentacao === "SAIDA" || movimentacao === "ENTRADA") bool = true;
+
+                else alert("Valor de movimentação não identificado!");
+
+                return movimentacao === "SAIDA" ? true : false;
+            }
+
             onMounted(() => {
                 getMovimentacao();
 
@@ -270,7 +284,8 @@
                 lines,
                 excluirMaterial,
                 movimentacoesAbertas,
-                toggleMovimentacao
+                toggleMovimentacao,
+                isSaida
             };
         },
     }).mount("#app");
