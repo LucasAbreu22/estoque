@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="fltrColumn">
-                    <label for="buscarMaterial"> <b> Digite o código ou descrição:</b> </label>
+                    <label for="buscarMaterial"> <b> Digite o descrição:</b> </label>
                     <input type="text" id="buscarMaterial">
                 </div>
 
@@ -68,10 +68,7 @@
                             <td class="actions"><a v-if="isSaida(movimentacao.tipo)" @click.stop :href="'<?= url("/documento/comprovanteSaida/") ?>' + movimentacao.id_movimentacao" target="_blank"><button class="btn-edit">Visualizar</button></a></td>
                         </tr>
                         <tr v-if="movimentacoesAbertas.has(movimentacao.id_movimentacao)" v-for="(material, j) in movimentacao.materialList" :key="'material-'+j" class="sublist">
-                            <td colspan="2">
-                                <span><b>Código: </b>{{ material.codigo }}</span>
-                            </td>
-                            <td colspan="3">
+                            <td colspan="5">
                                 <span><b>Material: </b>{{ material.descricao }}</span>
                             </td>
                             <td colspan="2">
@@ -160,10 +157,8 @@
                     dataType: "json",
                     success: function(response) {
 
-                        if (response.hasOwnProperty("message") && response.message.indexOf("<br>[ERRO]") === 0) {
-                            alert(response.message);
+                        if (response.code === 200) {
 
-                        } else {
                             movimentacoes.value = response.data.movimentacoes;
                             qtdMovimentacoes = response.data.qtdMovimentacoes;
 
@@ -193,6 +188,9 @@
                             }
 
                             navIdx.innerHTML = `${paginaAtual}/${paginaFinal} Páginas`;
+                        } else {
+                            alert(response.message);
+
                         }
                         ocultarLoading()
                     }

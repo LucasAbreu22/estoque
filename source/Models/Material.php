@@ -9,7 +9,6 @@ class Material
 {
     private  ?INT $id_material;
     private  ?Categoria $categoria;
-    private  STRING $codigo;
     private  STRING $descricao;
     private  array $lotes;
     private  INT $quantidade;
@@ -26,7 +25,6 @@ class Material
     function __construct(
         ?INT $id_material = null,
         ?Categoria $categoria = null,
-        STRING $codigo = "",
         STRING $descricao = "",
         array $lotes = [],
         INT $quantidade = 0,
@@ -42,7 +40,6 @@ class Material
     ) {
         $this->setIdMaterial($id_material);
         $this->setCategoria($categoria);
-        $this->setCodigo($codigo);
         $this->setDescricao($descricao);
         $this->setLotes($lotes);
         $this->setQuantidade($quantidade);
@@ -93,24 +90,6 @@ class Material
     public function setCategoria(?Categoria $categoria): self
     {
         $this->categoria = $categoria;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of codigo
-     */
-    public function getCodigo(): STRING
-    {
-        return $this->codigo;
-    }
-
-    /**
-     * Set the value of codigo
-     */
-    public function setCodigo(STRING $codigo): self
-    {
-        $this->codigo = $codigo;
 
         return $this;
     }
@@ -421,7 +400,6 @@ class Material
         }
 
         $this->setIdMaterial($data->id_material);
-        $this->setCodigo($data->codigo);
         $this->setDescricao($data->descricao);
         $this->setQuantidade($quantidade);
         $this->setUnidadeBase($data->unidade_base);
@@ -437,7 +415,6 @@ class Material
     {
 
         if (is_null($this->getCategoria())) throw new Exception("[ERRO][Material 13] Informação de CATEGORIA vazia!", 1);
-        if (empty($this->getCodigo())) throw new Exception("[ERRO][Material 14] Informação de CÓDIGO vazia!", 1);
         if (empty($this->getDescricao())) throw new Exception("[ERRO][Material 15] Informação de DESCRIÇÃO vazia!", 1);
         if (empty($this->getUnidadeBase())) throw new Exception("[ERRO][Material 16] Informação de UNIDADE BASE vazia!", 1);
         if (empty($this->getUnidadeCompra())) throw new Exception("[ERRO][Material 16] Informação de UNIDADE DE COMPRA vazia!", 1);
@@ -447,7 +424,6 @@ class Material
 
         $material = [
             "id_material" => $this->getIdMaterial(),
-            "codigo" => $this->getCodigo(),
             "descricao" => $this->getDescricao(),
             "quantidade" => $this->getQuantidade(),
             "unidade_base" => $this->getUnidadeBase(),

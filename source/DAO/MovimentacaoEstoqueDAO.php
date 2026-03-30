@@ -79,7 +79,7 @@ class MovimentacaoEstoqueDAO
             }
 
             if (!empty($buscarMaterial)) {
-                $sql .= " AND (ma.codigo LIKE :buscarMaterial OR ma.descricao LIKE :buscarMaterial)";
+                $sql .= " AND ma.descricao LIKE :buscarMaterial";
             }
 
             if (!empty($buscarPessoa)) {
@@ -157,7 +157,7 @@ class MovimentacaoEstoqueDAO
             }
 
             if (!empty($buscarMaterial)) {
-                $sql .= " AND (ma.codigo LIKE :buscarMaterial OR ma.descricao LIKE :buscarMaterial)";
+                $sql .= " AND ma.descricao LIKE :buscarMaterial";
             }
 
             if (!empty($buscarPessoa)) {
@@ -227,7 +227,6 @@ class MovimentacaoEstoqueDAO
             return $this->connect->lastInsertId();
         } catch (PDOException $e) {
             $msg = "[ERRO][Movimentação DAO 03] ";
-            $msg .= str_contains($e->getMessage(), "Duplicate entry") ? "Código de movimentação já existente!" : $e->getMessage();
 
             throw new Exception($msg);
         }

@@ -50,7 +50,6 @@ class Materiais
             $material = new Material(
                 empty($param["id_material"]) ? null : (int)$param["id_material"],
                 $categoria,
-                $param["codigo"],
                 $param["descricao"],
                 [],
                 (int)$param["quantidade"],

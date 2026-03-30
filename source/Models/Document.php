@@ -173,9 +173,6 @@ final class Document
                     <th style="width: 8%">
                         Item
                     </th>
-                    <th style="width: 12%">
-                        Código
-                    </th>
                     <th>
                         Descrição
                     </th>
@@ -197,9 +194,6 @@ final class Document
                         <tr>
                             <td class="center">
                                 <span>' . $idx . '</span>
-                            </td>
-                            <td>
-                                <span>' . $material->codigo . '</span>
                             </td>
                             <td>
                                 <span>' . $material->descricao . '</span>

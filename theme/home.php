@@ -5,7 +5,7 @@
         <div class="top-actions">
             <div class="fltrArea">
                 <div class="fltrColumn">
-                    <label> <b> Digite o código ou descrição:</b> </label>
+                    <label> <b>Descrição:</b> </label>
                     <input type="text" id="buscarMaterial">
                 </div>
 
@@ -39,7 +39,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Código</th>
                         <th>Descrição de material</th>
                         <th>Categoria</th>
                         <th>Saldo</th>
@@ -54,7 +53,6 @@
                 <tbody id="tabelaMateriais">
                     <template v-for="(material, i) in materiais" :key="i">
                         <tr @click="toggleMaterial(material.id_material)" style="cursor:pointer">
-                            <td class="codigo">{{material.codigo}}</td>
                             <td class="left descricao">{{material.descricao}}</td>
                             <td class="left">{{material.categoria}}</td>
                             <td class="saldo">{{material.quantidade}}</td>
@@ -78,7 +76,7 @@
                             <td colspan="2">
                                 <span><b>Lote: </b>{{ lote.lote }}</span>
                             </td>
-                            <td colspan="4">
+                            <td colspan="3">
                                 <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
                             </td>
                             <td colspan="3">
@@ -146,7 +144,6 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Código</th>
                                 <th>Descrição de material</th>
                                 <th>Unidade</th>
                                 <th>Lote</th>
@@ -158,7 +155,6 @@
                         <tbody id="tabelaCarrinho">
                             <template v-for="(material, i) in carrinhoList" :key="i">
                                 <tr v-for="(lote, j) in material.loteList" :key="j">
-                                    <td class="codigo">{{material.codigo}}</td>
                                     <td class="left descricao">{{material.descricao}}</td>
                                     <td class="left">{{tipoMov ==='SAIDA' ? material.unidade_base : material.unidade_compra}}</td>
                                     <td class="columnLote"><input type="number" min="1" @input="editLote($event, i, j)" :value="lote.lote" :disabled="tipoMov==='SAIDA' ? true : false"></td>
@@ -179,7 +175,6 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Código</th>
                                 <th>Descrição de material</th>
                                 <th>Saldo</th>
                                 <th>Ações</th>
@@ -188,7 +183,6 @@
                         <tbody id="tabelaMateriaisModal">
                             <template v-for="(materialModal, i) in materiaisModal" :key="i">
                                 <tr>
-                                    <td class="codigo">{{materialModal.codigo}}</td>
                                     <td class="left descricao">{{materialModal.descricao}}</td>
                                     <td>{{materialModal.quantidade}}</td>
                                     <td class="actions">
@@ -196,14 +190,12 @@
                                     </td>
                                 </tr>
                                 <tr v-if="materiaisAbertosModal.has(materialModal.id_material) && tipoMov === 'SAIDA'" v-for="(lote, index) in materialModal.loteList" :key="'loteModal-'+index" class="sublist">
-                                    <td>
-                                        <span><b>Lote: </b>{{ lote.lote }}</span>
-                                    </td>
-                                    <td>
-                                        <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
-                                    </td>
-                                    <td>
-                                        <span><b>Vencimento: </b>{{ lote.vencimentoFormatted }}</span>
+                                    <td colspan="2">
+                                        <div style="display:flex; gap:20px; justify-content: space-evenly;">
+                                            <span><b>Lote: </b>{{ lote.lote }}</span>
+                                            <span><b>Quantidade: </b>{{ lote.quantidade }}</span>
+                                            <span><b>Vencimento: </b>{{ lote.vencimentoFormatted }}</span>
+                                        </div>
                                     </td>
                                     <td class="actions">
                                         <button :class="tipoMov === 'SAIDA' && lote.quantidade == 0? 'disabled-button ': 'btn-entry '" @click="adicionarItem(lote.id_material, lote.id_lote)">▲</button>
@@ -231,9 +223,6 @@
         <div class="modal" id="modalMaterial">
             <div class="modal-content">
                 <h2 id="titleModalMaterial">Material</h2>
-
-                <label>Código</label>
-                <input type="text" id="codigo">
 
                 <label>Descrição</label>
                 <input type="text" id="descricao">
@@ -459,7 +448,6 @@
                     return false;
                 }
 
-                document.getElementById('codigo').value = linhaSelecionada.codigo;
                 document.getElementById('descricao').value = linhaSelecionada.descricao;
                 document.getElementById('categoria').value = linhaSelecionada.id_categoria;
                 document.getElementById('unBase').value = linhaSelecionada.unidade_base;
@@ -500,7 +488,6 @@
 
             function salvarMaterial() {
 
-                const codigo = document.getElementById('codigo').value;
                 const descricao = document.getElementById('descricao').value;
                 const id_categoria = document.getElementById('categoria').value;
                 const categoria = document.getElementById('categoria').selectedOptions[0].text;
@@ -509,11 +496,6 @@
                 const fator = document.getElementById('fator').value;
                 const minimo = document.getElementById('minimo').value;
                 const localizacao = document.getElementById('localizacao').value;
-
-                if (codigo === "" || codigo === undefined) {
-                    alert("Campo de código vazio!");
-                    return;
-                }
 
                 if (descricao === "" || descricao === undefined) {
                     alert("Campo de descrição vazio!");
@@ -554,7 +536,6 @@
                     "id_material": null,
                     "id_categoria": id_categoria,
                     "categoria": categoria,
-                    "codigo": codigo,
                     "descricao": descricao,
                     "quantidade": 0,
                     "unidade_base": unBase,
@@ -903,10 +884,12 @@
                                 });
                             });
 
-                            const link = document.createElement('a');
-                            link.href = `<?= url("/documento/comprovanteSaida/") ?>${response.id_movimentacao}`;
-                            link.target = '_blank';
-                            link.click();
+                            if (tipoMov.value === 'SAIDA') {
+                                const link = document.createElement('a');
+                                link.href = `<?= url("/documento/comprovanteSaida/") ?>${response.id_movimentacao}`;
+                                link.target = '_blank';
+                                link.click();
+                            }
 
                             tipoMov.value = "SAIR";
 
@@ -1089,7 +1072,6 @@
             function fecharModal(id) {
 
                 if (id === "modalMaterial") {
-                    document.getElementById('codigo').value = "";
                     document.getElementById('descricao').value = "";
                     document.getElementById('fator').value = "";
                     document.getElementById('minimo').value = "";

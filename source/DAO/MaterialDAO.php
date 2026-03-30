@@ -32,7 +32,7 @@ class MaterialDAO
         try {
             $sql = "
             SELECT 
-                ma.id_material, ma.id_categoria, ma.codigo,
+                ma.id_material, ma.id_categoria, 
                 ma.descricao, ma.unidade_base, ma.unidade_compra,
                 ma.fator_conversao, ma.quantidade_minima, ma.custo_unitario,
                 ma.localizacao,
@@ -43,7 +43,7 @@ class MaterialDAO
         ";
 
             if (!empty($search)) {
-                $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
+                $sql .= " AND ma.descricao LIKE :search";
             }
 
             if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
@@ -126,7 +126,7 @@ class MaterialDAO
             ";
 
             if (!empty($search)) {
-                $sql .= " AND (ma.descricao LIKE :search OR ma.codigo LIKE :search)";
+                $sql .= " AND ma.descricao LIKE :search";
             }
 
             if (!is_null($fltrCategoria) && $fltrCategoria > 0) {
@@ -192,21 +192,20 @@ class MaterialDAO
     public function criarMaterial(array $material)
     {
         try {
-            $sql = "INSERT INTO materiais(codigo, descricao,  unidade_base, unidade_compra, fator_conversao, quantidade_minima, custo_unitario, localizacao, id_categoria)
-            VALUES (?, ?,  ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO materiais(descricao, unidade_base, unidade_compra, fator_conversao, quantidade_minima, custo_unitario, localizacao, id_categoria)
+            VALUES ( ?,  ?, ?, ?, ?, ?, ?, ?)";
 
 
             $stmt = $this->connect->prepare($sql);
 
-            $stmt->bindValue(1, convertNull($material["codigo"]), PDO::PARAM_STR);
-            $stmt->bindValue(2, convertNull($material["descricao"]), PDO::PARAM_STR);
-            $stmt->bindValue(3, convertNull($material["unidade_base"]), PDO::PARAM_STR);
-            $stmt->bindValue(4, convertNull($material["unidade_compra"]), PDO::PARAM_STR);
-            $stmt->bindValue(5, convertNull($material["fator_conversao"]), PDO::PARAM_STR);
-            $stmt->bindValue(6, convertNull($material["quantidade_minima"]), PDO::PARAM_INT);
-            $stmt->bindValue(7, convertNull($material["custo_unitario"]), PDO::PARAM_STR);
-            $stmt->bindValue(8, convertNull($material["localizacao"]), PDO::PARAM_STR);
-            $stmt->bindValue(9, convertNull($material["id_categoria"]), PDO::PARAM_INT);
+            $stmt->bindValue(1, convertNull($material["descricao"]), PDO::PARAM_STR);
+            $stmt->bindValue(2, convertNull($material["unidade_base"]), PDO::PARAM_STR);
+            $stmt->bindValue(3, convertNull($material["unidade_compra"]), PDO::PARAM_STR);
+            $stmt->bindValue(4, convertNull($material["fator_conversao"]), PDO::PARAM_STR);
+            $stmt->bindValue(5, convertNull($material["quantidade_minima"]), PDO::PARAM_INT);
+            $stmt->bindValue(6, convertNull($material["custo_unitario"]), PDO::PARAM_STR);
+            $stmt->bindValue(7, convertNull($material["localizacao"]), PDO::PARAM_STR);
+            $stmt->bindValue(8, convertNull($material["id_categoria"]), PDO::PARAM_INT);
 
             /* $stmt->debugDumpParams(); */
 
@@ -218,7 +217,6 @@ class MaterialDAO
             ];
         } catch (PDOException $e) {
             $msg = "[ERRO][Material DAO 03] ";
-            $msg .= str_contains($e->getMessage(), "Duplicate entry") ? "Código de material já existente!" : $e->getMessage();
 
             throw new Exception($msg);
         }
@@ -227,7 +225,7 @@ class MaterialDAO
     public function editarMaterial(array $material)
     {
         try {
-            $sql = "UPDATE materiais SET codigo = ?, descricao = ?, 
+            $sql = "UPDATE materiais SET descricao = ?, 
             unidade_base = ?, unidade_compra = ?, 
             fator_conversao = ?, quantidade_minima = ?, 
             custo_unitario = ?, localizacao = ?, data_edicao = ?, id_categoria = ?
@@ -236,17 +234,16 @@ class MaterialDAO
 
             $stmt = $this->connect->prepare($sql);
 
-            $stmt->bindValue(1, convertNull($material["codigo"]), PDO::PARAM_STR);
-            $stmt->bindValue(2, convertNull($material["descricao"]), PDO::PARAM_STR);
-            $stmt->bindValue(3, convertNull($material["unidade_base"]), PDO::PARAM_STR);
-            $stmt->bindValue(4, convertNull($material["unidade_compra"]), PDO::PARAM_STR);
-            $stmt->bindValue(5, convertNull($material["fator_conversao"]), PDO::PARAM_STR);
-            $stmt->bindValue(6, convertNull($material["quantidade_minima"]), PDO::PARAM_INT);
-            $stmt->bindValue(7, convertNull($material["custo_unitario"]), PDO::PARAM_STR);
-            $stmt->bindValue(8, convertNull($material["localizacao"]), PDO::PARAM_STR);
-            $stmt->bindValue(9, date('Y-m-d H:i:s'), PDO::PARAM_STR);
-            $stmt->bindValue(10, convertNull($material["id_categoria"]), PDO::PARAM_INT);
-            $stmt->bindValue(11, convertNull($material["id_material"]), PDO::PARAM_INT);
+            $stmt->bindValue(1, convertNull($material["descricao"]), PDO::PARAM_STR);
+            $stmt->bindValue(2, convertNull($material["unidade_base"]), PDO::PARAM_STR);
+            $stmt->bindValue(3, convertNull($material["unidade_compra"]), PDO::PARAM_STR);
+            $stmt->bindValue(4, convertNull($material["fator_conversao"]), PDO::PARAM_STR);
+            $stmt->bindValue(5, convertNull($material["quantidade_minima"]), PDO::PARAM_INT);
+            $stmt->bindValue(6, convertNull($material["custo_unitario"]), PDO::PARAM_STR);
+            $stmt->bindValue(7, convertNull($material["localizacao"]), PDO::PARAM_STR);
+            $stmt->bindValue(8, date('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindValue(9, convertNull($material["id_categoria"]), PDO::PARAM_INT);
+            $stmt->bindValue(10, convertNull($material["id_material"]), PDO::PARAM_INT);
 
             /* $stmt->debugDumpParams(); */
 
@@ -255,8 +252,6 @@ class MaterialDAO
             return "Dados salvos com sucesso!";
         } catch (PDOException $e) {
             $msg = "[ERRO][Material DAO 04] ";
-            $msg .= str_contains($e->getMessage(), "Duplicate entry") ? "Código de material já existente!" : $e->getMessage();
-
             throw new Exception($msg);
         }
     }

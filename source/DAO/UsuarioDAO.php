@@ -97,7 +97,7 @@ class UsuarioDAO
     {
         try {
             $sql = "SELECT 
-            ma.id_material, ma.id_categoria, ma.codigo,
+            ma.id_material, ma.id_categoria, 
             ma.descricao, ma.quantidade, ma.unidade_base, ma.unidade_compra,
             ma.fator_conversao, ma.quantidade_minima, ma.custo_unitario,
             CASE

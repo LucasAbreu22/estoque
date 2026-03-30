@@ -68,8 +68,8 @@ class CategoriaDAO
     public function salvarMaterial(array $material)
     {
         try {
-            $sql = "INSERT INTO materiais(codigo, descricao, quantidade, unidade_base, unidade_compra, fator_conversao, quantidade_minima, custo_unitario, localizacao, id_categoria)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO materiais( descricao, quantidade, unidade_base, unidade_compra, fator_conversao, quantidade_minima, custo_unitario, localizacao, id_categoria)
+            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $this->connect->prepare($sql);
 
@@ -82,7 +82,6 @@ class CategoriaDAO
             $stmt->bindValue(7, convertNull($material[6]), PDO::PARAM_STR);
             $stmt->bindValue(8, convertNull($material[7]), PDO::PARAM_STR);
             $stmt->bindValue(9, convertNull($material[8]), PDO::PARAM_STR);
-            $stmt->bindValue(10, convertNull($material[9]), PDO::PARAM_STR);
 
             /* $stmt->debugDumpParams(); */
 

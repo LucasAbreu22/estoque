@@ -23,8 +23,6 @@ class Movimentacoes
             $fltrMovEntrada =  isset($param["fltrMovEntrada"]) ? filter_var($param["fltrMovEntrada"], FILTER_VALIDATE_BOOLEAN) : false;;
             $fltrMovSaida =  isset($param["fltrMovSaida"]) ? filter_var($param["fltrMovSaida"], FILTER_VALIDATE_BOOLEAN) : false;;
 
-
-
             $movimentacao = new MovimentacaoEstoque();
 
             $callback = [
@@ -37,7 +35,7 @@ class Movimentacoes
 
             echo json_encode($callback);
         } catch (\Throwable $th) {
-            echo json_encode(["message" => $th->getMessage()]);
+            echo json_encode(["code" => 501, "message" => $th->getMessage()]);
         }
     }
 
@@ -71,7 +69,7 @@ class Movimentacoes
 
             echo json_encode($callback);
         } catch (\Throwable $th) {
-            echo json_encode(["message" => $th->getMessage()]);
+            echo json_encode(["code" => 501, "message" => $th->getMessage()]);
         }
     }
 }
