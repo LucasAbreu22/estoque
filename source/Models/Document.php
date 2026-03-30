@@ -7,29 +7,32 @@ use Exception;
 
 final class Document
 {
+    private MovimentacaoEstoque $movimentacao;
+    private MaterialMovimentacao $materialMovimentacao;
+    private Usuario $usuario;
 
     public function getComprovanteSaida(int $id_movimentacao = 0)
     {
 
         if ($id_movimentacao < 1) throw new Exception("[ERRO][Document Clss 01] Informação de ID de movimentação inválida!", 1);
 
-        $movimentacaoObj = new MovimentacaoEstoque();
-        $movimentacaoObj->setIdMovimentacao($id_movimentacao);
+        $this->movimentacao = new MovimentacaoEstoque();
+        $this->movimentacao->setIdMovimentacao($id_movimentacao);
 
-        $movimentacao = $movimentacaoObj->getMovimentacaoById();
+        $movimentacao = $this->movimentacao->getMovimentacaoById();
 
         if (empty($movimentacao)) throw new Exception("[ERRO][Document Clss 02] Nenhuma movimentação encontrada!", 1);
 
-        $materialMovimentacaoObj = new MaterialMovimentacao();
-        $materialMovimentacaoObj->setIdMovimentacao($movimentacao->id_movimentacao);
+        $this->materialMovimentacao = new MaterialMovimentacao();
+        $this->materialMovimentacao->setIdMovimentacao($movimentacao->id_movimentacao);
 
-        $materiais = $materialMovimentacaoObj->getMateriaisByMovimentacao();
+        $materiais = $this->materialMovimentacao->getMateriaisByMovimentacao();
 
         if (empty($materiais)) throw new Exception("[ERRO][Document Clss 03] Nenhum material encontrado!", 1);
 
-        $usuarioObj = new Usuario();
-        $usuarioObj->setIdUsuario($movimentacao->id_usuario);
-        $usuarioObj->getUsuarioById();
+        $this->usuario = new Usuario();
+        $this->usuario->setIdUsuario($movimentacao->id_usuario);
+        $this->usuario->getUsuarioById();
 
         $formatedDate = $movimentacao->data_movimentacao;
         $formatedDate = date('d/m/Y H:i', strtotime($formatedDate));
@@ -140,10 +143,10 @@ final class Document
                 <tbody>
                     <tr>
                         <td style="width: 30%">
-                            <b>Nome: </b><span>' . $usuarioObj->getNome() . '</span>
+                            <b>Nome: </b><span>' . $this->usuario->getNome() . '</span>
                         </td>
                         <td>
-                            <b>Ponto: </b><span>P_' . $usuarioObj->getPonto() . '</span>
+                            <b>Ponto: </b><span>P_' . $this->usuario->getPonto() . '</span>
                         </td>
                     </tr>
                 </tbody>
