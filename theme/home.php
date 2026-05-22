@@ -398,6 +398,7 @@
                                 ...material,
                                 quantidade: Number(material.quantidade),
                                 quantidade_minima: Number(material.quantidade_minima),
+                                loteList: material.loteList || []
                             }));
                             qtdMateriais = response.data.qtdMateriais;
 
@@ -651,6 +652,7 @@
                                 ...material,
                                 quantidade: Number(material.quantidade),
                                 quantidade_minima: Number(material.quantidade_minima),
+                                loteList: material.loteList || []
                             }));
 
                             qtdMateriaisModal = response.data.qtdMateriais;
@@ -850,38 +852,42 @@
 
                             carrinhoList.value.forEach(material => {
                                 let line = materiais.value.find((item) => item.id_material === material.id_material);
+                                if (!line) return;
 
-                                line.quantidade = parseFloat(line.quantidade);
+                                line.quantidade = Number(line.quantidade);
+                                if (!line.loteList) line.loteList = [];
 
                                 material.loteList.forEach(lote => {
-                                    lote.quantidade = Number(lote.quantidade)
+                                    lote.quantidade = Number(lote.quantidade);
                                     if (tipoMov.value === 'ENTRADA') {
-                                        lote.quantidade = Number(material.fator_conversao) * lote.quantidade;
-                                        line.quantidade += lote.quantidade;
+                                        const qtdConvertida = Number(material.fator_conversao) * lote.quantidade;
+                                        line.quantidade += qtdConvertida;
 
+                                        // Atualiza o objeto lote para refletir a quantidade convertida na sub-lista
+                                        lote.quantidade = qtdConvertida;
                                         const data = new Date(lote.vencimento);
-
                                         lote.vencimentoFormatted = data.toLocaleDateString('pt-BR', {
                                             timeZone: 'UTC'
                                         });
 
                                         line.loteList.push(lote);
                                     } else {
-                                        let idxLoteLine = line.loteList.findIndex((item) => item.id_lote === lote.id_lote);
+                                        let idxLoteLine = line.loteList.findIndex((item) => Number(item.id_lote) === Number(lote.id_lote));
 
-                                        line.loteList[idxLoteLine].quantidade -= lote.quantidade;
-
-                                        if (line.loteList[idxLoteLine].quantidade === 0) line.loteList.splice(idxLoteLine, 1);
-
+                                        if (idxLoteLine !== -1) {
+                                            line.loteList[idxLoteLine].quantidade -= lote.quantidade;
+                                            if (line.loteList[idxLoteLine].quantidade <= 0) {
+                                                line.loteList.splice(idxLoteLine, 1);
+                                            }
+                                        }
                                         line.quantidade -= lote.quantidade;
                                     }
-
-                                    if (line.quantidade == 0) line.status = "Sem Estoque";
-
-                                    else if (line.quantidade < line.quantidade_minima) line.status = "Acabando"
-
-                                    else line.status = "Normal"
                                 });
+
+                                // Atualiza o status uma única vez após processar todos os lotes do material
+                                if (line.quantidade <= 0) line.status = "Sem Estoque";
+                                else if (line.quantidade < Number(line.quantidade_minima)) line.status = "Acabando";
+                                else line.status = "Normal";
                             });
 
                             if (tipoMov.value === 'SAIDA') {
