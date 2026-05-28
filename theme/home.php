@@ -243,6 +243,7 @@
                     <option>Litro</option>
                     <option>Metro</option>
                     <option>Mililitro</option>
+                    <option>Quilo</option>
                     <option>Unidade</option>
                 </select>
 
@@ -262,6 +263,7 @@
                     <option>Resma</option>
                     <option>Rolo</option>
                     <option>Saco</option>
+                    <option>Unidade</option>
                 </select>
 
                 <label>Fator de Conversão</label>
