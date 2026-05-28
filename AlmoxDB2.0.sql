@@ -25,13 +25,14 @@ CREATE TABLE IF NOT EXISTS `categorias` (
   `nome` varchar(100) NOT NULL,
   `visibilidade` tinyint(4) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Copiando dados para a tabela almox_beta.categorias: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela almox_beta.categorias: ~4 rows (aproximadamente)
 INSERT INTO `categorias` (`id_categoria`, `nome`, `visibilidade`) VALUES
 	(1, 'Papel', 1),
 	(2, 'Insumos', 1),
-	(3, 'Acabamento', 1);
+	(3, 'Acabamento', 1),
+	(4, 'Expediente', 1);
 
 -- Copiando estrutura para tabela almox_beta.logs_sistema
 CREATE TABLE IF NOT EXISTS `logs_sistema` (
@@ -61,9 +62,9 @@ CREATE TABLE IF NOT EXISTS `lotes` (
   UNIQUE KEY `lote` (`lote`),
   KEY `FK__materiais` (`id_material`),
   CONSTRAINT `FK__materiais` FOREIGN KEY (`id_material`) REFERENCES `materiais` (`id_material`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Copiando dados para a tabela almox_beta.lotes: ~11 rows (aproximadamente)
+-- Copiando dados para a tabela almox_beta.lotes: ~15 rows (aproximadamente)
 INSERT INTO `lotes` (`id_lote`, `id_material`, `lote`, `vencimento`, `quantidade`) VALUES
 	(2, 100, 546865, '2026-02-25', 250),
 	(3, 20, 46546, '2026-02-25', 0),
@@ -74,16 +75,19 @@ INSERT INTO `lotes` (`id_lote`, `id_material`, `lote`, `vencimento`, `quantidade
 	(20, 101, 231312, '2026-03-24', 1),
 	(21, 25, 32141241, '2026-03-24', 5),
 	(22, 104, 78989, '2026-04-25', 489),
-	(23, 100, 421412, '2026-03-26', 1000),
+	(23, 100, 421412, '2026-03-26', 0),
 	(24, 105, 89116546, '2026-03-27', 50000),
-	(25, 22, 7899, '2026-03-30', 50000);
+	(25, 22, 7899, '2026-03-30', 50000),
+	(26, 100, 31231, '2026-05-22', 0),
+	(27, 100, 23123, '2026-05-22', 0),
+	(28, 100, 213123, '2026-05-22', 0);
 
 -- Copiando estrutura para tabela almox_beta.materiais
 CREATE TABLE IF NOT EXISTS `materiais` (
   `id_material` int(11) NOT NULL AUTO_INCREMENT,
   `descricao` varchar(255) NOT NULL,
-  `unidade_base` enum('Centímetro','Chapa','Folha','Grama','Litro','Metro','Mililitro','Unidade') NOT NULL,
-  `unidade_compra` enum('Bisnaga','Bobina','Bombona','Fardo','Frasco','Galão','Caixa','Lata','Metro','Pacote','Quilo','Resma','Rolo','Saco') NOT NULL,
+  `unidade_base` enum('Centímetro','Chapa','Folha','Grama','Litro','Metro','Mililitro','Unidade','Quilo') NOT NULL,
+  `unidade_compra` enum('Bisnaga','Bobina','Bombona','Fardo','Frasco','Galão','Caixa','Lata','Metro','Pacote','Quilo','Resma','Rolo','Saco','Unidade') NOT NULL,
   `fator_conversao` int(11) NOT NULL DEFAULT 0,
   `quantidade_minima` int(11) DEFAULT NULL,
   `custo_unitario` decimal(10,2) DEFAULT NULL,
@@ -97,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `materiais` (
   CONSTRAINT `fk_material_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`)
 ) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Copiando dados para a tabela almox_beta.materiais: ~94 rows (aproximadamente)
+-- Copiando dados para a tabela almox_beta.materiais: ~96 rows (aproximadamente)
 INSERT INTO `materiais` (`id_material`, `descricao`, `unidade_base`, `unidade_compra`, `fator_conversao`, `quantidade_minima`, `custo_unitario`, `localizacao`, `id_categoria`, `data_criacao`, `data_edicao`, `visibilidade`) VALUES
 	(1, 'Papel Cartão', 'Folha', 'Resma', 500, 200, 0.00, 'A2', 1, '2026-01-22 17:35:08', NULL, 1),
 	(2, 'Papel Couchê 150g', 'Folha', 'Resma', 500, 200, 0.12, 'A1', 1, '2026-01-27 15:39:10', NULL, 1),
@@ -210,7 +214,7 @@ CREATE TABLE IF NOT EXISTS `materiais_movimentacao` (
   CONSTRAINT `FK_materiais_movimentacao_movimentacoes_estoque` FOREIGN KEY (`id_movimentacao`) REFERENCES `movimentacoes_estoque` (`id_movimentacao`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Copiando dados para a tabela almox_beta.materiais_movimentacao: ~18 rows (aproximadamente)
+-- Copiando dados para a tabela almox_beta.materiais_movimentacao: ~26 rows (aproximadamente)
 INSERT INTO `materiais_movimentacao` (`id_movimentacao`, `id_material`, `id_lote`, `quantidade`) VALUES
 	(87, 97, 2, 5),
 	(87, 103, 3, 7),
@@ -233,7 +237,14 @@ INSERT INTO `materiais_movimentacao` (`id_movimentacao`, `id_material`, `id_lote
 	(122, 100, 2, 500),
 	(123, 100, 2, 250),
 	(124, 105, 24, 100),
-	(125, 22, 25, 500);
+	(125, 22, 25, 500),
+	(126, 100, 26, 10),
+	(127, 100, 27, 10),
+	(128, 100, 28, 1),
+	(129, 100, 23, 1000),
+	(129, 100, 26, 5000),
+	(129, 100, 27, 5000),
+	(129, 100, 28, 500);
 
 -- Copiando estrutura para tabela almox_beta.movimentacoes_estoque
 CREATE TABLE IF NOT EXISTS `movimentacoes_estoque` (
@@ -250,9 +261,9 @@ CREATE TABLE IF NOT EXISTS `movimentacoes_estoque` (
   PRIMARY KEY (`id_movimentacao`),
   KEY `fk_mov_usuario` (`id_usuario`),
   CONSTRAINT `fk_mov_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Copiando dados para a tabela almox_beta.movimentacoes_estoque: ~19 rows (aproximadamente)
+-- Copiando dados para a tabela almox_beta.movimentacoes_estoque: ~24 rows (aproximadamente)
 INSERT INTO `movimentacoes_estoque` (`id_movimentacao`, `id_usuario`, `codigo_sigma`, `tipo`, `unidade_utilizada`, `fator_conversao_aplicado`, `quantidade_convertida`, `ponto_solicitante`, `nome_solicitante`, `data_movimentacao`) VALUES
 	(67, 1, NULL, 'SAIDA', 'BASE', NULL, 0, '456', 'Teste', '2026-03-10 17:47:20'),
 	(87, 1, 2147483647, 'ENTRADA', 'BASE', NULL, 0, '', '', '2026-03-11 14:51:08'),
@@ -273,7 +284,11 @@ INSERT INTO `movimentacoes_estoque` (`id_movimentacao`, `id_usuario`, `codigo_si
 	(122, 1, NULL, 'SAIDA', 'BASE', NULL, 0, '6220', 'Paulo Felipe', '2026-03-25 16:55:02'),
 	(123, 1, NULL, 'SAIDA', 'BASE', NULL, 0, '6220', 'Paulo Felipe', '2026-03-25 17:39:58'),
 	(124, 1, 56456456, 'ENTRADA', 'BASE', NULL, 0, '', '', '2026-03-27 15:36:54'),
-	(125, 1, 546456, 'ENTRADA', 'BASE', NULL, 0, '', '', '2026-03-30 10:55:04');
+	(125, 1, 546456, 'ENTRADA', 'BASE', NULL, 0, '', '', '2026-03-30 10:55:04'),
+	(126, 1, 321312, 'ENTRADA', 'BASE', NULL, 0, '', '', '2026-05-22 11:24:55'),
+	(127, 1, 312321, 'ENTRADA', 'BASE', NULL, 0, '', '', '2026-05-22 11:25:27'),
+	(128, 1, 32131, 'ENTRADA', 'BASE', NULL, 0, '', '', '2026-05-22 11:26:09'),
+	(129, 1, NULL, 'SAIDA', 'BASE', NULL, 0, '123', 'dasdas', '2026-05-22 11:26:54');
 
 -- Copiando estrutura para tabela almox_beta.usuarios
 CREATE TABLE IF NOT EXISTS `usuarios` (
