@@ -93,13 +93,18 @@
             </table>
         </div>
 
-        <div id="nav-table">
+        <div id="nav-table" style="display: flex; justify-content: flex-start; align-items: center; position: relative; margin-top: 20px;">
             <button class="btn-nav disabled-button" id="navVoltar" @click="getMateriais(-lines)" disabled>
                 ◄ </button>
-            <span id="nav-index">1</span>
+            <span id="nav-index" style="margin: 0 15px;">1</span>
 
             <button class="btn-nav disabled-button" id="navAvancar" @click="getMateriais(lines)" disabled> ► </button>
+
+            <button class="btn-add" style="position: absolute; right: 0; margin: 0; height: 35px; padding: 0 20px;" @click="gerarRelatorio()">
+                📄 Relatório PDF
+            </button>
         </div>
+
 
         <!-- MODAL MOVIMENTAÇÃO -->
         <div class="modal" id="modalMov">
@@ -590,6 +595,10 @@
                 else if (material.quantidade < material.quantidade_minima) return "low"
 
                 else return "ok"
+            }
+
+            function gerarRelatorio() {
+                window.open("<?= url("/documento/gerarRelatorio") ?>", "_blank");
             }
 
             // LOTE
@@ -1196,7 +1205,8 @@
                 editQtdItemModal,
                 editVencLoteModal,
                 editLoteModal,
-                excluirLote
+                excluirLote,
+                gerarRelatorio
             };
         },
     }).mount("#app");

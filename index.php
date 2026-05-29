@@ -40,6 +40,7 @@ $router->post("/consultarPonto", "Usuarios:consultarPonto");
 
 $router->group("documento");
 $router->get("/comprovanteSaida/{id_movimentacao}", "Documentos:getComprovanteSaida");
+$router->get("/gerarRelatorio", "Documentos:gerarRelatorioEstoque");
 
 
 /* ROTA DE ERRO */

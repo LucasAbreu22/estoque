@@ -7,6 +7,7 @@ use PDO;
 use PDOException;
 
 use Source\Connect;
+use Source\Models\Material;
 
 class MaterialDAO
 {
@@ -89,6 +90,31 @@ class MaterialDAO
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
+            throw new Exception("[ERRO][Material DAO 08]" . $e->getMessage());
+        }
+    }
+
+    public function getAllMateriais()
+    {
+        try {
+            $sql = "
+            SELECT 
+                ma.descricao, unidade_base, SUM(lo.quantidade) AS saldo
+            FROM 
+                materiais ma
+            LEFT JOIN 
+                lotes lo ON ma.id_material = lo.id_material
+            WHERE 
+                ma.visibilidade = 1
+            GROUP BY ma.id_material
+            ORDER BY 
+                ma.descricao ASC";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
             throw new Exception("[ERRO][Material DAO 06]" . $e->getMessage());
         }
     }
@@ -112,7 +138,7 @@ class MaterialDAO
             $stmt->execute();
             return $stmt->fetch();
         } catch (\Throwable $e) {
-            throw new Exception("[ERRO][Material DAO 06]" . $e->getMessage());
+            throw new Exception("[ERRO][Material DAO 07]" . $e->getMessage());
         }
     }
 

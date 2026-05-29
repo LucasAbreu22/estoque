@@ -365,6 +365,12 @@ class Material
         return $materiaisList;
     }
 
+    public function getAllMateriais()
+    {
+        $materialDAO = new MaterialDAO();
+        return $materialDAO->getAllMateriais();
+    }
+
     public function contarMateriais(string $search = "", ?int $fltrCategoria = null, bool $fltrStatusNormal = false, bool $fltrStatusAcabando = false, bool $fltrStatusSemEstoque = false)
     {
         $materialDAO = new MaterialDAO();
