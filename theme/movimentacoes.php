@@ -85,12 +85,16 @@
                 </tbody>
             </table>
         </div>
-        <div id="nav-table">
-            <button class="btn-nav" id="navVoltar" @click="getMovimentacao(-lines)">
-                < </button>
-                    <span id="nav-index">1</span>
+        <div id="nav-table" style="display: flex; justify-content: flex-start; align-items: center; position: relative; margin-top: 20px;">
 
-                    <button class="btn-nav" id="navAvancar" @click="getMovimentacao(lines)"> > </button>
+            <button class="btn-nav" id="navVoltar" @click="getMovimentacao(-lines)"> ◄ </button>
+            <span id="nav-index" style="margin: 0 15px;">1</span>
+            <button class="btn-nav" id="navAvancar" @click="getMovimentacao(lines)"> ► </button>
+
+
+            <button class="btn-add" style="position: absolute; right: 0; margin: 0; height: 35px; padding: 0 20px;" @click="gerarRelatorioMovimentacao()">
+                📄 Relatório PDF
+            </button>
         </div>
     </div>
 </main>
@@ -226,6 +230,16 @@
                 });
             }
 
+            function gerarRelatorioMovimentacao() {
+                const dataInicial = document.getElementById("dateInicial").value;
+                const dataFinal = document.getElementById("dateFinal").value;
+
+                let url = "<?= url("/documento/gerarRelatorioMovimentacao") ?>";
+                url += `?dataInicial=${dataInicial}&dataFinal=${dataFinal}`;
+
+                window.open(url, "_blank");
+            }
+
             function isSaida(movimentacao) {
                 let bool = false;
 
@@ -283,7 +297,8 @@
                 excluirMaterial,
                 movimentacoesAbertas,
                 toggleMovimentacao,
-                isSaida
+                isSaida,
+                gerarRelatorioMovimentacao
             };
         },
     }).mount("#app");

@@ -6,6 +6,7 @@ use Source\Models\Document;
 
 use Exception;
 use Source\Models\Material;
+use Source\Models\MovimentacaoEstoque;
 
 class Documentos
 {
@@ -23,7 +24,6 @@ class Documentos
             echo json_encode(["message" => $th->getMessage()]);
         }
     }
-
 
     function gerarRelatorioEstoque(): void
     {
@@ -46,6 +46,35 @@ class Documentos
 
             $documento = new Document();
             $documento->gerarRelatorioEstoque($produtos);
+
+            // echo json_encode($callback);
+        } catch (\Throwable $th) {
+            echo json_encode(["message" => $th->getMessage()]);
+        }
+    }
+
+    function gerarRelatorioMovimentacao(): void
+    {
+        try {
+            $dataInicial = $_GET["dataInicial"] ?? "";
+            $dataFinal = $_GET["dataFinal"] ?? "";
+
+            // Se ambos estiverem vazios, busca do ano atual
+            if (empty($dataInicial) && empty($dataFinal)) {
+                $dataInicial = date("Y-01-01");
+                $dataFinal = date("Y-12-31");
+            }
+
+            // Ajusta para cobrir o dia inteiro se as datas existirem
+            $start = !empty($dataInicial) ? $dataInicial . " 00:00:00" : "";
+            $end = !empty($dataFinal) ? $dataFinal . " 23:59:59" : "";
+
+            $movModel = new MovimentacaoEstoque();
+            // Busca movimentações com os filtros (offset 0 para relatório completo)
+            $movimentacoes = $movModel->getMovimentacoes(0, $start, $end);
+
+            $documento = new Document();
+            $documento->gerarRelatorioMovimentacao($movimentacoes);
 
             // echo json_encode($callback);
         } catch (\Throwable $th) {
