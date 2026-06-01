@@ -136,7 +136,7 @@
                 <div id="areaSolicitante">
                     <div id="areaPontoSolicitante">
                         <label>Ponto solicitante</label>
-                        <input type="number" id="pontoSolicitante">
+                        <input type="number" id="pontoSolicitante" @input="editPontoSolicitante">
                     </div>
                     <div id="areaNomeSolicitante">
                         <label>Nome solicitante</label>
@@ -929,6 +929,33 @@
                 carrinhoList.value[idxMat].loteList[idxLot].lote = Number(event.target.value);
             }
 
+            function editPontoSolicitante(event) {
+                const ponto = document.getElementById('pontoSolicitante').value;
+
+                if (ponto === "") return;
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?= url("/getSolicitante") ?>",
+                    data: {
+                        ponto: ponto
+                    },
+                    dataType: "json",
+                    success: function(response) {
+
+                        if (response.code == 200) {
+                            document.getElementById('nomeSolicitante').value = response.data.nome;
+
+                        } else {
+                            alert(response.message);
+                        }
+
+                        ocultarLoading();
+                    }
+                });
+            }
+
+
             // MODAL
             function abrirMovimentacao(tipo = "ENTRADA", id_item = null) {
 
@@ -1206,7 +1233,8 @@
                 editVencLoteModal,
                 editLoteModal,
                 excluirLote,
-                gerarRelatorio
+                gerarRelatorio,
+                editPontoSolicitante
             };
         },
     }).mount("#app");

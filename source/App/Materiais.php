@@ -8,6 +8,7 @@ use Source\Models\Lote;
 use Source\Models\Material;
 use Source\Models\MaterialMovimentacao;
 use Source\Models\MovimentacaoEstoque;
+use Source\Models\Solicitante;
 use Source\Models\Usuario;
 
 class Materiais
@@ -199,6 +200,28 @@ class Materiais
             $loteObj->setIdLote((int)$param);
 
             echo json_encode(["code" => 200, "message" => $loteObj->excluirLote()]);
+        } catch (\Throwable $th) {
+            echo json_encode(["code" => 501, "message" => $th->getMessage()]);
+        }
+    }
+
+    function getSolicitante($param): void
+    {
+        try {
+            if (!isset($param) || empty($param)) {
+                throw new Exception("[ERRO][Materiais 09] Informação de ponto de solicitante não encontrada!", 1);
+            }
+
+            if (!isset($param["ponto"]) || empty($param["ponto"])) {
+                throw new Exception("[ERRO][Materiais 09] Informação de ponto de solicitante não encontrada!", 1);
+            }
+
+            $ponto = $param["ponto"];
+
+            $solicitante = new Solicitante();
+            $callback = $solicitante->getSolicitante($ponto);
+
+            echo json_encode(["code" => 200, "data" => $callback]);
         } catch (\Throwable $th) {
             echo json_encode(["code" => 501, "message" => $th->getMessage()]);
         }
