@@ -243,7 +243,7 @@ class MovimentacaoEstoque
         return $this;
     }
 
-    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
+    public function getMovimentacoes(?int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
     {
 
         $movimentacaoDAO = new MovimentacaoEstoqueDAO();

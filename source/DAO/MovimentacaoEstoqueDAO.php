@@ -53,7 +53,7 @@ class MovimentacaoEstoqueDAO
         }
     }
 
-    public function getMovimentacoes(int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
+    public function getMovimentacoes(?int $offset = 0, string $dataInicial = "", string $dataFinal = "", string $buscarCodSig = "", string $buscarMaterial = "", string $buscarPessoa = "", bool $fltrMovEntrada = false, bool $fltrMovSaida = false)
     {
         try {
             $sql = "SELECT 
@@ -96,8 +96,11 @@ class MovimentacaoEstoqueDAO
 
             $sql .= " 
             GROUP BY me.id_movimentacao
-            ORDER BY me.id_movimentacao DESC
-            LIMIT 14 OFFSET :offset";
+            ORDER BY me.id_movimentacao DESC";
+
+            if (!is_null($offset)) {
+                $sql .= " LIMIT 14 OFFSET :offset";
+            }
 
             $stmt = $this->connect->prepare($sql);
 
@@ -121,7 +124,10 @@ class MovimentacaoEstoqueDAO
                 $stmt->bindValue(":buscarPessoa", "%$buscarPessoa%", PDO::PARAM_STR);;
             }
 
-            $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+            if (!is_null($offset)) {
+                $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+            }
+
 
             // $stmt->debugDumpParams();
 

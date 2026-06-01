@@ -71,7 +71,7 @@ class Documentos
 
             $movModel = new MovimentacaoEstoque();
             // Busca movimentações com os filtros (offset 0 para relatório completo)
-            $movimentacoes = $movModel->getMovimentacoes(0, $start, $end);
+            $movimentacoes = $movModel->getMovimentacoes(null, $start, $end);
 
             $documento = new Document();
             $documento->gerarRelatorioMovimentacao($movimentacoes);
