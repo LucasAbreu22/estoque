@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="<?= url("/theme/assets/css/app.css") ?>">
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
+  <link rel="icon" type="image/x-icon" href="<?= url("/theme/assets/img/icone-estoque.png"); ?>">
   <title><?= SITE . " - " . $title; ?></title>
 </head>
 

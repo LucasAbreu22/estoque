@@ -248,6 +248,7 @@
                     <option>Litro</option>
                     <option>Metro</option>
                     <option>Mililitro</option>
+                    <option>Pacote</option>
                     <option>Quilo</option>
                     <option>Unidade</option>
                 </select>
