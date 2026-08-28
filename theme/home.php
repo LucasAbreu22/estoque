@@ -241,31 +241,36 @@
 
                 <label>Unidade Base</label>
                 <select id="unBase">
+                    <option>Barra</option>
+                    <option>Caixa</option>
                     <option>Centímetro</option>
                     <option>Chapa</option>
                     <option>Folha</option>
                     <option>Grama</option>
+                    <option>Kg</option>
                     <option>Litro</option>
                     <option>Metro</option>
                     <option>Mililitro</option>
                     <option>Pacote</option>
-                    <option>Quilo</option>
                     <option>Unidade</option>
                 </select>
 
                 <label>Unidade por embalagem</label>
                 <select id="unCompra">
+                    <option>Barra</option>
                     <option>Bisnaga</option>
                     <option>Bobina</option>
                     <option>Bombona</option>
+                    <option>Caixa</option>
                     <option>Fardo</option>
                     <option>Frasco</option>
+                    <option>Folha</option>
                     <option>Galão</option>
-                    <option>Caixa</option>
+                    <option>Kg</option>
                     <option>Lata</option>
+                    <option>Litro</option>
                     <option>Metro</option>
                     <option>Pacote</option>
-                    <option>Quilo</option>
                     <option>Resma</option>
                     <option>Rolo</option>
                     <option>Saco</option>
