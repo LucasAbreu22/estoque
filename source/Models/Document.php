@@ -443,10 +443,6 @@ final class Document
                         font-family: "stone-sans", sans-serif;
                     }
 
-                    #cabecalho{
-                        width: auto !important;
-                    }
-
                     #cabecalho,
                     #cabecalho td,
                     #cabecalho tr,
@@ -495,6 +491,11 @@ final class Document
                         font-size: 14px;
                     }
 
+                    .left{
+                        text-align: left;
+                        padding-left: 5px;
+                    }
+
                     .center{
                         text-align: center;
                     }
@@ -505,6 +506,7 @@ final class Document
                         background-color: #000;
                     }
                 </style>
+                
             </head>
 
             <table id="cabecalho">
@@ -526,7 +528,7 @@ final class Document
 
             <table id="materiais">
                 <thead>
-                    <th>Descrição</th>
+                    <th class="left">Descrição</th>
                     <th>Unidade</th>
                     <th>Saldo <br> Ant.</th>
                     <th>Entrada</th>
