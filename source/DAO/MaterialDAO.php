@@ -119,6 +119,81 @@ class MaterialDAO
         }
     }
 
+    public function getComparacaoSaldo()
+    {
+        try {
+            $sql = "
+            WITH SaldoLotes AS (
+                SELECT 
+                    id_material,
+                    SUM(COALESCE(quantidade, 0)) AS saldo_atual
+                FROM lotes
+                GROUP BY id_material
+            ),
+            MovimentacoesAno AS (
+                SELECT
+                    mm.id_material,
+
+                    SUM(
+                        CASE 
+                            WHEN me.tipo = 'ENTRADA'
+                            THEN COALESCE(mm.quantidade, 0)
+                            ELSE 0
+                        END
+                    ) AS entrada_ano,
+
+                    SUM(
+                        CASE 
+                            WHEN me.tipo = 'SAIDA'
+                            THEN COALESCE(mm.quantidade, 0)
+                            ELSE 0
+                        END
+                    ) AS saida_ano
+
+                FROM materiais_movimentacao mm
+                INNER JOIN movimentacoes_estoque me
+                    ON me.id_movimentacao = mm.id_movimentacao
+
+                WHERE YEAR(me.data_movimentacao) = YEAR(CURDATE())
+
+                GROUP BY
+                    mm.id_material
+            )
+
+            SELECT
+                ma.id_material,
+                ma.descricao,
+                ma.unidade_base,
+                COALESCE(sl.saldo_atual, 0)
+                    - COALESCE(mv.entrada_ano, 0)
+                    + COALESCE(mv.saida_ano, 0)
+                    AS saldo_anterior,
+                COALESCE(mv.entrada_ano, 0) AS entrada,
+                COALESCE(mv.saida_ano, 0) AS saida,
+                COALESCE(sl.saldo_atual, 0) AS saldo_atual
+
+            FROM materiais ma
+
+            LEFT JOIN SaldoLotes sl
+                ON ma.id_material = sl.id_material
+
+            LEFT JOIN MovimentacoesAno mv
+                ON ma.id_material = mv.id_material
+
+            WHERE ma.visibilidade = 1
+
+            ORDER BY
+                ma.descricao";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            throw new Exception("[ERRO][Material DAO 11]" . $e->getMessage());
+        }
+    }
+
     public function getMaterialById(int $id_material)
     {
         try {

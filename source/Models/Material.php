@@ -460,4 +460,10 @@ class Material
         $materialDAO = new MaterialDAO();
         return $materialDAO->excluirMaterial($this->getIdMaterial());
     }
+
+    public function getComparacaoSaldo(): array
+    {
+        $materialDAO = new MaterialDAO();
+        return $materialDAO->getComparacaoSaldo();
+    }
 }

@@ -416,12 +416,14 @@ final class Document
         }
     }
 
-    public function gerarRelatorioMovimentacao(array $movimentacoes = []): void
+    public function gerarRelatorioMovimentacao(array $materiais = []): void
     {
         try {
-            if (empty($movimentacoes)) throw new Exception("[ERRO][Document Clss 05] Nenhuma movimentação encontrada para o período!", 1);
+
+            if (empty($materiais)) throw new Exception("[ERRO][Document Clss 05] Nenhum material encontrado!", 1);
 
             $formatedDate = date('d/m/Y H:i');
+            $anoAtual = date('Y');
 
             $dompdf = new Dompdf(['enable_remote' => true]);
 
@@ -520,48 +522,39 @@ final class Document
 
             <p><b>Data do relatório:</b> ' . $formatedDate . '</p>
                         
-            <h3>Extrato de Movimentações</h3>
+            <h3>Inventário de Materiais - ' . $anoAtual . '</h3>
 
             <table id="materiais">
                 <thead>
-                    <th style="width: 5%">ID</th>
-                    <th style="width: 15%">Data</th>
-                    <th style="width: 10%">Tipo</th>
-                    <th>Solicitante</th>
-                    <th>Responsável</th>
-                    <th style="width: 20%">Resumo Itens</th>
+                    <th>Descrição</th>
+                    <th>Unidade</th>
+                    <th>Saldo <br> Ant.</th>
+                    <th>Entrada</th>
+                    <th>Saída</th>
+                    <th>Saldo <br>Atual</th>
                 </thead>
                 <tbody>';
 
-            foreach ($movimentacoes as $mov) {
-                $resumoMateriais = "";
-                if (!empty($mov->materialList)) {
-                    $itens = [];
-                    foreach ($mov->materialList as $m) {
-                        $itens[] = "{$m->descricao} ({$m->quantidade})";
-                    }
-                    $resumoMateriais = implode(", ", $itens);
-                }
-
+            foreach ($materiais as $material) {
                 $html .= '
                         <tr>
+                            <td>
+                                <span>' . $material->descricao . '</span>
+                            </td>
+                            <td>
+                                <span>' . $material->unidade_base . '</span>
+                            </td>
                             <td class="center">
-                                <span>' . $mov->id_movimentacao . '</span>
-                            </td>
-                            <td>
-                                <span>' . $mov->data_movimentacao . '</span>
+                                <span>' . $material->saldo_anterior . '</span>
                             </td>
                             <td class="center">
-                                <span>' . $mov->tipo . '</span>
+                                <span>' . $material->entrada . '</span>
                             </td>
-                            <td>
-                                <span>' . ($mov->nome_solicitante ?? "-") . '</span>
+                            <td class="center">
+                                <span>' . $material->saida . '</span>
                             </td>
-                            <td>
-                                <span>' . $mov->nome . '</span>
-                            </td>
-                            <td style="font-size: 10px;">
-                                <span>' . $resumoMateriais . '</span>
+                            <td class="center">
+                                <span>' . $material->saldo_atual . '</span>
                             </td>
                         </tr>';
             }

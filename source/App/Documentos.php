@@ -56,25 +56,12 @@ class Documentos
     function gerarRelatorioMovimentacao(): void
     {
         try {
-            $dataInicial = $_GET["dataInicial"] ?? "";
-            $dataFinal = $_GET["dataFinal"] ?? "";
 
-            // Se ambos estiverem vazios, busca do ano atual
-            if (empty($dataInicial) && empty($dataFinal)) {
-                $dataInicial = date("Y-01-01");
-                $dataFinal = date("Y-12-31");
-            }
-
-            // Ajusta para cobrir o dia inteiro se as datas existirem
-            $start = !empty($dataInicial) ? $dataInicial . " 00:00:00" : "";
-            $end = !empty($dataFinal) ? $dataFinal . " 23:59:59" : "";
-
-            $movModel = new MovimentacaoEstoque();
-            // Busca movimentações com os filtros (offset 0 para relatório completo)
-            $movimentacoes = $movModel->getMovimentacoes(null, $start, $end);
+            $material = new Material();
+            $materiais = $material->getComparacaoSaldo();
 
             $documento = new Document();
-            $documento->gerarRelatorioMovimentacao($movimentacoes);
+            $documento->gerarRelatorioMovimentacao($materiais);
 
             // echo json_encode($callback);
         } catch (\Throwable $th) {

@@ -231,11 +231,8 @@
             }
 
             function gerarRelatorioMovimentacao() {
-                const dataInicial = document.getElementById("dateInicial").value;
-                const dataFinal = document.getElementById("dateFinal").value;
 
                 let url = "<?= url("/documento/gerarRelatorioMovimentacao") ?>";
-                url += `?dataInicial=${dataInicial}&dataFinal=${dataFinal}`;
 
                 window.open(url, "_blank");
             }
