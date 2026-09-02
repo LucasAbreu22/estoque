@@ -9,7 +9,7 @@ define("CONNECT_CONFIG", [
     "driver" => "mysql",
     "host" => "localhost",
     "port" => "3306",
-    "dbname" => "almox_beta",
+    "dbname" => "almox",
     "username" => "root",
     "passwd" => "",
     "options" => [
