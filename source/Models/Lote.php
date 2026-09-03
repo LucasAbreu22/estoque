@@ -127,8 +127,12 @@ class Lote
         $lotes = $loteDAO->getLotesByMaterial($this->getIdMaterial());
 
         foreach ($lotes as $lote) {
-            $date = new DateTime($lote["vencimento"]);
-            $lote["vencimentoFormatted"] = $date->format('d/m/Y');
+            if (empty($lote["vencimento"])) {
+                $lote["vencimentoFormatted"] = "";
+            } else {
+                $date = new DateTime($lote["vencimento"]);
+                $lote["vencimentoFormatted"] = $date->format('d/m/Y');
+            }
 
             $ids = array_column($lotes, 'id_lote');
             $key = array_search($lote["id_lote"], $ids);
@@ -156,7 +160,6 @@ class Lote
         if (is_null($this->getIdLote())) {
             if (is_null($this->getIdMaterial()) || $this->getIdMaterial() < 1) throw new Exception("[ERRO][Lote Clss 03] Informação de ID de Material vazia!", 1);
             if (is_null($this->getLote()) || $this->getLote() < 1) throw new Exception("[ERRO][Lote Clss 04] Informação de LOTE inválido!", 1);
-            if (is_null($this->getVencimento()) || empty($this->getVencimento())) throw new Exception("[ERRO][Lote Clss 05] Informação de VENCIMENTO vazia!", 1);
             if ($this->getQuantidade() < 1) throw new Exception("[ERRO][Lote Clss 06] Informação de QUANTIDADE inválido!", 1);
 
             $material =  new Material();

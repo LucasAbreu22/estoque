@@ -68,7 +68,7 @@
                             <td class="actions"><a v-if="isSaida(movimentacao.tipo)" @click.stop :href="'<?= url("/documento/comprovanteSaida/") ?>' + movimentacao.id_movimentacao" target="_blank"><button class="btn-edit">Visualizar</button></a></td>
                         </tr>
                         <tr v-if="movimentacoesAbertas.has(movimentacao.id_movimentacao)" v-for="(material, j) in movimentacao.materialList" :key="'material-'+j" class="sublist">
-                            <td colspan="5">
+                            <td colspan="4">
                                 <span><b>Material: </b>{{ material.descricao }}</span>
                             </td>
                             <td colspan="2">
@@ -76,6 +76,9 @@
                             </td>
                             <td>
                                 <span><b>Quantidade: </b>{{ material.quantidade }}</span>
+                            </td>
+                            <td>
+                                <span><b>Vencimento: </b>{{ material.vencimentoFormatted }}</span>
                             </td>
                             <td class="actions">
                                 <button class="btn-exit" @click="excluirMaterial(material)">Excluir</button>

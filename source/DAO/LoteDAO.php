@@ -72,7 +72,7 @@ class LoteDAO
         }
     }
 
-    public function salvarLote(int $id_material, int $lote, string $vencimento, int $quantidade)
+    public function salvarLote(int $id_material, int $lote, ?string $vencimento, int $quantidade)
     {
         try {
             $sql = "INSERT INTO lotes (id_material, lote, vencimento, quantidade)
@@ -80,9 +80,11 @@ class LoteDAO
 
             $stmt = $this->connect->prepare($sql);
 
+            $vencimento = convertNull($vencimento);
+
             $stmt->bindValue(1, $id_material, PDO::PARAM_INT);
             $stmt->bindValue(2, $lote, PDO::PARAM_INT);
-            $stmt->bindValue(3, $vencimento, PDO::PARAM_STR);
+            $stmt->bindValue(3, $vencimento, is_null($vencimento) ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindValue(4, $quantidade, PDO::PARAM_INT);
 
             /* $stmt->debugDumpParams(); */

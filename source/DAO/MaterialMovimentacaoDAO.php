@@ -60,7 +60,7 @@ class MaterialMovimentacaoDAO
         try {
             $sql = "SELECT 
             mm.id_material, mm.id_movimentacao, mm.id_lote, mm.quantidade,
-            ma.descricao, lo.lote, ma.unidade_base
+            ma.descricao, lo.lote, lo.vencimento, ma.unidade_base
             FROM materiais_movimentacao mm
             INNER JOIN materiais ma ON ma.id_material = mm.id_material
             INNER JOIN lotes lo ON mm.id_lote = lo.id_lote

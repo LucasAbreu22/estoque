@@ -2,6 +2,7 @@
 
 namespace Source\Models;
 
+use DateTime;
 use Exception;
 use Source\DAO\LoteDAO;
 use Source\DAO\MaterialMovimentacaoDAO;
@@ -115,6 +116,15 @@ class MaterialMovimentacao
 
         $materialMovDAO = new MaterialMovimentacaoDAO();
         $callback = $materialMovDAO->getMateriaisByMovimentacao($this->getIdMovimentacao());
+
+        foreach ($callback as $material) {
+            if (empty($material->vencimento)) {
+                $material->vencimentoFormatted = "";
+            } else {
+                $date = new DateTime($material->vencimento);
+                $material->vencimentoFormatted = $date->format('d/m/Y');
+            }
+        }
 
         return $callback;
     }
