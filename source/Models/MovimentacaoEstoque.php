@@ -15,9 +15,6 @@ class MovimentacaoEstoque
     private ?int $codigo_sigma;
     private array $materiais;
     private ?string $tipo;
-    private ?string $unidade_utilizada;
-    private ?int $fator_conversao_aplicado;
-    private ?int $quantidade_convertida;
     private ?string $ponto_solicitante;
     private ?string $nome_solicitante;
     private ?string $data_movimentacao;
@@ -29,9 +26,6 @@ class MovimentacaoEstoque
         $this->setCodigoSigma(null);
         $this->setmateriais([]);
         $this->settipo(null);
-        $this->setUnidadeUtilizada(null);
-        $this->setFatorConversaoAplicado(null);
-        $this->setQuantidadeConvertida(null);
         $this->setPontoSolicitante(null);
         $this->setNomeSolicitante(null);
         $this->setDataMovimentacao(null);
@@ -136,60 +130,6 @@ class MovimentacaoEstoque
     }
 
     /**
-     * Get the value of unidade_utilizada
-     */
-    public function getUnidadeUtilizada(): ?string
-    {
-        return $this->unidade_utilizada;
-    }
-
-    /**
-     * Set the value of unidade_utilizada
-     */
-    public function setUnidadeUtilizada(?string $unidade_utilizada): self
-    {
-        $this->unidade_utilizada = $unidade_utilizada;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of fator_conversao_aplicado
-     */
-    public function getFatorConversaoAplicado(): ?int
-    {
-        return $this->fator_conversao_aplicado;
-    }
-
-    /**
-     * Set the value of fator_conversao_aplicado
-     */
-    public function setFatorConversaoAplicado(?int $fator_conversao_aplicado): self
-    {
-        $this->fator_conversao_aplicado = $fator_conversao_aplicado;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of quantidade_convertida
-     */
-    public function getQuantidadeConvertida(): ?int
-    {
-        return $this->quantidade_convertida;
-    }
-
-    /**
-     * Set the value of quantidade_convertida
-     */
-    public function setQuantidadeConvertida(?int $quantidade_convertida): self
-    {
-        $this->quantidade_convertida = $quantidade_convertida;
-
-        return $this;
-    }
-
-    /**
      * Get the value of ponto_solicitante
      */
     public function getPontoSolicitante(): ?string
@@ -274,9 +214,6 @@ class MovimentacaoEstoque
 
         if (empty($this->getTipo())) throw new Exception("[ERRO][Movimentacao 03] Informação TIPO de vazia!", 1);
 
-
-        if (empty($this->getUnidadeUtilizada())) throw new Exception("[ERRO][Movimentacao 05] Informação UNIDADE de vazia!", 1);
-
         if ($this->getTipo() === "SAIDA" && $this->getMateriais()[0]->getQuantidade() === 0) throw new Exception("[ERRO][Movimentacao 06] Material sem estoque!", 1);
 
         $movimentacaoDAO =  new MovimentacaoEstoqueDAO();
@@ -287,7 +224,6 @@ class MovimentacaoEstoque
                 "id_usuario" => $this->getUsuario()->getIdUsuario(),
                 "codigoSigma" => $this->getCodigoSigma(),
                 "tipo" => $this->getTipo(),
-                "quantidade_convertida" => $this->getQuantidadeConvertida(),
                 "ponto_solicitante" => $this->getPontoSolicitante(),
                 "nome_solicitante" => $this->getNomeSolicitante(),
             ];
