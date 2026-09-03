@@ -203,4 +203,60 @@ class Usuario
         $usuarioDAO = new UsuarioDAO();
         return $usuarioDAO->consultarPonto($this->getPonto());
     }
+
+    public function getUsuarios(int $offset = 0, string $search = "")
+    {
+        $usuarioDAO = new UsuarioDAO();
+        return $usuarioDAO->getUsuarios($offset, $search);
+    }
+
+    public function contarUsuarios(string $search = "")
+    {
+        $usuarioDAO = new UsuarioDAO();
+        return $usuarioDAO->contarUsuarios($search);
+    }
+
+    public function salvarUsuario(): array
+    {
+        // NOME e PONTO são NOT NULL no banco -> obrigatórios.
+        // SENHA é anulável -> não obrigatória (não há login por senha).
+        if (empty($this->getNome())) throw new Exception("[ERRO][Usuário 04] Informação de NOME vazia!", 1);
+        if (empty($this->getPonto())) throw new Exception("[ERRO][Usuário 05] Informação de PONTO vazia!", 1);
+
+        $usuarioDAO = new UsuarioDAO();
+
+        $usuario = [
+            "id_usuario" => $this->getIdUsuario(),
+            "nome" => $this->getNome(),
+            "ponto" => $this->getPonto(),
+            "senha" => $this->getSenha(),
+        ];
+
+        if (empty($this->getIdUsuario())) {
+            $callback = $usuarioDAO->criarUsuario($usuario);
+            $this->setIdUsuario((int) $callback["newId"]);
+
+            return [
+                "message" => $callback["message"],
+                "id_usuario" => $this->getIdUsuario(),
+                "evento" => "INSERT"
+            ];
+        }
+
+        $message = $usuarioDAO->editarUsuario($usuario);
+
+        return [
+            "message" => $message,
+            "id_usuario" => $this->getIdUsuario(),
+            "evento" => "UPDATE"
+        ];
+    }
+
+    public function excluirUsuario(): string
+    {
+        if (empty($this->getIdUsuario())) throw new Exception("[ERRO][Usuário 06] Informação de ID vazia!", 1);
+
+        $usuarioDAO = new UsuarioDAO();
+        return $usuarioDAO->excluirUsuario($this->getIdUsuario());
+    }
 }

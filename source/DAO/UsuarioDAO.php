@@ -93,32 +93,29 @@ class UsuarioDAO
         }
     }
 
-    public function getUsuarios(int $offset = 0)
+    public function getUsuarios(int $offset = 0, string $search = "")
     {
         try {
             $sql = "SELECT 
-            ma.id_material, ma.id_categoria, 
-            ma.descricao, ma.quantidade, ma.unidade_base, ma.unidade_compra,
-            ma.fator_conversao, ma.quantidade_minima, ma.custo_unitario,
-            CASE
-                WHEN ma.quantidade = 0 THEN 'Sem Estoque'
-                WHEN ma.quantidade < ma.quantidade_minima THEN 'Acabando'
-                ELSE 'Normal'
-            END AS status,
-            ma.localizacao, DATE_FORMAT(ma.data_criacao, '%d/%m/%Y %H:%i:%s') AS data_criacao, DATE_FORMAT(ma.data_edicao, '%d/%m/%Y %H:%i:%s') AS data_edicao,
-            ca.nome AS categoria
-            FROM materiais ma
-            INNER JOIN
-            categorias ca
-            ON
-            ma.id_categoria = ca.id_categoria
-            WHERE ma.visibilidade = 1
-            ORDER BY ma.descricao ASC
-            LIMIT 13 OFFSET ?";
+            id_usuario, nome, ponto,
+            DATE_FORMAT(data_criacao, '%d/%m/%Y %H:%i:%s') AS data_criacao,
+            DATE_FORMAT(data_edicao, '%d/%m/%Y %H:%i:%s') AS data_edicao
+            FROM usuarios
+            WHERE visibilidade = 1";
+
+            if (!empty($search)) {
+                $sql .= " AND (nome LIKE :search OR ponto LIKE :search)";
+            }
+
+            $sql .= " ORDER BY nome ASC LIMIT 13 OFFSET :offset";
 
             $stmt = $this->connect->prepare($sql);
 
-            $stmt->bindValue(1, $offset, PDO::PARAM_INT);
+            if (!empty($search)) {
+                $stmt->bindValue(":search", "%$search%", PDO::PARAM_STR);
+            }
+
+            $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
 
             // $stmt->debugDumpParams();
 
@@ -126,6 +123,109 @@ class UsuarioDAO
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             throw new Exception("[ERRO][Usuário DAO 02]" . $e->getMessage());
+        }
+    }
+
+    public function contarUsuarios(string $search = "")
+    {
+        try {
+            $sql = "SELECT count(*) AS qtdUsuarios
+            FROM usuarios
+            WHERE visibilidade = 1";
+
+            if (!empty($search)) {
+                $sql .= " AND (nome LIKE :search OR ponto LIKE :search)";
+            }
+
+            $stmt = $this->connect->prepare($sql);
+
+            if (!empty($search)) {
+                $stmt->bindValue(":search", "%$search%", PDO::PARAM_STR);
+            }
+
+            $stmt->execute();
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            throw new Exception("[ERRO][Usuário DAO 05]" . $e->getMessage());
+        }
+    }
+
+    public function criarUsuario(array $usuario)
+    {
+        try {
+            $sql = "INSERT INTO usuarios (nome, ponto, senha, data_criacao, visibilidade)
+            VALUES (?, ?, ?, ?, 1)";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $senha = convertNull($usuario["senha"]);
+
+            $stmt->bindValue(1, $usuario["nome"], PDO::PARAM_STR);
+            $stmt->bindValue(2, $usuario["ponto"], PDO::PARAM_STR);
+            $stmt->bindValue(3, $senha, is_null($senha) ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(4, date('Y-m-d H:i:s'), PDO::PARAM_STR);
+
+            /* $stmt->debugDumpParams(); */
+
+            $stmt->execute();
+
+            return [
+                "message" => "Usuário criado com sucesso!",
+                "newId" => $this->connect->lastInsertId()
+            ];
+        } catch (\Throwable $e) {
+            $msg = "[ERRO][Usuário DAO 06]";
+            $msg .= str_contains($e->getMessage(), "Duplicate entry") ? " Número de PONTO já existente! " : $e->getMessage();
+
+            throw new Exception($msg);
+        }
+    }
+
+    public function editarUsuario(array $usuario)
+    {
+        try {
+            $sql = "UPDATE usuarios SET nome = ?, ponto = ?, senha = ?, data_edicao = ? WHERE id_usuario = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $senha = convertNull($usuario["senha"]);
+
+            $stmt->bindValue(1, $usuario["nome"], PDO::PARAM_STR);
+            $stmt->bindValue(2, $usuario["ponto"], PDO::PARAM_STR);
+            $stmt->bindValue(3, $senha, is_null($senha) ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(4, date('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindValue(5, $usuario["id_usuario"], PDO::PARAM_INT);
+
+            /* $stmt->debugDumpParams(); */
+
+            $stmt->execute();
+
+            return "Usuário editado com sucesso!";
+        } catch (\Throwable $e) {
+            $msg = "[ERRO][Usuário DAO 07]";
+            $msg .= str_contains($e->getMessage(), "Duplicate entry") ? " Número de PONTO já existente! " : $e->getMessage();
+
+            throw new Exception($msg);
+        }
+    }
+
+    public function excluirUsuario(int $id_usuario)
+    {
+        try {
+            $sql = "UPDATE usuarios SET visibilidade = 0, data_edicao = ? WHERE id_usuario = ?";
+
+            $stmt = $this->connect->prepare($sql);
+
+            $stmt->bindValue(1, date('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindValue(2, $id_usuario, PDO::PARAM_INT);
+
+            /* $stmt->debugDumpParams(); */
+
+            $stmt->execute();
+
+            return "Usuário excluído com sucesso!";
+        } catch (PDOException $e) {
+            throw new Exception("[ERRO][Usuário DAO 08]" . $e->getMessage());
         }
     }
 }

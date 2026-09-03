@@ -39,6 +39,13 @@ $router->group("usuario");
 // $router->get("/", "Web:movimentacoes");
 $router->post("/consultarPonto", "Usuarios:consultarPonto");
 
+/* ROTA USUARIOS (CRUD) */
+$router->group("usuarios");
+$router->get("/", "Web:usuarios");
+$router->post("/", "Usuarios:getUsuarios");
+$router->post("/salvar", "Usuarios:salvarUsuario");
+$router->post("/excluir", "Usuarios:excluirUsuario");
+
 $router->group("documento");
 $router->get("/comprovanteSaida/{id_movimentacao}", "Documentos:getComprovanteSaida");
 $router->get("/gerarRelatorio", "Documentos:gerarRelatorioEstoque");

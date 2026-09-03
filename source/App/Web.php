@@ -42,6 +42,18 @@ class Web
         }
     }
 
+    public function usuarios(): void
+    {
+        try {
+
+            echo $this->view->render("usuarios", [
+                "title" => "Gerenciamento de Usuários",
+            ]);
+        } catch (\Throwable $e) {
+            echo json_encode(["message" => $e->getMessage()]);
+        }
+    }
+
     public function error($error): void
     {
         try {

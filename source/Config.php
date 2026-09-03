@@ -65,3 +65,26 @@ function convertNull($value)
 {
     return empty($value) ? null : $value;
 }
+
+/**
+ * Retorna o ID do usuário atualmente identificado a partir do cookie "usuario"
+ * (que armazena o PONTO do responsável). Utilizado para registrar os LOGs das
+ * interações sem alterar a forma de autenticação do sistema.
+ *
+ * @return int|null ID do usuário ou null se não for possível identificar.
+ */
+function usuarioLogadoId(): ?int
+{
+    $ponto = isset($_COOKIE['usuario']) ? $_COOKIE['usuario'] : null;
+
+    if (empty($ponto)) return null;
+
+    try {
+        $usuarioDAO = new \Source\DAO\UsuarioDAO();
+        $data = $usuarioDAO->getUsuarioByPonto($ponto);
+
+        return !empty($data) ? (int) $data->id_usuario : null;
+    } catch (\Throwable $e) {
+        return null;
+    }
+}

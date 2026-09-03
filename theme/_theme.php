@@ -22,8 +22,12 @@
 
     <?php if ($title == "Gerenciamento Estoque"): ?>
       <a href="<?= url("/movimentacoes/") ?>">Histórico de movimentações ➨</a>
+      <a href="<?= url("/usuarios/") ?>">Usuários ➨</a>
     <?php endif; ?>
     <?php if ($title == "Movimentações Estoque"): ?>
+      <a href="<?= url("/") ?>">Estoque ➨</a>
+    <?php endif; ?>
+    <?php if ($title == "Gerenciamento de Usuários"): ?>
       <a href="<?= url("/") ?>">Estoque ➨</a>
     <?php endif; ?>
   </header>

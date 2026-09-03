@@ -4,6 +4,7 @@ namespace Source\App;
 
 use Exception;
 use Source\Models\Categoria;
+use Source\Models\Log;
 use Source\Models\Lote;
 use Source\Models\Material;
 use Source\Models\MaterialMovimentacao;
@@ -48,6 +49,26 @@ class Materiais
 
             if (empty($categoria->getCategoriaById())) throw new Exception("[ERRO][Materiais 01] Categoria não encontrada!", 1);
 
+            $isEdicao = !empty($param["id_material"]);
+
+            // Captura o estado anterior para o LOG de edição.
+            $valorAntigo = null;
+            if ($isEdicao) {
+                $antigo = new Material((int)$param["id_material"]);
+                $antigo->getMaterialById();
+
+                $valorAntigo = [
+                    "descricao" => $antigo->getDescricao(),
+                    "unidade_base" => $antigo->getUnidadeBase(),
+                    "unidade_compra" => $antigo->getUnidadeCompra(),
+                    "fator_conversao" => $antigo->getFatorConversao(),
+                    "quantidade_minima" => $antigo->getQuantidadeMinima(),
+                    "custo_unitario" => $antigo->getCustoUnitario(),
+                    "localizacao" => $antigo->getLocalizacao(),
+                    "id_categoria" => $antigo->getCategoria() ? $antigo->getCategoria()->getIdCategoria() : null,
+                ];
+            }
+
             $material = new Material(
                 empty($param["id_material"]) ? null : (int)$param["id_material"],
                 $categoria,
@@ -70,6 +91,25 @@ class Materiais
 
             if (empty($param["id_material"])) $callback["data"]["newId"] = $material->getIdMaterial();
 
+            // LOG da interação (criação ou edição).
+            Log::registrar(
+                usuarioLogadoId(),
+                "materiais",
+                $material->getIdMaterial(),
+                $isEdicao ? "UPDATE" : "INSERT",
+                $valorAntigo,
+                [
+                    "descricao" => $material->getDescricao(),
+                    "unidade_base" => $material->getUnidadeBase(),
+                    "unidade_compra" => $material->getUnidadeCompra(),
+                    "fator_conversao" => $material->getFatorConversao(),
+                    "quantidade_minima" => $material->getQuantidadeMinima(),
+                    "custo_unitario" => $material->getCustoUnitario(),
+                    "localizacao" => $material->getLocalizacao(),
+                    "id_categoria" => $categoria->getIdCategoria(),
+                ]
+            );
+
             echo json_encode($callback);
         } catch (\Throwable $th) {
             echo json_encode(["code" => 501, "message" => $th->getMessage()]);
@@ -86,10 +126,29 @@ class Materiais
 
             $material =  new Material((int)$param["id_material"]);
 
+            // Captura o estado anterior para o LOG de exclusão.
+            $valorAntigo = null;
+            try {
+                $material->getMaterialById();
+                $valorAntigo = ["descricao" => $material->getDescricao()];
+            } catch (\Throwable $e) {
+                $valorAntigo = null;
+            }
+
             $callback = [
                 "code" => 200,
                 "message" => $material->excluirMaterial(),
             ];
+
+            // LOG da exclusão.
+            Log::registrar(
+                usuarioLogadoId(),
+                "materiais",
+                (int)$param["id_material"],
+                "DELETE",
+                $valorAntigo,
+                null
+            );
 
             echo json_encode($callback);
         } catch (\Throwable $th) {
@@ -144,6 +203,21 @@ class Materiais
 
             $msg = $movimentacao->criarMovimentacao();
 
+            // LOG da movimentação de estoque (ENTRADA ou SAIDA).
+            Log::registrar(
+                $usuario->getIdUsuario(),
+                "movimentacoes_estoque",
+                $movimentacao->getIdMovimentacao(),
+                $param["tipo"],
+                null,
+                [
+                    "tipo" => $param["tipo"],
+                    "codigo_sigma" => empty($param["codigoSigma"]) ? null : $param["codigoSigma"],
+                    "ponto_solicitante" => $param["pontoSolicitante"],
+                    "nome_solicitante" => $param["nomeSolicitante"],
+                    "qtd_itens" => count($materiais),
+                ]
+            );
 
             $callback = [
                 "code" => 200,

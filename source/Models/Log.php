@@ -2,10 +2,53 @@
 
 namespace Source\Models;
 
+use Source\DAO\LogDAO;
+
 class Log
 {
+    /**
+     * Registra uma interação de dados (criação, edição, exclusão ou movimentação).
+     *
+     * O log é auxiliar ao sistema: qualquer falha no registro NUNCA deve
+     * interromper a operação principal que o originou.
+     *
+     * @param int|null      $id_usuario     Usuário responsável pela interação.
+     * @param string        $tabela_afetada Tabela onde ocorreu a interação.
+     * @param int           $id_registro    Identificação do registro afetado.
+     * @param string        $evento         INSERT | UPDATE | DELETE | ENTRADA | SAIDA.
+     * @param mixed         $valor_antigo   Estado anterior (array/obj vira JSON).
+     * @param mixed         $valor_novo     Estado posterior (array/obj vira JSON).
+     */
+    public static function registrar(?int $id_usuario, string $tabela_afetada, int $id_registro, string $evento, $valor_antigo = null, $valor_novo = null): void
+    {
+        try {
+            // Sem usuário identificado não há como registrar (FK obrigatória).
+            if (empty($id_usuario)) return;
+
+            $logDAO = new LogDAO();
+            $logDAO->salvarLog(
+                $id_usuario,
+                $tabela_afetada,
+                $id_registro,
+                $evento,
+                self::normalizarValor($valor_antigo),
+                self::normalizarValor($valor_novo)
+            );
+        } catch (\Throwable $e) {
+            // Log é auxiliar: falhas aqui são silenciadas para não afetar a operação.
+        }
+    }
+
+    private static function normalizarValor($valor): ?string
+    {
+        if (is_null($valor)) return null;
+        if (is_array($valor) || is_object($valor)) return json_encode($valor, JSON_UNESCAPED_UNICODE);
+
+        return (string) $valor;
+    }
+
     private INT $id_log;
-    private Usuario $usuario;
+    private ?Usuario $usuario;
     private INT $id_registro;
     private STRING $tabela_afetada;
     private STRING $evento;
@@ -16,7 +59,7 @@ class Log
 
     function __construct(
         INT $id_log = 0,
-        Usuario $usuario,
+        ?Usuario $usuario = null,
         INT $id_registro = 0,
         STRING $tabela_afetada = "",
         STRING $evento = "",
@@ -55,7 +98,7 @@ class Log
     /**
      * Get the value of usuario
      */
-    public function getUsuario(): Usuario
+    public function getUsuario(): ?Usuario
     {
         return $this->usuario;
     }
@@ -63,7 +106,7 @@ class Log
     /**
      * Set the value of usuario
      */
-    public function setUsuario(Usuario $usuario): self
+    public function setUsuario(?Usuario $usuario): self
     {
         $this->usuario = $usuario;
 
