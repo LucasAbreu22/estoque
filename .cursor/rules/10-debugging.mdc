@@ -1,0 +1,18 @@
+---
+description: Estratégia para investigação e correção de bugs
+alwaysApply: false
+---
+
+# Debugging
+
+- Primeiro reproduza ou identifique claramente o comportamento incorreto.
+- Localize a origem do problema antes de modificar código.
+- Não altere código baseado apenas em suposições quando for possível verificar.
+- Investigue o menor caminho necessário para reproduzir o problema.
+- Corrija a causa raiz, não apenas o sintoma.
+- Preserve comportamentos que já funcionam.
+- Após corrigir, teste o caso que falhava.
+- Faça pelo menos uma verificação de regressão nos comportamentos diretamente relacionados.
+- Não transforme uma correção de bug em uma refatoração geral.
+- Se a execução real for possível, prefira execução real a análise puramente estática.
+- Ao finalizar, informe a causa, a correção e os testes realizados.

@@ -1,0 +1,21 @@
+---
+description: Regras para desenvolvimento PHP e Laravel
+globs:
+    - "**/*.php"
+    - "composer.json"
+    - "artisan"
+alwaysApply: false
+---
+
+# PHP/Laravel
+
+- Respeite a arquitetura existente do projeto.
+- Antes de criar código, procure implementações existentes que possam ser reutilizadas.
+- Preserve compatibilidade com a versão do PHP e Laravel utilizada pelo projeto.
+- Não atualize dependências sem solicitação explícita.
+- Não altere composer.json ou composer.lock sem necessidade.
+- Preserve APIs públicas, rotas e contratos existentes.
+- Prefira correções localizadas em vez de refatorações amplas.
+- Mantenha responsabilidades existentes de Controllers, Services, Models e Views.
+- Valide alterações com testes ou execução real quando possível.
+- Não altere .env ou credenciais durante testes.

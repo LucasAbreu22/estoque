@@ -1,0 +1,24 @@
+---
+description: Regras gerais para trabalhar com máxima eficiência e mínimo consumo de contexto
+alwaysApply: true
+---
+
+# Eficiência
+
+- Trabalhe somente no escopo solicitado.
+- Antes de alterar código, identifique os arquivos diretamente envolvidos.
+- Leia somente o contexto necessário para entender e corrigir o problema.
+- Não percorra o projeto inteiro sem necessidade.
+- Não faça refatorações, melhorias ou alterações fora do escopo.
+- Prefira alterações pequenas e localizadas.
+- Reutilize código existente antes de criar novas abstrações.
+- Não crie dependências, arquivos ou estruturas sem necessidade.
+- Não reescreva arquivos inteiros quando uma alteração localizada for suficiente.
+- Não faça trabalho especulativo.
+- Se faltar contexto, investigue o código existente antes de perguntar.
+- Após alterar, execute somente os testes relevantes.
+- Se o terminal não funcionar, use outra forma segura disponível para executar o código real.
+- Remova arquivos temporários criados durante testes.
+- Nunca altere configurações de produção sem necessidade explícita.
+- Ao concluir, informe de forma objetiva: problema, alteração e resultado dos testes.
+- Depois de resolver e validar o problema, pare. Não continue procurando melhorias não solicitadas.

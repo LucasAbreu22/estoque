@@ -1,0 +1,20 @@
+---
+description: Regras para JavaScript
+globs:
+    - "**/*.js"
+    - "**/*.jsx"
+    - "**/*.ts"
+    - "**/*.tsx"
+alwaysApply: false
+---
+
+# JavaScript
+
+- Preserve o padrão existente do projeto.
+- Reutilize funções e componentes existentes.
+- Não introduza bibliotecas sem necessidade.
+- Não altere arquitetura sem solicitação.
+- Faça alterações mínimas.
+- Preserve compatibilidade com o ambiente atual.
+- Evite refatorações oportunistas.
+- Teste somente o fluxo afetado.
