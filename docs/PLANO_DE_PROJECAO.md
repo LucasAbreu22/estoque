@@ -32,11 +32,12 @@ Hoje a identificação do responsável é feita por um **cookie com o número do
 O registro de LOGs (`logs_sistema`) passou a funcionar para criação, edição e
 exclusão de materiais e usuários, além de ENTRADA/SAIDA de movimentações.
 
-- **Tela de auditoria**: página para consultar `logs_sistema` com filtros por
-  usuário, tabela, evento e período (o `LogDAO::getLogs` já foi preparado para isso).
-- **Diff visual**: exibir lado a lado `valor_antigo` × `valor_novo` (já são JSON).
-- **Retenção/arquivamento**: rotina para arquivar logs antigos e manter a tabela
-  performática.
+- ✅ **Tela de auditoria** *(CONCLUÍDO)*: página `/logs` consulta `logs_sistema`
+  com filtros por usuário (nome/ponto), tabela, evento e período, com paginação.
+- ✅ **Diff visual** *(CONCLUÍDO)*: exibe `valor_antigo` × `valor_novo` de forma
+  legível (JSON convertido em pares "campo: valor").
+- **Retenção/arquivamento** *(PENDENTE)*: rotina para arquivar logs antigos e
+  manter a tabela performática.
 
 ## 3. Integridade e Modelagem de Dados
 
@@ -90,8 +91,18 @@ exclusão de materiais e usuários, além de ENTRADA/SAIDA de movimentações.
 
 ### Priorização sugerida (curto → longo prazo)
 
-1. Tela de auditoria de LOGs + filtros. *(baixo esforço, alto valor)*
-2. Alertas de estoque mínimo e vencimento. *(alto valor operacional)*
-3. Perfis de acesso + CSRF/sessão. *(segurança)*
-4. Dashboard e exportações. *(gestão)*
-5. Refatorações de arquitetura e testes. *(sustentabilidade)*
+- ✅ **[CONCLUÍDO] Tela de auditoria de LOGs + filtros** — página `/logs` com
+  filtros (usuário, tabela, evento, período), paginação e diff anterior/novo.
+
+Próximas demandas (reordenadas):
+
+1. Alertas de estoque mínimo e vencimento. *(alto valor operacional)*
+2. Perfis de acesso + CSRF/sessão. *(segurança — ver ressalva abaixo)*
+3. Dashboard e exportações. *(gestão)*
+4. Retenção/arquivamento de logs antigos. *(sustentabilidade)*
+5. Refatorações de arquitetura e testes automatizados. *(sustentabilidade)*
+
+> Ressalva de contexto: o sistema **não trata dados sensíveis** e **não está
+> exposto à internet** (uso interno). Assim, itens de segurança (login por senha,
+> RBAC, CSRF) permanecem recomendados, porém de prioridade menor do que ganhos
+> operacionais como alertas e dashboard.

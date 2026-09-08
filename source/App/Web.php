@@ -54,6 +54,18 @@ class Web
         }
     }
 
+    public function logs(): void
+    {
+        try {
+
+            echo $this->view->render("logs", [
+                "title" => "Auditoria de LOGs",
+            ]);
+        } catch (\Throwable $e) {
+            echo json_encode(["message" => $e->getMessage()]);
+        }
+    }
+
     public function error($error): void
     {
         try {

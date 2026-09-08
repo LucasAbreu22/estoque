@@ -42,7 +42,7 @@ class LogDAO
         }
     }
 
-    public function getLogs(int $offset = 0, string $tabela_afetada = "")
+    public function getLogs(int $offset = 0, string $tabela_afetada = "", string $evento = "", string $buscarUsuario = "", string $dataInicial = "", string $dataFinal = "")
     {
         try {
             $sql = "SELECT 
@@ -54,17 +54,13 @@ class LogDAO
             INNER JOIN usuarios us ON lo.id_usuario = us.id_usuario
             WHERE 1=1";
 
-            if (!empty($tabela_afetada)) {
-                $sql .= " AND lo.tabela_afetada = :tabela_afetada";
-            }
+            $sql .= $this->montarFiltros($tabela_afetada, $evento, $buscarUsuario, $dataInicial, $dataFinal);
 
             $sql .= " ORDER BY lo.id_log DESC LIMIT 14 OFFSET :offset";
 
             $stmt = $this->connect->prepare($sql);
 
-            if (!empty($tabela_afetada)) {
-                $stmt->bindValue(":tabela_afetada", $tabela_afetada, PDO::PARAM_STR);
-            }
+            $this->vincularFiltros($stmt, $tabela_afetada, $evento, $buscarUsuario, $dataInicial, $dataFinal);
 
             $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
 
@@ -72,6 +68,69 @@ class LogDAO
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             throw new Exception("[ERRO][Log DAO 02]" . $e->getMessage());
+        }
+    }
+
+    public function contarLogs(string $tabela_afetada = "", string $evento = "", string $buscarUsuario = "", string $dataInicial = "", string $dataFinal = "")
+    {
+        try {
+            $sql = "SELECT count(*) AS qtdLogs
+            FROM logs_sistema lo
+            INNER JOIN usuarios us ON lo.id_usuario = us.id_usuario
+            WHERE 1=1";
+
+            $sql .= $this->montarFiltros($tabela_afetada, $evento, $buscarUsuario, $dataInicial, $dataFinal);
+
+            $stmt = $this->connect->prepare($sql);
+
+            $this->vincularFiltros($stmt, $tabela_afetada, $evento, $buscarUsuario, $dataInicial, $dataFinal);
+
+            $stmt->execute();
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            throw new Exception("[ERRO][Log DAO 03]" . $e->getMessage());
+        }
+    }
+
+    private function montarFiltros(string $tabela_afetada, string $evento, string $buscarUsuario, string $dataInicial, string $dataFinal): string
+    {
+        $sql = "";
+
+        if (!empty($tabela_afetada)) {
+            $sql .= " AND lo.tabela_afetada = :tabela_afetada";
+        }
+        if (!empty($evento)) {
+            $sql .= " AND lo.evento = :evento";
+        }
+        if (!empty($buscarUsuario)) {
+            $sql .= " AND (us.nome LIKE :buscarUsuario OR us.ponto LIKE :buscarUsuario)";
+        }
+        if (!empty($dataInicial)) {
+            $sql .= " AND lo.data_evento >= :dataInicial";
+        }
+        if (!empty($dataFinal)) {
+            $sql .= " AND lo.data_evento <= :dataFinal";
+        }
+
+        return $sql;
+    }
+
+    private function vincularFiltros($stmt, string $tabela_afetada, string $evento, string $buscarUsuario, string $dataInicial, string $dataFinal): void
+    {
+        if (!empty($tabela_afetada)) {
+            $stmt->bindValue(":tabela_afetada", $tabela_afetada, PDO::PARAM_STR);
+        }
+        if (!empty($evento)) {
+            $stmt->bindValue(":evento", $evento, PDO::PARAM_STR);
+        }
+        if (!empty($buscarUsuario)) {
+            $stmt->bindValue(":buscarUsuario", "%$buscarUsuario%", PDO::PARAM_STR);
+        }
+        if (!empty($dataInicial)) {
+            $stmt->bindValue(":dataInicial", $dataInicial, PDO::PARAM_STR);
+        }
+        if (!empty($dataFinal)) {
+            $stmt->bindValue(":dataFinal", $dataFinal, PDO::PARAM_STR);
         }
     }
 }

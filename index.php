@@ -46,6 +46,11 @@ $router->post("/", "Usuarios:getUsuarios");
 $router->post("/salvar", "Usuarios:salvarUsuario");
 $router->post("/excluir", "Usuarios:excluirUsuario");
 
+/* ROTA LOGS (AUDITORIA) */
+$router->group("logs");
+$router->get("/", "Web:logs");
+$router->post("/", "Logs:getLogs");
+
 $router->group("documento");
 $router->get("/comprovanteSaida/{id_movimentacao}", "Documentos:getComprovanteSaida");
 $router->get("/gerarRelatorio", "Documentos:gerarRelatorioEstoque");

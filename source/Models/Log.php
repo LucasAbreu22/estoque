@@ -220,4 +220,16 @@ class Log
 
         return $this;
     }
+
+    public function getLogs(int $offset = 0, string $tabela_afetada = "", string $evento = "", string $buscarUsuario = "", string $dataInicial = "", string $dataFinal = "")
+    {
+        $logDAO = new LogDAO();
+        return $logDAO->getLogs($offset, $tabela_afetada, $evento, $buscarUsuario, $dataInicial, $dataFinal);
+    }
+
+    public function contarLogs(string $tabela_afetada = "", string $evento = "", string $buscarUsuario = "", string $dataInicial = "", string $dataFinal = "")
+    {
+        $logDAO = new LogDAO();
+        return $logDAO->contarLogs($tabela_afetada, $evento, $buscarUsuario, $dataInicial, $dataFinal);
+    }
 }
