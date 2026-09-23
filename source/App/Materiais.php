@@ -170,7 +170,6 @@ class Materiais
             $movimentacao->setTipo($param["tipo"]);
             $movimentacao->setPontoSolicitante($param["pontoSolicitante"]);
             $movimentacao->setNomeSolicitante($param["nomeSolicitante"]);
-            $movimentacao->setUnidadeUtilizada('BASE');
 
             $materiais = $param["materiais"];
 
